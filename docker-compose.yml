@@ -1,6 +1,6 @@
 services:
   python-venv:
-    image: python-venv-3.12.9:v1.0
+    image: venv-3.12.9:v1.0
 #    build:
 #      context: .  # 上下文路径为当前目录, 如果使用dockerfile构建，则image是构建的镜像名
 #      dockerfile: Dockerfile  # 指定 Dockerfile 的相对路径
