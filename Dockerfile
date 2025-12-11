@@ -19,7 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     iproute2 net-tools iputils-ping \
  && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --upgrade pip
+# 安装 uv（官方推荐方式）
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:$PATH"
 
 # 准备 sshd 与 host keys
 RUN mkdir -p /var/run/sshd && ssh-keygen -A
