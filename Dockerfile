@@ -16,8 +16,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-server \
     vim curl git \
     build-essential \
-    iproute2 net-tools iputils-ping \
- && rm -rf /var/lib/apt/lists/*
+    iproute2 net-tools iputils-ping lsof \
+    && rm -rf /var/lib/apt/lists/*
 
 # 安装 uv（官方推荐方式）
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -45,7 +45,7 @@ EXPOSE 22
 
 # 轻量健康检查：确认 22 已监听（iproute2 的 ss 命令）
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD sh -c "ss -lnt | grep -q ':22 ' || exit 1"
+    CMD sh -c "ss -lnt | grep -q ':22 ' || exit 1"
 
 # 前台跑 sshd，日志打到 stderr 便于 docker logs
 CMD ["/usr/sbin/sshd", "-D", "-e"]
