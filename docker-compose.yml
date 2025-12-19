@@ -1,22 +1,24 @@
 services:
   python-venv:
     image: venv-3.12.9:v1.0
-#    build:
-#      context: .  # 上下文路径为当前目录, 如果使用dockerfile构建，则image是构建的镜像名
-#      dockerfile: Dockerfile  # 指定 Dockerfile 的相对路径
     container_name: python-venv
+    build:
+      context: . # 上下文路径为当前目录, 如果使用dockerfile构建，则image是构建的镜像名
+      dockerfile: Dockerfile # 指定 Dockerfile 的相对路径
     environment:
-      TZ: "UTC"  # 设置时区为 UTC
+      TZ: "UTC" # 设置时区为 UTC
     ports:
-      - "10022:22"  # 映射主机的 10222 端口到容器的 22 端口，用于 SSH 连接
-      - "8080:8080"  # 映射主机的 8080 端口到容器的 8080 端口（如果需要）
+      - "10022:22" # 映射主机的 10222 端口到容器的 22 端口，用于 SSH 连接
       - "8000:8000"
-    privileged: true  # 开启特权模式，允许容器执行某些操作（如访问宿主机硬件）
-    stdin_open: true  # 保持容器的标准输入打开
-    tty: true  # 分配伪终端
-    entrypoint: [ "sh" ]  # 默认启动 shell，可以更改为其他命令
+      - "8070:8070"
+      - "8080:8080"
+      - "8090:8090"
+    privileged: true # 开启特权模式，允许容器执行某些操作（如访问宿主机硬件）
+    stdin_open: true # 保持容器的标准输入打开
+    tty: true # 分配伪终端
+    entrypoint: ["sh"] # 默认启动 shell，可以更改为其他命令
     networks:
-      - common-network  # 使用共享网络
+      - common-network # 使用共享网络
 
   mysql:
     image: "mysql:8.0.30"
@@ -24,7 +26,7 @@ services:
     ports:
       - "3306:3306"
     environment:
-      TZ: "Asia/Shanghai"
+      TZ: "UTC"
       MYSQL_ROOT_USER: "root"
       MYSQL_ROOT_PASSWORD: "123456"
     volumes:
@@ -33,6 +35,20 @@ services:
       - "./mysql/logs:/var/log/mysql"
     # root
     privileged: true
+    networks:
+      - common-network
+
+  redis:
+    image: "redis:6.0.16"
+    container_name: redis-server
+    ports:
+      - "6379:6379"
+    environment:
+      TZ: "UTC"
+    command: redis-server --requirepass 123456
+    volumes:
+      - "./redis/data:/data"
+      - "./redis-6.0.16/redis.conf:/etc/redis/redis.conf"
     networks:
       - common-network
 
