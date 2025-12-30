@@ -16,7 +16,6 @@ services:
     privileged: true # 开启特权模式，允许容器执行某些操作（如访问宿主机硬件）
     stdin_open: true # 保持容器的标准输入打开
     tty: true # 分配伪终端
-    entrypoint: ["sh"] # 默认启动 shell，可以更改为其他命令
     networks:
       - common-network # 使用共享网络
 
