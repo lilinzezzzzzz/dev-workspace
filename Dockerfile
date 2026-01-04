@@ -11,6 +11,10 @@ ENV TZ=Etc/UTC \
 
 WORKDIR /app
 
+# 替换为阿里云镜像源（Debian Bookworm）
+RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources && \
+    sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources
+
 # 基础工具 + sshd；--no-install-recommends 降低体积
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-server \
