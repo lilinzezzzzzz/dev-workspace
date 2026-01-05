@@ -11,6 +11,7 @@ ENV TZ=Etc/UTC \
 
 WORKDIR /app
 
+RUN echo "set mouse=" >> /root/.vimrc
 # 替换为阿里云镜像源（Debian Bookworm）
 RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources && \
     sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources
