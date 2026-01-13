@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     iproute2 net-tools iputils-ping lsof \
     libmagic1 libmagic-dev \
+    libreoffice-writer \
     && rm -rf /var/lib/apt/lists/*
 
 # 安装 uv（官方推荐方式）

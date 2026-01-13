@@ -19,23 +19,6 @@ services:
     networks:
       - common-network # 使用共享网络
 
-  python-venv-3.12.9:
-    image: venv-3.12.9:v1.0
-    container_name: python-venv-3.12.9
-    build:
-      context: . # 上下文路径为当前目录, 如果使用dockerfile构建，则image是构建的镜像名
-      dockerfile: Dockerfile # 指定 Dockerfile 的相对路径
-    environment:
-      TZ: "UTC" # 设置时区为 UTC
-    ports:
-      - "10222:22" # 映射主机的 10222 端口到容器的 22 端口，用于 SSH 连接
-      - "8010:8010"
-    privileged: true # 开启特权模式，允许容器执行某些操作（如访问宿主机硬件）
-    stdin_open: true # 保持容器的标准输入打开
-    tty: true # 分配伪终端
-    networks:
-      - common-network # 使用共享网络
-
   mysql:
     image: "mysql:8.0.30"
     container_name: mysql-server
