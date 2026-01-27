@@ -19,23 +19,23 @@ services:
     networks:
       - common-network # 使用共享网络
 
-  mysql:
-    image: "mysql:8.0.30"
-    container_name: mysql-server
-    ports:
-      - "3306:3306"
-    environment:
-      TZ: "UTC"
-      MYSQL_ROOT_USER: "root"
-      MYSQL_ROOT_PASSWORD: "123456"
-    volumes:
-      - "./mysql-8.0.30/data:/var/lib/mysql"
-      - "./mysql-8.0.30/conf:/etc/mysql/conf.d"
-      - "./mysql-8.0.30/logs:/var/log/mysql"
-    # root
-    privileged: true
-    networks:
-      - common-network
+  # mysql:
+  #   image: "mysql:8.0.30"
+  #   container_name: mysql-server
+  #   ports:
+  #     - "3306:3306"
+  #   environment:
+  #     TZ: "UTC"
+  #     MYSQL_ROOT_USER: "root"
+  #     MYSQL_ROOT_PASSWORD: "123456"
+  #   volumes:
+  #     - "./mysql-8.0.30/data:/var/lib/mysql"
+  #     - "./mysql-8.0.30/conf:/etc/mysql/conf.d"
+  #     - "./mysql-8.0.30/logs:/var/log/mysql"
+  #   # root
+  #   privileged: true
+  #   networks:
+  #     - common-network
 
   redis:
     image: "redis:6.0.16"
