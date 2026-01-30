@@ -8,12 +8,27 @@ services:
     environment:
       TZ: "UTC" # 设置时区为 UTC
     ports:
-      - "10022:22" # 映射主机的 10222 端口到容器的 22 端口，用于 SSH 连接
+      - "10022:22" # 映射主机的 10222 端口到容器的 22 端口,用于 SSH 连接
       - "8000:8000"
       - "8070:8070"
       - "8080:8080"
       - "8090:8090"
-    privileged: true # 开启特权模式，允许容器执行某些操作（如访问宿主机硬件）
+    volumes:
+      # 挂载 SSH 密钥到临时目录
+      - "${USERPROFILE}/.ssh:/tmp/host-ssh:ro"
+    privileged: true # 开启特权模式,允许容器执行某些操作(如访问宿主机硬件)
+    # 复制 SSH 密钥并修复权限
+    command: >
+      sh -c '
+        if [ -d /tmp/host-ssh ]; then
+          rm -rf /root/.ssh;
+          cp -r /tmp/host-ssh /root/.ssh;
+          chmod 700 /root/.ssh;
+          chmod 600 /root/.ssh/* 2>/dev/null || true;
+          chmod 644 /root/.ssh/*.pub 2>/dev/null || true;
+        fi;
+        exec /usr/sbin/sshd -D -e
+      '
     stdin_open: true # 保持容器的标准输入打开
     tty: true # 分配伪终端
     networks:
