@@ -3,6 +3,7 @@ FROM python:3.11.10-slim
 ENV TZ=Etc/UTC \
     LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
+    TERM=xterm-256color \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
@@ -11,7 +12,13 @@ ENV TZ=Etc/UTC \
 
 WORKDIR /app
 
-RUN echo "set mouse=" >> /root/.vimrc
+# 启用 bash 颜色支持
+RUN echo "set mouse=" >> /root/.vimrc && \
+    echo 'export PS1="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /root/.bashrc && \
+    echo 'alias ls="ls --color=auto"' >> /root/.bashrc && \
+    echo 'alias ll="ls -lh --color=auto"' >> /root/.bashrc && \
+    echo 'alias grep="grep --color=auto"' >> /root/.bashrc && \
+    echo 'export TERM=xterm-256color' >> /root/.bashrc
 # 替换为阿里云镜像源（Debian Bookworm）
 RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources && \
     sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources
