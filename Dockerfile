@@ -26,12 +26,9 @@ RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debia
 # 基础工具 + sshd；--no-install-recommends 降低体积
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-server \
-    vim curl git \
+    vim curl git wget unzip \
     build-essential \
     iproute2 net-tools iputils-ping lsof \
-    libmagic1 libmagic-dev \
-    libreoffice-writer \
-    fonts-noto-cjk \
     && rm -rf /var/lib/apt/lists/*
 
 # 安装 uv（官方推荐方式）
