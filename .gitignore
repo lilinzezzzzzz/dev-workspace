@@ -6,18 +6,12 @@
 mysql/data/*
 mysql/logs/*
 
-mysql-8.0.30/data/*
-mysql-8.0.30/logs/*
-
 # Elasticsearch
 elasticsearch/data/*
 
 # Redis
 redis/data/*
 redis/logs/*
-
-redis-6.0.16/data/*
-redis-6.0.16/logs/*
 
 # MongoDB
 mongodb/db/*
@@ -141,6 +135,13 @@ configs/.secrets
 *.key
 .env.local
 .env.*.local
+
+# SSH Keys
+ssh-keys/config
+ssh-keys/id_rsa
+ssh-keys/id_rsa.pub
+ssh-keys/known_hosts
+ssh-keys/known_hosts.old
 
 # Type checkers
 .mypy_cache/

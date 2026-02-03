@@ -1,6 +1,6 @@
 services:
   python-venv:
-    image: venv-3.11.10:v1.0
+    image: python-uv-env:latest
     container_name: python-venv
     build:
       context: . # 上下文路径为当前目录, 如果使用dockerfile构建，则image是构建的镜像名
@@ -14,51 +14,18 @@ services:
       - "8080:8080"
       - "8090:8090"
     volumes:
-      # 挂载 SSH 密钥到临时目录
-      - "${USERPROFILE}/.ssh:/tmp/host-ssh:ro"
-    privileged: true # 开启特权模式,允许容器执行某些操作(如访问宿主机硬件)
-    # 复制 SSH 密钥并修复权限
-    command: >
-      sh -c '
-        if [ -d /tmp/host-ssh ]; then
-          rm -rf /root/.ssh;
-          cp -r /tmp/host-ssh /root/.ssh;
-          chmod 700 /root/.ssh;
-          chmod 600 /root/.ssh/* 2>/dev/null || true;
-          chmod 644 /root/.ssh/*.pub 2>/dev/null || true;
-          if [ -f /root/.ssh/id_rsa.pub ]; then
-            cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys;
-            chmod 600 /root/.ssh/authorized_keys;
-          fi;
-        fi;
-        exec /usr/sbin/sshd -D -e
-      '
+      # 挂载 SSH 密钥（仅挂载必要文件）
+      - "./ssh-keys/id_rsa:/tmp/host-ssh/id_rsa:ro"
+      - "./ssh-keys/id_rsa.pub:/tmp/host-ssh/id_rsa.pub:ro"
+    privileged: true # 开启特权模式
     stdin_open: true # 保持容器的标准输入打开
     tty: true # 分配伪终端
     networks:
       - common-network # 使用共享网络
 
-  # mysql:
-  #   image: "mysql:8.0.30"
-  #   container_name: mysql-server
-  #   ports:
-  #     - "3306:3306"
-  #   environment:
-  #     TZ: "UTC"
-  #     MYSQL_ROOT_USER: "root"
-  #     MYSQL_ROOT_PASSWORD: "123456"
-  #   volumes:
-  #     - "./mysql-8.0.30/data:/var/lib/mysql"
-  #     - "./mysql-8.0.30/conf:/etc/mysql/conf.d"
-  #     - "./mysql-8.0.30/logs:/var/log/mysql"
-  #   # root
-  #   privileged: true
-  #   networks:
-  #     - common-network
-
   redis:
     image: "redis:6.0.16"
-    container_name: redis-server
+    container_name: redis
     ports:
       - "6379:6379"
     environment:
@@ -66,7 +33,7 @@ services:
     command: redis-server --requirepass 123456
     volumes:
       - "./redis/data:/data"
-      - "./redis-6.0.16/redis.conf:/etc/redis/redis.conf"
+      - "./redis/redis.conf:/etc/redis/redis.conf"
     networks:
       - common-network
 

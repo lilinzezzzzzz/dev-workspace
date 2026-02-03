@@ -1,4 +1,4 @@
-FROM python:3.11.10-slim
+FROM buildpack-deps:bookworm
 
 ENV TZ=Etc/UTC \
     LANG=C.UTF-8 \
@@ -6,9 +6,9 @@ ENV TZ=Etc/UTC \
     TERM=xterm-256color \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_INDEX_URL=https://mirrors.aliyun.com/pypi/simple \
-    PIP_NO_CACHE_DIR=1
+    UV_PYTHON_INSTALL_DIR=/opt/python \
+    UV_PYTHON_PREFERENCE=only-managed \
+    UV_INDEX_URL=https://mirrors.aliyun.com/pypi/simple
 
 WORKDIR /app
 
@@ -23,17 +23,25 @@ RUN echo "set mouse=" >> /root/.vimrc && \
 RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources && \
     sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources
 
-# 基础工具 + sshd；--no-install-recommends 降低体积
+# 基础工具 + sshd
+# buildpack-deps 已包含: curl, wget, git, build-essential
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-server \
-    vim curl git wget unzip \
-    build-essential \
+    vim unzip \
     iproute2 net-tools iputils-ping lsof \
     && rm -rf /var/lib/apt/lists/*
 
 # 安装 uv（官方推荐方式）
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-ENV PATH="/root/.local/bin:$PATH"
+ENV PATH="/root/.local/bin:/opt/python/bin:$PATH"
+
+# 使用 uv 安装多个 Python 版本
+RUN uv python install 3.11.10 && \
+    uv python install 3.12.9 && \
+    uv python pin 3.11.10
+
+# 验证安装的 Python 版本
+RUN uv python list
 
 # 准备 sshd 与 host keys
 RUN mkdir -p /var/run/sshd && ssh-keygen -A
@@ -53,11 +61,14 @@ RUN sed -ri 's/^#?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config 
     sed -ri 's@^#?AuthorizedKeysFile .*@AuthorizedKeysFile .ssh/authorized_keys@' /etc/ssh/sshd_config && \
     mkdir -p /root/.ssh && chmod 700 /root/.ssh
 
+# 复制入口脚本：处理 SSH 密钥并启动 sshd
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 EXPOSE 22
 
-# 轻量健康检查：确认 22 已监听（iproute2 的 ss 命令）
+# 轻量健康检查：确认 22 已监听
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD sh -c "ss -lnt | grep -q ':22 ' || exit 1"
 
-# 前台跑 sshd，日志打到 stderr 便于 docker logs
-CMD ["/usr/sbin/sshd", "-D", "-e"]
+ENTRYPOINT ["/entrypoint.sh"]
