@@ -35,6 +35,17 @@ if [ -f "$HOST_SSH_DIR/known_hosts" ]; then
     echo "[SSH] known_hosts 已复制"
 fi
 
+# 配置 SSH 客户端：禁用严格的主机密钥检查（开发环境）
+if [ ! -f "$SSH_DIR/config" ]; then
+    cat > "$SSH_DIR/config" << 'EOF'
+Host *
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+EOF
+    chmod 600 "$SSH_DIR/config"
+    echo "[SSH] 已配置自动接受主机密钥（开发环境）"
+fi
+
 echo "[SSH] 配置完成"
 
 # 启动 sshd

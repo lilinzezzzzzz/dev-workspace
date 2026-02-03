@@ -1,0 +1,306 @@
+{
+  // ==================== Go 基础配置 ====================
+  // Go 语言服务器 (gopls)
+  "go.useLanguageServer": true,
+  // GOROOT 路径 (通常自动检测)
+  // "go.goroot": "",
+  // GOPATH 路径 (通常自动检测)
+  // "go.gopath": "",
+  // 启用 Go Modules
+  "go.toolsManagement.autoUpdate": true,
+
+  // ==================== 编辑器配置 ====================
+  "[go]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    "editor.rulers": [
+      80,
+      120
+    ],
+    "editor.tabSize": 4,
+    "editor.insertSpaces": false,
+    "editor.defaultFormatter": "golang.go"
+  },
+  "[go.mod]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "golang.go"
+  },
+  "[go.sum]": {
+    "editor.formatOnSave": false
+  },
+
+  // ==================== gopls 语言服务器配置 ====================
+  "gopls": {
+    // 静态分析
+    "staticcheck": true,
+    // 代码补全
+    "completeUnimported": true,
+    "usePlaceholders": true,
+    // 代码提示
+    "analyses": {
+      "unusedparams": true,
+      "shadow": true,
+      "fieldalignment": false,
+      "nilness": true,
+      "unusedwrite": true,
+      "useany": true
+    },
+    // 提示配置
+    "hints": {
+      "assignVariableTypes": false,
+      "compositeLiteralFields": true,
+      "compositeLiteralTypes": false,
+      "constantValues": true,
+      "functionTypeParameters": false,
+      "parameterNames": true,
+      "rangeVariableTypes": false
+    },
+    // 代码导航
+    "importShortcut": "Both",
+    // 语义高亮
+    "semanticTokens": true,
+    // 诊断延迟 (毫秒)
+    "diagnosticsDelay": "500ms"
+  },
+
+  // ==================== 代码格式化 ====================
+  // 使用 gofumpt (更严格的格式化, 需要安装)
+  "go.formatTool": "goimports",
+  // Lint 工具
+  "go.lintTool": "golangci-lint",
+  "go.lintFlags": [
+    "--fast"
+  ],
+  "go.lintOnSave": "package",
+
+  // ==================== 测试配置 ====================
+  "go.testFlags": [
+    "-v",
+    "-race"
+  ],
+  "go.testTimeout": "30s",
+  "go.coverOnSave": false,
+  "go.coverOnSingleTest": true,
+  "go.coverOnSingleTestFile": true,
+  "go.coverageDecorator": {
+    "type": "gutter",
+    "coveredHighlightColor": "rgba(64,128,64,0.5)",
+    "uncoveredHighlightColor": "rgba(128,64,64,0.5)",
+    "coveredGutterStyle": "blockgreen",
+    "uncoveredGutterStyle": "blockred"
+  },
+
+  // ==================== 构建配置 ====================
+  "go.buildOnSave": "off",
+  "go.buildFlags": [],
+  "go.buildTags": "",
+
+  // ==================== 调试配置 ====================
+  "go.delveConfig": {
+    "dlvLoadConfig": {
+      "followPointers": true,
+      "maxVariableRecurse": 1,
+      "maxStringLen": 512,
+      "maxArrayValues": 64,
+      "maxStructFields": -1
+    },
+    "apiVersion": 2,
+    "showGlobalVariables": false,
+    "debugAdapter": "dlv-dap"
+  },
+
+  // ==================== 文件关联 ====================
+  "files.associations": {
+    "*.go": "go",
+    "go.mod": "go.mod",
+    "go.sum": "go.sum",
+    "*.tmpl": "html",
+    "*.gohtml": "html",
+    "*.yaml": "yaml",
+    "*.yml": "yaml"
+  },
+
+  // ==================== 文件排除 ====================
+  "files.exclude": {
+    "**/vendor": true,
+    "**/.git": true,
+    "**/bin": true,
+    "**/dist": true
+  },
+
+  // ==================== 搜索排除 ====================
+  "search.exclude": {
+    "**/vendor": true,
+    "**/node_modules": true,
+    "**/*.lock": true,
+    "**/go.sum": true
+  },
+
+  // ==================== YAML 配置 ====================
+  "[yaml]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.autoIndent": "advanced"
+  },
+
+  // ==================== JSON 配置 ====================
+  "[json]": {
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[jsonc]": {
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true
+  },
+
+  // ==================== Makefile 配置 ====================
+  "[makefile]": {
+    "editor.insertSpaces": false,
+    "editor.tabSize": 4
+  },
+
+  // ==================== Dockerfile 配置 ====================
+  "[dockerfile]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true
+  },
+
+  // ==================== Git 配置 ====================
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  // 禁用自动拉取，避免后台重复执行 Git 命令
+  "git.autofetch": false,
+  // 默认显示工作树中的所有更改
+  "git.showUntrackedFiles": true,
+  // 启用装饰器（显示文件的Git状态标记）
+  "git.decorations.enabled": true,
+  // 减少 Git 轮询频率，避免重复命令(毫秒)
+  "git.autorefresh": true,
+  "git.refreshInterval": 5000,
+  // 禁用空消息提交，必须填写 commit message
+  "git.allowNoVerifyCommit": false,
+  "git.inputValidation": true,
+  "git.inputValidationLength": 5,
+  "git.inputValidationSubjectLength": 50,
+
+  // ==================== 终端配置 ====================
+  "terminal.integrated.env.windows": {
+    "GOFLAGS": "-mod=mod"
+  },
+  // 终端字体大小
+  "terminal.integrated.fontSize": 13,
+  // 终端字体家族(使用与编辑器相同的等宽字体)
+  "terminal.integrated.fontFamily": "'Source Code Pro', 'Courier New', monospace",
+  // 终端字体粗细(normal, bold, 100-900)
+  "terminal.integrated.fontWeight": "normal",
+  // 终端行高(像素值,1.0为默认)
+  "terminal.integrated.lineHeight": 1.0,
+  // 终端右键行为
+  "terminal.integrated.rightClickBehavior": "default",
+
+  // ==================== 其他 ====================
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.stickyScroll.enabled": true,
+
+  // ==================== 编辑器增强配置 ====================
+  // 自动保存(窗口失去焦点时)
+  "files.autoSave": "onFocusChange",
+  // 自动补全括号/引号
+  "editor.autoClosingBrackets": "always",
+  "editor.autoClosingQuotes": "always",
+  // 括号内自动补全空格
+  "editor.autoSurround": "languageDefined",
+  // 光标闪烁样式
+  "editor.cursorBlinking": "smooth",
+  // 光标平滑动画
+  "editor.cursorSmoothCaretAnimation": "on",
+  // 小地图配置
+  "editor.minimap.enabled": true,
+  "editor.minimap.maxColumn": 80,
+  "editor.minimap.renderCharacters": false,
+  // 滚动平滑动画
+  "editor.smoothScrolling": true,
+  // 显示空白字符(boundary:仅在单词边界显示)
+  "editor.renderWhitespace": "boundary",
+  // 显示缩进参考线
+  "editor.guides.indentation": true,
+  // 高亮显示当前行
+  "editor.renderLineHighlight": "all",
+  // 启用内联建议
+  "editor.inlineSuggest.enabled": true,
+  // 编辑器圆角边框
+  "editor.roundedSelection": true,
+
+  // ==================== 空格与换行控制 ====================
+  // 文件末尾自动添加空行
+  "files.insertFinalNewline": true,
+  // 自动删除文件末尾多余的空行
+  "files.trimFinalNewlines": true,
+  // 保存时自动删除行尾空格
+  "files.trimTrailingWhitespace": true,
+  // 文件编码(UTF-8)
+  "files.encoding": "utf8",
+  // 行结束符(Linux/macOS使用LF)
+  "files.eol": "\n",
+  // 自动检测缩进
+  "editor.detectIndentation": true,
+  // 自动缩进策略
+  "editor.autoIndent": "full",
+  // 自动换行
+  "editor.wordWrap": "off",
+  // 换行列宽度
+  "editor.wordWrapColumn": 120,
+  // 显示控制字符
+  "editor.renderControlCharacters": true,
+
+  // ==================== 字体配置 ====================
+  // 编辑器字体家族（推荐使用等宽字体）
+  "editor.fontFamily": "'Source Code Pro', 'Courier New', monospace",
+  // 字体大小
+  "editor.fontSize": 13,
+  // 启用字体连字
+  "editor.fontLigatures": true,
+  // 字体粗细
+  "editor.fontWeight": "400",
+  // 行高
+  "editor.lineHeight": 0,
+  // 字母间距
+  "editor.letterSpacing": 0,
+
+  // ==================== 标题栏显示优化 ====================
+  // 窗口标题栏：只显示文件名和工作区名称
+  "window.title": "${dirty}${activeEditorShort}${separator}${rootName}",
+  // 标签页显示：短格式
+  "workbench.editor.labelFormat": "short",
+  // 限制打开的编辑器数量
+  "workbench.editor.limit.enabled": true,
+  "workbench.editor.limit.value": 5,
+  "workbench.editor.limit.perEditorGroup": true,
+
+  // ==================== 主题配置 ====================
+  // 颜色主题
+  "workbench.colorTheme": "One Dark Pro Night Flat",
+  // 文件图标主题
+  "workbench.iconTheme": "material-icon-theme",
+  // 产品图标主题
+  "workbench.productIconTheme": "material-product-icons",
+  "workbench.editor.tabActionLocation": "right",
+
+  // ==================== 标签页颜色自定义 ====================
+  "workbench.colorCustomizations": {
+    "tab.activeBackground": "#3a4f6b",
+    "tab.activeForeground": "#ffffff",
+    "tab.activeBorder": "#61afef",
+    "tab.activeBorderTop": "#4fa8ff",
+    "tab.inactiveBackground": "#181b20",
+    "tab.inactiveForeground": "#6b7280"
+  },
+
+  // ==================== 注释翻译 ====================
+  "commentTranslate.multiLineMerge": false,
+  "commentTranslate.targetLanguage": "zh-CN"
+}

@@ -29,6 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-server \
     vim unzip \
     iproute2 net-tools iputils-ping lsof \
+    bubblewrap \
     && rm -rf /var/lib/apt/lists/*
 
 # 安装 uv（官方推荐方式）

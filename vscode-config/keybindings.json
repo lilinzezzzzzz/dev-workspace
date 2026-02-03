@@ -1,0 +1,14 @@
+[
+  // ==================== 格式化文档快捷键 ====================
+  // 将格式化文档快捷键从 Shift+Alt+F 改为 Ctrl+Alt+F
+  {
+    "key": "ctrl+alt+f",
+    "command": "editor.action.formatDocument",
+    "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
+  },
+  // 移除原有的 Shift+Alt+F 快捷键(可选)
+  {
+    "key": "shift+alt+f",
+    "command": "-editor.action.formatDocument"
+  }
+]
