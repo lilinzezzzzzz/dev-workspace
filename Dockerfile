@@ -62,7 +62,7 @@ RUN sed -ri 's/^#?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config 
     mkdir -p /root/.ssh && chmod 700 /root/.ssh
 
 # 复制入口脚本：处理 SSH 密钥并启动 sshd
-COPY entrypoint.sh /entrypoint.sh
+COPY scripts/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 EXPOSE 22

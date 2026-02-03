@@ -3,23 +3,23 @@
 ################################################################################
 
 # MySQL
-mysql/data/*
-mysql/logs/*
+infras/mysql/data/*
+infras/mysql/logs/*
 
 # Elasticsearch
-elasticsearch/data/*
+infras/elasticsearch/data/*
 
 # Redis
-redis/data/*
-redis/logs/*
+infras/redis/data/*
+infras/redis/logs/*
 
 # MongoDB
-mongodb/db/*
-mongodb/logs/*
+infras/mongodb/db/*
+infras/mongodb/logs/*
 
 # ClickHouse
-clickhouse/data/*
-clickhouse/logs/*
+infras/clickhouse/data/*
+infras/clickhouse/logs/*
 
 # Docker specific
 *.sdi

@@ -32,8 +32,8 @@ services:
       TZ: "UTC"
     command: redis-server --requirepass 123456
     volumes:
-      - "./redis/data:/data"
-      - "./redis/redis.conf:/etc/redis/redis.conf"
+      - "./infras/redis/data:/data"
+      - "./infras/redis/redis.conf:/etc/redis/redis.conf"
     networks:
       - common-network
 

@@ -31,6 +31,19 @@ if [ ! -d "$SSH_SOURCE_DIR" ]; then
     exit 1
 fi
 
+# 检查私钥文件是否存在
+if [ ! -f "$SSH_SOURCE_DIR/id_rsa" ] && [ ! -f "$SSH_SOURCE_DIR/id_ed25519" ]; then
+    echo -e "${RED}错误: 未找到SSH密钥文件 (id_rsa 或 id_ed25519)${NC}"
+    echo -e "${YELLOW}请先生成SSH密钥:${NC}"
+    echo -e "  ${GREEN}ssh-keygen -t rsa -b 4096${NC}"
+    echo -e "  或"
+    echo -e "  ${GREEN}ssh-keygen -t ed25519${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✓ 检测到SSH密钥${NC}"
+echo ""
+
 echo -e "${YELLOW}源目录: $SSH_SOURCE_DIR${NC}"
 echo -e "${YELLOW}目标目录: $SCRIPT_DIR${NC}"
 echo ""

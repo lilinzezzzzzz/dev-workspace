@@ -1,6 +1,0 @@
-docker build -t ubuntu3.6.2:v1 .
-
-docker run -itd --name ubuntu-3.6.2 -e TZ=Asia/Shanghai -p 10022:10022 -p 8088:8088 ubuntu:18.04 /bin/bash
-
-
-docker run -itd --name py-3.10.4 -e TZ=Asia/Shanghai -p 10023:10023 fc700cbfd643 /bin/bash

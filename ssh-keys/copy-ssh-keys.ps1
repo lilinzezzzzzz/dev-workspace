@@ -35,6 +35,22 @@ if (-not (Test-Path $SshSourceDir)) {
     exit 1
 }
 
+# 检查私钥文件是否存在
+$rsaKey = Join-Path $SshSourceDir "id_rsa"
+$ed25519Key = Join-Path $SshSourceDir "id_ed25519"
+
+if (-not (Test-Path $rsaKey) -and -not (Test-Path $ed25519Key)) {
+    Write-ColorOutput Red "错误: 未找到SSH密钥文件 (id_rsa 或 id_ed25519)"
+    Write-ColorOutput Yellow "请先生成SSH密钥:"
+    Write-Output "  ssh-keygen -t rsa -b 4096"
+    Write-Output "  或"
+    Write-Output "  ssh-keygen -t ed25519"
+    exit 1
+}
+
+Write-ColorOutput Green "✓ 检测到SSH密钥"
+Write-Output ""
+
 Write-ColorOutput Yellow "源目录: $SshSourceDir"
 Write-ColorOutput Yellow "目标目录: $ScriptDir"
 Write-Output ""

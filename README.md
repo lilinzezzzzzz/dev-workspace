@@ -1,203 +1,230 @@
-# docker-env
+# Docker Python 开发环境
 
-## 注意事项
+基于 Docker 的 Python 多版本开发环境，使用 `uv` 管理 Python 版本和虚拟环境。
 
-- 此项目基于docker,docker-compose。用于快速构建Python开发环境以及一些可能需要的中间件。
-- 使用`容器网络模式`，所以中间件和Python容器一个网络。映射出一些常用的端口，所以服务之间可以使用`127.0.0.1`访问。
-- 如果需要构建其他的Python环境,可以使用指定容器模式链接到`docker-rnv_default`网络。
-- 构建的Python环境需要用ssh或者sftp远程链接使用，默认映射端口`10029:22`， 可以按需在docker-compose修改。
-- ./command.py 常用的docker命令
-- ./info.txt 中间件的一些命令
-- 中间件版本按需指定，ES分词器需要自己匹配
-- ./test 用于构建单个Python解释器
+## 特性
 
-## 清华镜像
+- **多版本 Python**: 预装 Python 3.11.10 和 3.12.9，支持随时安装其他版本
+- **uv 包管理**: 使用 uv 替代 pip，速度提升 10-100 倍
+- **SSH 免密登录**: 支持从宿主机免密登录容器
+- **Git SSH 支持**: 容器内可直接拉取/推送代码到远程仓库
+- **共享网络**: 容器间使用 `common-network`，支持 `127.0.0.1` 互访
+- **一键部署**: 提供跨平台自动化部署脚本
 
-```shell
-https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/
+## 快速开始
+
+### 前置条件
+
+1. 安装 [Docker Desktop](https://www.docker.com/products/docker-desktop)
+2. 确保本机已生成 SSH 密钥：
+   ```bash
+   # 如果没有，先生成
+   ssh-keygen -t rsa -b 4096
+   ```
+
+### 一键部署
+
+**Windows:**
+```powershell
+.\setup.ps1
 ```
 
-## 使用
-
-- 使用docker-compose构建之前，先确定你要使用的Python容器是基于什么Linux版本，不同的版本需要不同的source.list（`tail /etc/os-release 查看操作系统` ）。
-- 确定好操作系统，更换Dockerfile构建文件夹得source.list
-- docker-compose up -d
-- 各个中间件远程访问都已经配置完成
-- 启动服务之后，需要进去py-env容器，配置SSH远程访问，并且重启SSH
-
-## 远程登录
-
-```sql
-use mysql;
-select host, user, authentication_string, plugin from user;
-update user set host='%' where user='root';
-
-ALTER USER 'root'@'%' IDENTIFIED BY 'password' PASSWORD EXPIRE NEVER;
-ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
-
-ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '123456!';
+**Linux/Mac:**
+```bash
+chmod +x setup.sh
+./setup.sh
 ```
 
-### Redis
+脚本会自动完成：
+1. 检查 Docker 环境
+2. 检查并复制 SSH 密钥
+3. 设置私钥权限
+4. 构建 Docker 镜像
+5. 启动服务
 
-```docker
-info Server  # 查看redis信息
-docker run -itd --name nosugar-redis -p 6379:6379 redis 
-docker run -itd --name nosugar-redis -p 6379:6379 -v "d:\docker-volume\redis\redis.conf:/etc/redis/redis.conf" -v "d:\docker-volume\redis\logs\redis.log:/var/log/redis/redis.log" -v "d:\docker-volume\redis\data:/data" redis
+## 服务列表
+
+| 服务 | 容器名 | 端口映射 | 说明 |
+|-----|-------|---------|------|
+| python-venv | python-venv | 10022→22, 8000-8090 | Python 开发环境 |
+| redis | redis | 6379→6379 | Redis 缓存服务 |
+
+## 连接方式
+
+### SSH 连接容器
+
+```bash
+# 免密登录（推荐）
+ssh -i ./ssh-keys/id_rsa root@localhost -p 10022
+
+# 密码登录（密码: 123456）
+ssh root@localhost -p 10022
 ```
 
-### Elasticsearch
+### 进入容器
 
-```docker
-http.cors.enabled: true
-http.cors.allow-origin: "*"
-
-docker pull elasticsearch:6.5.4
-
-docker run --name es-env -itd -e ES_JAVA_OPTS="-Xms256m -Xmx256m" -e "discovery.type=single-node" -p 9200:9200 -p 9300:9300 elasticsearch:6.5.4
-
-docker run --name es-env -itd -e ES_JAVA_OPTS="-Xms256m -Xmx256m" --net host --restart=always -e "discovery.type=single-node" -p 9200:9200 -p 9300:9300 elasticsearch:6.5.4
-
-elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v6.5.4/elasticsearch-analysis-ik-6.5.4.zip
-
-curl -X GET 127.0.0.1:9200/_analyze?pretty -H 'content-Type:application/json' -d '{"analyzer": "ik_max_word", "text": "我是&中国人"}'
+```bash
+docker exec -it python-venv bash
 ```
 
-查看操作系统
+### Redis 连接
 
-```shell
-tail /etc/os-release 
+```bash
+redis-cli -h localhost -p 6379 -a 123456
 ```
 
-查看端口进程
+## Python 版本管理
 
-```shell
-lsof -i tcp:port
+容器内使用 `uv` 管理 Python 版本：
+
+```bash
+# 查看已安装的 Python 版本
+uv python list
+
+# 安装新版本
+uv python install 3.13
+
+# 切换默认版本
+uv python pin 3.12.9
 ```
 
-离线下载所有包，依赖
+## 项目开发
 
-```python
-pip download -d path flask
-pip download -d flasgger
+### 创建虚拟环境
+
+```bash
+# 使用默认 Python 版本
+uv venv
+
+# 指定 Python 版本
+uv venv --python 3.12.9
 ```
 
-```docker
-docker run -itd --name env-3.6.1 -p 10022:22 --privileged=true python:3.6.1 /bin/bash
+### 安装依赖
 
-docker run -itd --name env-3.10.0 -p 10023:22 --privileged=true python:3.10.0 /bin/bash
+```bash
+# 安装单个包
+uv pip install requests
 
-docker run -itd --name env-3.9.2 --network onewiki -p 10029:22 -p 3306:3306 -p 6379:6379 -p 27017:27017 -p 9200:9200 -p 9300:9300 -p 8000:8000 py-3.9.2:v1 /bin/bash
+# 从 requirements.txt 安装
+uv pip install -r requirements.txt
+
+# 使用 uv sync（推荐）
+uv sync
 ```
 
-使用container网络构建环境
+### 运行脚本
 
-```docker
-1.先docker run 一个Python环境的容器(py-env),需要映射出docker-compose所有服务需要的端口
-2.docker-compose network_mode:"py-env"
+```bash
+# 无需激活虚拟环境
+uv run python script.py
 
-Python环境容器和docker-compose各服务容器共享一个网络栈，可以使用127.0.0.1互相访问宿主机也可以通过127.0.0.1:端口访问docker-compose服务
+# 指定 Python 版本运行
+uv run --python 3.11.10 python script.py
 ```
 
-拷贝文件
+## 目录结构
 
-```docker
-docker cp [宿主机路径] [容器:容器路径]
-docker cp [容器:容器路径] [宿主机路径] 
+```
+docker-venv/
+├── Dockerfile              # Docker 镜像构建文件
+├── docker-compose.yml      # 服务编排配置
+├── entrypoint.sh           # 容器入口脚本
+├── setup.ps1               # Windows 一键部署脚本
+├── setup.sh                # Linux/Mac 一键部署脚本
+├── ssh-keys/               # SSH 密钥目录
+│   ├── copy-ssh-keys.ps1   # Windows 密钥复制脚本
+│   ├── copy-ssh-keys.sh    # Linux/Mac 密钥复制脚本
+│   └── README.md           # SSH 使用说明
+├── redis/                  # Redis 配置和数据
+│   ├── redis.conf
+│   └── data/
+└── mysql/                  # MySQL 配置和数据（可选）
+    ├── conf/
+    ├── data/
+    └── logs/
 ```
 
-容器commit生成镜像
+## 常用命令
 
-```docker
-docker commit -a "作者" -m "提交信息" [container name/id]  镜像名:标签(tag)
+### Docker 操作
+
+```bash
+# 构建镜像
+docker-compose build
+
+# 启动服务
+docker-compose up -d
+
+# 停止服务
+docker-compose down
+
+# 查看服务状态
+docker-compose ps
+
+# 查看日志
+docker logs python-venv
 ```
 
-构建镜像Dockerfile
+### 容器内操作
 
-```docker
-当前路径
-    docker build -t py-env3.8.7 .
-指定路径
-    docker build -f /path/to/a/Dockerfile .
+```bash
+# 查看 Python 版本
+uv python list
+
+# 初始化新项目
+uv init my-project
+
+# 添加依赖
+uv add requests pandas
+
+# 运行项目
+uv run python main.py
 ```
 
-保存容器
+## 网络配置
 
-```docker
-    docker save 保存的是镜像（image），docker export 保存的是容器(container)
-    docker load 用来载入镜像包，docker load 可以为镜像指定新名称。
-    docker import 用来载入容器包，docker import 可以为镜像指定新名称。
+所有服务使用 `common-network` 桥接网络：
+
+- 容器间可使用服务名互访：`redis:6379`
+- 宿主机通过映射端口访问：`localhost:6379`
+
+## 环境变量
+
+| 变量 | 值 | 说明 |
+|-----|---|------|
+| TZ | UTC | 时区 |
+| UV_PYTHON_INSTALL_DIR | /opt/python | Python 安装目录 |
+| UV_INDEX_URL | mirrors.aliyun.com | PyPI 镜像源 |
+
+## 故障排查
+
+### SSH 连接失败
+
+```bash
+# 检查容器日志
+docker logs python-venv
+
+# 确认 SSH 服务状态
+docker exec python-venv ss -lnt | grep 22
 ```
 
-保存镜像
+### 私钥权限问题 (Windows)
 
-```docker
-    docker export
-    docker import
+```powershell
+# 重新设置权限
+icacls .\ssh-keys\id_rsa /inheritance:r /grant:r "$($env:USERNAME):(R)"
 ```
 
-查看所有网络
+### 镜像构建失败
 
-```docker
-    docker network ls
+```bash
+# 清理缓存重新构建
+docker-compose build --no-cache
 ```
 
-创建网络
+## 参考资源
 
-```docker
-    docker network create [network name] -d [network_mode bridge/host/none]
-    例：docker network create network_name -d bridge
-```
-
-查看网络下的容器
-
-```docker
-    docker network inspect [container name/id]
-    例：docker network inspect xxs
-```
-
-容器链接(断开)新网络
-
-```docker
-    docker network connect(disconnect) [network name/id] [container name/id]
-    例：docker network connect(disconnect) network_name xxs
-    通过docker inspect xxs 查看xxs容器的网络信息，增加(减少)了network_name网络
-```
-
-网络类型
-
-```docker
-host: 共享宿主机网络
-bridge: 同一个bridge网络的容器可以互相通信，各个容器IP不同，可能会有变动
-container: 同一个container网络下的容器共享网络，一个IP，容器之间可以使用 localhost 高效快速通信。
-    docker run -itd --name xxs --network container:[container name/id] kky:v1 /bin/bash
-
-network_mode: "bridge"
-network_mode: "host"
-network_mode: "none"
-network_mode: "service:[service name]"
-network_mode: "container:[container name/id]"
-```
-
-docker daemon配置
-
-```docker
-阿里云源:https://ygz2147j.mirror.aliyuncs.com
-    {
-    "registry-mirrors": [
-        "https://ygz2147j.mirror.aliyuncs.com"
-    ],
-    "features": {
-        "buildkit": true
-    },
-    "experimental": false,
-    "builder": {
-        "gc": {
-        "enabled": true,
-        "defaultKeepStorage": "20GB"
-        }
-    },
-    "log-driver":"json-file",
-    "log-opts":{ "max-size" :"100m","max-file":"3"}
-    }
-```
+- [uv 官方文档](https://docs.astral.sh/uv/)
+- [Docker 文档](https://docs.docker.com/)
+- [Docker Compose 文档](https://docs.docker.com/compose/)
