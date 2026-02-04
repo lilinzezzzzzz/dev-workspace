@@ -46,8 +46,9 @@
     "reportUnknownArgumentType": "none",
     "reportUnknownVariableType": "none",
     "reportCallInDefaultInitializer": "none",
-    // ===== 降级为信息（information）=====
     "reportUnnecessaryIsInstance": "none",
+    // ===== 降级为信息（information）=====
+    "reportOptionalMemberAccess": "information",
     "reportUnnecessaryComparison": "information",
     "reportAttributeAccessIssue": "information"
   },
