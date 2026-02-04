@@ -22,6 +22,8 @@
     "humao.rest-client",
     // 代码注释
     "aaron-bond.better-comments",
+    // 注释翻译
+    "intellsmi.comment-translate",
     // 括号高亮
     "oderwat.indent-rainbow",
     // 路径智能补全
@@ -36,6 +38,6 @@
     // Material Icon Theme
     "pkief.material-icon-theme",
     // Material Product Icons
-    "pkief.material-product-icons",
+    "pkief.material-product-icons"
   ]
 }
