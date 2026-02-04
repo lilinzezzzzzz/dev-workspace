@@ -46,7 +46,7 @@ chmod +x setup.sh
 
 | 服务 | 容器名 | 端口映射 | 说明 |
 |-----|-------|---------|------|
-| python-venv | python-venv | 10022→22, 8000-8090 | Python 开发环境 |
+| dev-env | dev-env | 10022→22, 8000-8090 | Python 开发环境 |
 | redis | redis | 6379→6379 | Redis 缓存服务 |
 
 ## 连接方式
@@ -64,7 +64,7 @@ ssh root@localhost -p 10022
 ### 进入容器
 
 ```bash
-docker exec -it python-venv bash
+docker exec -it dev-env bash
 ```
 
 ### Redis 连接
@@ -129,20 +129,18 @@ uv run --python 3.11.10 python script.py
 docker-venv/
 ├── Dockerfile              # Docker 镜像构建文件
 ├── docker-compose.yml      # 服务编排配置
-├── entrypoint.sh           # 容器入口脚本
+├── scripts/                # 脚本目录
 ├── setup.ps1               # Windows 一键部署脚本
 ├── setup.sh                # Linux/Mac 一键部署脚本
+├── scripts/                # 脚本目录
+│   └── entrypoint.sh       # 容器入口脚本
 ├── ssh-keys/               # SSH 密钥目录
 │   ├── copy-ssh-keys.ps1   # Windows 密钥复制脚本
 │   ├── copy-ssh-keys.sh    # Linux/Mac 密钥复制脚本
 │   └── README.md           # SSH 使用说明
-├── redis/                  # Redis 配置和数据
-│   ├── redis.conf
-│   └── data/
-└── mysql/                  # MySQL 配置和数据（可选）
-    ├── conf/
-    ├── data/
-    └── logs/
+└── infras/                 # 基础设施配置
+    ├── redis/              # Redis 配置和数据
+    └── mysql/              # MySQL 配置和数据
 ```
 
 ## 常用命令
@@ -163,7 +161,7 @@ docker-compose down
 docker-compose ps
 
 # 查看日志
-docker logs python-venv
+docker logs dev-env
 ```
 
 ### 容器内操作
@@ -203,10 +201,10 @@ uv run python main.py
 
 ```bash
 # 检查容器日志
-docker logs python-venv
+docker logs dev-env
 
 # 确认 SSH 服务状态
-docker exec python-venv ss -lnt | grep 22
+docker exec dev-env ss -lnt | grep 22
 ```
 
 ### 私钥权限问题 (Windows)
