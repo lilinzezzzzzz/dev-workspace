@@ -283,7 +283,7 @@
 
   // ==================== 主题配置 ====================
   // 颜色主题
-  "workbench.colorTheme": "One Dark Pro Night Flat",
+  "workbench.colorTheme": "Qoder Dark",
   // 文件图标主题
   "workbench.iconTheme": "material-icon-theme",
   // 产品图标主题
