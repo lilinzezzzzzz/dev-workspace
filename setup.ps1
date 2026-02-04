@@ -96,6 +96,11 @@ $copiedCount = 0
 foreach ($file in $filesToCopy) {
     $sourceFile = Join-Path $SshSourceDir $file
     if (Test-Path $sourceFile) {
+        # 如果目标文件已存在且权限受限，先恢复写入权限以允许覆盖
+        $targetFile = Join-Path $SshTargetDir $file
+        if (Test-Path $targetFile) {
+            icacls $targetFile /grant "$($env:USERNAME):(M)" 2>&1 | Out-Null
+        }
         Copy-Item -Path $sourceFile -Destination $SshTargetDir -Force
         Write-Host "  已复制: $file" -ForegroundColor Gray
         $copiedCount++
@@ -130,26 +135,35 @@ Write-Success "私钥权限设置完成"
 # ============================================================
 Write-Step "构建 Docker 镜像 (可能需要几分钟)..."
 
-try {
-    docker-compose build --no-cache 2>&1 | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
-    Write-Success "Docker 镜像构建完成"
-} catch {
+# 临时允许 stderr 输出，因为 Docker 的进度信息会输出到 stderr
+$ErrorActionPreference = "Continue"
+& docker-compose build --no-cache
+$buildExitCode = $LASTEXITCODE
+$ErrorActionPreference = "Stop"
+
+if ($buildExitCode -ne 0) {
     Write-Error "Docker 镜像构建失败"
     exit 1
 }
+
+Write-Success "Docker 镜像构建完成"
 
 # ============================================================
 # 步骤 6: 启动服务
 # ============================================================
 Write-Step "启动服务..."
 
-try {
-    docker-compose up -d 2>&1 | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
-    Write-Success "服务启动完成"
-} catch {
+$ErrorActionPreference = "Continue"
+& docker-compose up -d
+$upExitCode = $LASTEXITCODE
+$ErrorActionPreference = "Stop"
+
+if ($upExitCode -ne 0) {
     Write-Error "服务启动失败"
     exit 1
 }
+
+Write-Success "服务启动完成"
 
 # ============================================================
 # 步骤 7: 等待健康检查

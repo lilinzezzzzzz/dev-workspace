@@ -93,6 +93,11 @@ foreach ($file in $filesToCopy) {
     $sourceFile = Join-Path $SshSourceDir $file
     if (Test-Path $sourceFile) {
         try {
+            # 如果目标文件已存在且权限受限，先恢复写入权限以允许覆盖
+            $targetFile = Join-Path $ScriptDir $file
+            if (Test-Path $targetFile) {
+                icacls $targetFile /grant "$($env:USERNAME):(M)" 2>&1 | Out-Null
+            }
             Copy-Item -Path $sourceFile -Destination $ScriptDir -Force
             Write-Host "  " -NoNewline
             Write-ColorOutput Green "✓ 已复制: $file"
