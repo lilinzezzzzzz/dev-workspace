@@ -203,7 +203,7 @@
   "workbench.editor.limit.perEditorGroup": true,
   // ==================== 主题配置 ====================
   // 颜色主题 - Qoder Dark (Qoder 专用暗色主题)
-  "workbench.colorTheme": "One Dark Pro Night Flat",
+  "workbench.colorTheme": "Qoder Dark",
   // 文件图标主题 - A File Icon (清晰易辨识的文件图标)
   "workbench.iconTheme": "material-icon-theme",
   // 产品图标主题 - 默认
