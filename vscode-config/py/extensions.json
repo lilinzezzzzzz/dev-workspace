@@ -30,6 +30,8 @@
     "mikestead.dotenv",
     // Markdown
     "yzhang.markdown-all-in-one",
+    // Highlight - TODO/FIXME 高亮
+    "wayou.vscode-todo-highlight",
     // ==================== 主题/图标 ====================
     // Material Icon Theme
     "pkief.material-icon-theme",
