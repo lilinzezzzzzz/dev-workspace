@@ -19,19 +19,6 @@
     "zxh404.vscode-proto3",
     // ENV 环境变量
     "mikestead.dotenv",
-    // ==================== 容器/云原生 ====================
-    // Docker
-    "ms-azuretools.vscode-docker",
-    // Kubernetes
-    "ms-kubernetes-tools.vscode-kubernetes-tools",
-    // ==================== API 开发 ====================
-    // REST Client - HTTP 请求测试
-    "humao.rest-client",
-    // Thunder Client - 轻量级 API 测试 (Postman 替代)
-    "rangav.vscode-thunder-client",
-    // ==================== 数据库 ====================
-    // Database Client - 多数据库支持
-    "cweijan.vscode-database-client2",
     // ==================== 代码增强 ====================
     // Better Comments - 彩色注释
     "aaron-bond.better-comments",
