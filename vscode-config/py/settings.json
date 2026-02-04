@@ -28,12 +28,8 @@
   // ==================== Basedpyright 类型检查 (Pylance替代) ====================
   "basedpyright.analysis.typeCheckingMode": "basic",
   "basedpyright.analysis.autoImportCompletions": true,
-  "basedpyright.analysis.importFormat": "absolute",
   "basedpyright.analysis.inlayHints.functionReturnTypes": true,
   "basedpyright.analysis.inlayHints.variableTypes": false,
-  "basedpyright.analysis.inlayHints.pytestParameters": true,
-  // 追踪类型导入(查找定义时更智能)
-  "basedpyright.analysis.indexing": true,
   // 诊断严格程度
   "basedpyright.analysis.diagnosticSeverityOverrides": {
     // ===== 降为警告（warning）=====
@@ -109,18 +105,13 @@
   "git.confirmSync": false,
   // 禁用自动拉取，避免后台重复执行 Git 命令
   "git.autofetch": false,
-  // 默认显示工作树中的所有更改
-  "git.showUntrackedFiles": true,
+  // 启用 Git 自动刷新
+  "git.autorefresh": true,
   // 启用装饰器（显示文件的Git状态标记）
   "git.decorations.enabled": true,
-  // 减少 Git 轮询频率，避免重复命令(毫秒)
-  "git.autorefresh": true,
-  "git.refreshInterval": 5000,
-  // 禁用空消息提交，必须填写 commit message
-  "git.allowNoVerifyCommit": false,
+  // 禁止跳过 Git Hooks 验证(pre-commit/commit-msg等)
+  "git.allowNoVerifyCommit": true,
   "git.inputValidation": true,
-  "git.inputValidationLength": 5,
-  "git.inputValidationSubjectLength": 50,
   // ==================== 终端配置 ====================
   "terminal.integrated.env.windows": {
     "PYTHONIOENCODING": "utf-8"
