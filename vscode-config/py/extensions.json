@@ -29,6 +29,11 @@
     // 环境变量
     "mikestead.dotenv",
     // Markdown
-    "yzhang.markdown-all-in-one"
+    "yzhang.markdown-all-in-one",
+    // ==================== 主题/图标 ====================
+    // Material Icon Theme
+    "pkief.material-icon-theme",
+    // Material Product Icons
+    "pkief.material-product-icons",
   ]
 }
