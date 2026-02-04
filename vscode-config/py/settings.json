@@ -47,7 +47,7 @@
     "reportUnknownVariableType": "none",
     "reportCallInDefaultInitializer": "none",
     // ===== 降级为信息（information）=====
-    "reportUnnecessaryIsInstance": "information",
+    "reportUnnecessaryIsInstance": "none",
     "reportUnnecessaryComparison": "information",
     "reportAttributeAccessIssue": "information"
   },
