@@ -1,7 +1,7 @@
 ## Role & Context
 
 * **User Role:**
-  * Senior Python And Golang Backend Development Engineer.
+  * Senior Python & Golang Backend Development Engineer.
 * **Current Focus:**
   * Comprehensive AI technology stack (LLMs, GenAI, Multi-modal models), AI Engineering (Fine-tuning, Inference optimization, MLOps), and cutting-edge industry trends, alongside Knowledge Base (RAG) and AI Platform/Middle-end development.
 * **Personal Interests:**
@@ -10,23 +10,45 @@
 
 ## Coding Standards
 
+### General
+
+* **Quality:**
+  * High performance, production-ready.
+  * Zero tolerance for security vulnerabilities, undefined behavior, or logical flaws.
+* **Architecture:**
+  * Modular, scalable, and clean code structure suitable for AI enterprise applications.
+* **Type Safety:**
+  * Public APIs must be fully type-annotated.
+  * Use explicit, precise types over permissive or ambiguous typing.
+
+### Python
+
 * **Style:**
   * Pythonic, Pydantic v2, PEP 8 compliant.
   * Code style and type usage must be compatible with ruff and basedpyright (basic mode).
-  * Public APIs must be fully type-annotated.
   * Avoid implicit Any.
-  * Use explicit, precise types over permissive or ambiguous typing.
   * Do NOT include instructions to run ruff or basedpyright; compliance is assumed at generation time.
 * **Runtime & Environment:**
   * Project environment and dependency management are strictly based on uv (Astral).
   * Dependencies are defined via pyproject.toml (PEP 621) and resolved with uv.lock.
   * Do NOT assume requirements.txt, pip, pip-tools, poetry, or conda.
   * Generated code and instructions must be compatible with execution via uv run and installation via uv pip.
-* **Quality:**
-  * High performance, production-ready.
-  * Zero tolerance for security vulnerabilities, undefined behavior, or logical flaws.
-* **Architecture:**
-  * Modular, scalable, and clean code structure suitable for AI enterprise applications.
+
+### Golang
+
+* **Style:**
+  * Follow Effective Go and Go Code Review Comments.
+  * Code must pass go vet, staticcheck, and golangci-lint.
+  * Use gofmt / goimports for formatting.
+  * Do NOT include instructions to run linters; compliance is assumed at generation time.
+* **Runtime & Environment:**
+  * Use Go Modules (go.mod / go.sum) for dependency management.
+  * Prefer standard library when possible; minimize third-party dependencies.
+  * Generated code must be compatible with go build and go run.
+* **Conventions:**
+  * Error handling: Always check and handle errors explicitly; avoid _ for error returns.
+  * Concurrency: Use goroutines and channels idiomatically; prefer sync primitives for shared state.
+  * Naming: Use MixedCaps (exported) and mixedCaps (unexported); avoid underscores.
 
 
 ## Response Preferences
