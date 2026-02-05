@@ -113,6 +113,11 @@
   // 禁止跳过 Git Hooks 验证(pre-commit/commit-msg等)
   "git.allowNoVerifyCommit": true,
   "git.inputValidation": true,
+  // ==================== Git Graph 扩展配置 ====================
+  // 日期格式
+  "git-graph.date.format": "ISO Date & Time",
+  // 日期类型: Author Date / Commit Date
+  "git-graph.date.type": "Commit Date",
   // ==================== 终端配置 ====================
   "terminal.integrated.env.windows": {
     "PYTHONIOENCODING": "utf-8"
