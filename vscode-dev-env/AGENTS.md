@@ -36,6 +36,13 @@
   * Use httpx for async HTTP requests; avoid aiohttp.
   * Use anyio.create_task_group for structured concurrency.
   * Avoid mixing sync and async code; use anyio.to_thread.run_sync or anyio.to_process.run_sync for blocking calls.
+* **Logging:**
+  * Use structlog for structured logging; avoid print statements.
+  * Log levels: DEBUG for development, INFO for operations, WARNING/ERROR for issues.
+* **API Design:**
+  * Use FastAPI for REST APIs; prefer Pydantic V2 models for request/response schemas.
+  * Prefer GET and POST methods; use PUT/DELETE/PATCH only when explicitly required.
+  * Implement consistent error responses with error codes and messages.
 * **Runtime & Environment:**
   * Use uv (Astral) for project environment and dependency management.
   * Define dependencies via pyproject.toml (PEP 621), resolve with uv.lock.
