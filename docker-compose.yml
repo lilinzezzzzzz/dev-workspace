@@ -1,7 +1,7 @@
 services:
-  dev-env:
-    image: dev-env:latest
-    container_name: dev-env
+  dev-workspace:
+    image: dev-workspace:latest
+    container_name: dev-workspace
     build:
       context: . # 上下文路径为当前目录, 如果使用dockerfile构建，则image是构建的镜像名
       dockerfile: Dockerfile # 指定 Dockerfile 的相对路径
