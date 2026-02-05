@@ -46,8 +46,20 @@ chmod +x setup.sh
 
 | 服务 | 容器名 | 端口映射 | 说明 |
 |-----|-------|---------|------|
-| dev-env | dev-env | 10022→22, 8000-8090 | Python 开发环境 |
+| dev-env | dev-env | 10022→22, 8000, 8070, 8080, 8090 | Python 开发环境 |
 | redis | redis | 6379→6379 | Redis 缓存服务 |
+
+### 基础设施配置
+
+`infras/` 目录包含以下服务的配置文件：
+
+| 服务 | 目录 | 说明 |
+|-----|------|------|
+| ClickHouse | infras/clickhouse/ | 列式数据库配置 |
+| MongoDB | infras/mongodb/ | 文档数据库配置 |
+| MySQL | infras/mysql/ | 关系型数据库配置 |
+| Kafka + Zookeeper | infras/mq/ | 消息队列配置 |
+| Redis | infras/redis/ | 缓存服务配置 |
 
 ## 连接方式
 
@@ -84,8 +96,8 @@ uv python list
 # 安装新版本
 uv python install 3.13
 
-# 切换默认版本
-uv python pin 3.12.9
+# 切换默认版本（当前默认为 3.11.10）
+uv python pin 3.11.10
 ```
 
 ## 项目开发
@@ -126,10 +138,9 @@ uv run --python 3.11.10 python script.py
 ## 目录结构
 
 ```
-docker-venv/
+dev-workspace/
 ├── Dockerfile              # Docker 镜像构建文件
 ├── docker-compose.yml      # 服务编排配置
-├── scripts/                # 脚本目录
 ├── setup.ps1               # Windows 一键部署脚本
 ├── setup.sh                # Linux/Mac 一键部署脚本
 ├── scripts/                # 脚本目录
@@ -138,9 +149,19 @@ docker-venv/
 │   ├── copy-ssh-keys.ps1   # Windows 密钥复制脚本
 │   ├── copy-ssh-keys.sh    # Linux/Mac 密钥复制脚本
 │   └── README.md           # SSH 使用说明
+├── docs/                   # 文档目录
+│   └── UV_USAGE.md         # uv 使用指南
+├── vscode-dev-env/         # VSCode 配置模板
+│   ├── golang/             # Go 开发配置
+│   ├── py/                 # Python 开发配置
+│   ├── AGENTS.md           # AI Agent 配置说明
+│   └── keybindings.json    # 快捷键配置
 └── infras/                 # 基础设施配置
-    ├── redis/              # Redis 配置和数据
-    └── mysql/              # MySQL 配置和数据
+    ├── clickhouse/         # ClickHouse 配置
+    ├── mongodb/            # MongoDB 配置
+    ├── mq/                 # Kafka + Zookeeper 配置
+    ├── mysql/              # MySQL 配置
+    └── redis/              # Redis 配置
 ```
 
 ## 常用命令
