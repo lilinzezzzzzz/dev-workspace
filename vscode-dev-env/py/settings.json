@@ -56,7 +56,8 @@
   "python.testing.pytestEnabled": true,
   "python.testing.unittestEnabled": false,
   "python.testing.pytestArgs": [
-    "dev/tests",
+    "tests",
+    "-s",
     "-v",
     "--tb=short"
   ],
