@@ -9,20 +9,22 @@
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
+            // 显式指定虚拟环境中的 Python 解释器
+            "python": "${workspaceFolder}/.venv/bin/python",
             // 核心参数配置
             "args": [
-                "main:app", // 【注意】这里修改为你的入口文件和app对象，例如 app.main:app
+                "main:app",
                 "--host",
                 "0.0.0.0",
                 "--port",
                 "8000"
             ],
-            "jinja": true, // 开启 Jinja2 模板调试支持（如果你的项目涉及后端渲染HTML）
-            "justMyCode": true, // 只调试我的代码，跳过库文件（如进入 fastAPI 源码），设为 false 可深入库源码
+            // 开启 Jinja2 模板调试支持
+            "jinja": true,
+            // 只调试我的代码,跳过库文件
+            "justMyCode": true,
             "env": {
-                // 确保项目根目录在 PYTHONPATH 中，解决导入路径报错问题
                 "PYTHONPATH": "${workspaceFolder}"
-                // "MY_ENV_VAR": "value" // 可以在这里注入环境变量
             }
         },
         {
