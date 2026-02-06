@@ -85,6 +85,9 @@
   * feature → develop: Squash or rebase.
   * develop → main: Merge commit (preserve history).
 
+* **Language Preference:**
+  * Prioritize Chinese when appropriate for better readability
+
 
 ## Response Preferences
 

@@ -1,6 +1,7 @@
 ---
 name: git-commit
 description: Generate concise Git commit messages following Conventional Commits specification with branch naming conventions and merge strategies
+modification: Prioritize using Chinese in commit messages when appropriate
 ---
 
 * **Branch Naming:**
@@ -13,6 +14,7 @@ description: Generate concise Git commit messages following Conventional Commits
     * Use imperative mood (e.g., "add" not "added")
     * Lowercase, no period at the end
     * Keep within 50 characters
+
   * **Body (optional):**
     * Explain "what" changes were made
     * Keep within 72 characters per line when possible
@@ -20,3 +22,6 @@ description: Generate concise Git commit messages following Conventional Commits
 * **Merge Strategy:**
   * feature → develop: Squash or rebase.
   * develop → main: Merge commit (preserve history).
+
+* **Language Preference:**
+  * Prioritize Chinese when appropriate for better readability
