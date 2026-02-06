@@ -104,7 +104,8 @@
     "suppressCreatePullRequestPrompt": true // 抑制PR创建提示
   },
   "gitlens.defaultDateFormat": "YYYY-MM-DD HH:mm", // 默认日期格式
-  "gitlens.defaultDateShortFormat": "YY-MM-DD", // 短日期格式
+  "gitlens.defaultDateShortFormat": "YY-MM-DD",    // 短日期格式
+  "gitlens.defaultTimeFormat": "HH:mm:ss",         // 默认时间格式
   "gitlens.telemetry.enabled": false, // 禁用遥测数据收集
   "gitlens.views.commitDetails.files.layout": "auto", // 提交详情布局
   "gitlens.views.repositories.showBranchComparison": false, // 不显示分支比较
