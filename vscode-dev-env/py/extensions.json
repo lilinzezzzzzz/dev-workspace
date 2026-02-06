@@ -18,8 +18,6 @@
     "samuelcolvin.jinjahtml",
     // Docker
     "ms-azuretools.vscode-docker",
-    // REST API 测试
-    "humao.rest-client",
     // 代码注释
     "aaron-bond.better-comments",
     // 注释翻译
