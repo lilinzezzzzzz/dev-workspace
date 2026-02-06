@@ -61,7 +61,7 @@
   "workbench.productIconTheme": "material-product-icons", // 产品图标主题
   // -------------------- 标签页颜色自定义 --------------------
   "workbench.colorCustomizations": {
-    "tab.activeBackground": "#1e4570", // 激活标签页背景色 - 更深的蓝色
+    "tab.activeBackground": "#2d5a88", // 激活标签页背景色 - 更深的蓝色
     "tab.activeForeground": "#ffffff", // 激活标签页文字颜色 - 纯白色
     "tab.activeBorder": "#61afef", // 激活标签页边框色
     "tab.activeBorderTop": "#ff9f1c", // 激活标签页顶边框 - 醒目的橙色
@@ -70,7 +70,7 @@
     "tab.unfocusedActiveBorder": "#61afef",
     "tab.unfocusedActiveBorderTop": "#ff9f1c",
     // 资源管理器激活文件高亮
-    "list.activeSelectionBackground": "#1e4570", // 激活选中项背景 - 更深的蓝色
+    "list.activeSelectionBackground": "#2d5a88", // 激活选中项背景 - 更深的蓝色
     "list.activeSelectionForeground": "#ffffff", // 激活选中项文字 - 纯白
     "list.inactiveSelectionBackground": "#37415a", // 非焦点选中项背景
     "list.inactiveSelectionForeground": "#e0e0e0", // 非焦点选中项文字
