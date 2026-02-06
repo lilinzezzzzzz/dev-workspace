@@ -51,6 +51,9 @@
   "workbench.editor.limit.value": 5, // 最多同时打开5个编辑器
   "workbench.editor.limit.perEditorGroup": true, // 每个编辑器组独立限制
   "workbench.editor.tabActionLocation": "right", // 标签页操作按钮位置
+  // 活动栏配置
+  "workbench.activityBar.visible": true,        // 显示活动栏
+  "workbench.sideBar.location": "left",         // 侧边栏位置
   // -------------------- 主题配置 --------------------
   "workbench.colorTheme": "Qoder Dark", // 颜色主题
   "workbench.iconTheme": "material-icon-theme", // 文件图标主题
