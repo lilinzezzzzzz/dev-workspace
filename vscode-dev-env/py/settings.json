@@ -1,267 +1,219 @@
 {
-  // ==================== Python 基础配置 ====================
-  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python3",
-  "python.terminal.activateEnvironment": true,
-  "python.terminal.activateEnvInCurrentTerminal": true,
-  // 启用Python环境变量文件
-  "python.envFile": "${workspaceFolder}/.env",
-  // ==================== 编辑器配置 ====================
+  // =============================================================================
+  // 🐍 PYTHON 编程语言相关配置
+  // =============================================================================
+  // -------------------- Python 解释器配置 --------------------
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python3", // 默认Python解释器路径
+  "python.terminal.activateEnvironment": true, // 终端启动时激活虚拟环境
+  "python.terminal.activateEnvInCurrentTerminal": true, // 在当前终端中激活环境
+  "python.envFile": "${workspaceFolder}/.env", // Python环境变量文件路径
+  // -------------------- Python 语言特定设置 --------------------
   "[python]": {
-    "editor.formatOnSave": false,
-    "editor.codeActionsOnSave": {
-      "source.fixAll": "explicit",
-      "source.organizeImports": "explicit"
+    "editor.formatOnSave": false, // 保存时不自动格式化(由Ruff处理)
+    "editor.codeActionsOnSave": { // 保存时执行的操作
+      "source.fixAll": "explicit", // 自动修复所有问题
+      "source.organizeImports": "explicit" // 自动整理导入语句
     },
-    "editor.rulers": [
-      88,
-      120
+    "editor.rulers": [ // 显示标尺线
+      88, // PEP 8推荐行长
+      120 // 最大行长限制
     ],
-    "editor.tabSize": 4,
-    "editor.insertSpaces": true
+    "editor.tabSize": 4, // Tab宽度为4个空格
+    "editor.insertSpaces": true // 使用空格而非Tab字符
   },
-  // ==================== Ruff (Linting + Formatting) ====================
-  // Ruff 原生语言服务器配置（v2024+）
-  "ruff.enable": true,
-  "ruff.nativeServer": true,
-  "ruff.fixAll": true,
-  "ruff.configurationPreference": "filesystemFirst",
-  // ==================== Basedpyright 类型检查 (Pylance替代) ====================
-  "basedpyright.analysis.typeCheckingMode": "basic",
-  "basedpyright.analysis.autoImportCompletions": true,
-  "basedpyright.analysis.inlayHints.functionReturnTypes": true,
-  "basedpyright.analysis.inlayHints.variableTypes": false,
-  // 诊断严格程度
-  "basedpyright.analysis.diagnosticSeverityOverrides": {
-    // ===== 降为警告（warning）=====
-    "reportUnusedImport": "warning",
-    "reportUnusedVariable": "warning",
-    "reportUnusedFunction": "warning",
-    "reportUnusedClass": "warning",
-    "reportPrivateUsage": "warning",
-    // ===== 禁用（none）- 第三方库/框架误报 =====
-    "reportArgumentType": "none",
-    "reportGeneralTypeIssues": "none",
-    "reportMissingTypeStubs": "none",
-    "reportUnknownMemberType": "none",
-    "reportUnknownArgumentType": "none",
-    "reportUnknownVariableType": "none",
-    "reportCallInDefaultInitializer": "none",
-    "reportUnnecessaryIsInstance": "none",
-    // ===== 降级为信息（information）=====
-    "reportOptionalMemberAccess": "information",
-    "reportUnnecessaryComparison": "information",
-    "reportAttributeAccessIssue": "information"
+  // -------------------- Ruff Linting & Formatting --------------------
+  "ruff.enable": true, // 启用Ruff语言服务器
+  "ruff.nativeServer": true, // 使用Ruff原生服务器
+  "ruff.fixAll": true, // 启用自动修复功能
+  "ruff.configurationPreference": "filesystemFirst", // 优先使用文件系统配置
+  // -------------------- Basedpyright 类型检查 --------------------
+  "basedpyright.analysis.typeCheckingMode": "basic", // 类型检查模式(基础)
+  "basedpyright.analysis.autoImportCompletions": true, // 启用自动导入补全
+  "basedpyright.analysis.inlayHints.functionReturnTypes": true, // 显示函数返回类型提示
+  "basedpyright.analysis.inlayHints.variableTypes": false, // 不显示变量类型提示
+  "basedpyright.analysis.diagnosticSeverityOverrides": { // 诊断严重性覆盖设置
+    // 降为警告
+    "reportUnusedImport": "warning", // 未使用导入->警告
+    "reportUnusedVariable": "warning", // 未使用变量->警告
+    "reportUnusedFunction": "warning", // 未使用函数->警告
+    "reportUnusedClass": "warning", // 未使用类->警告
+    "reportPrivateUsage": "warning", // 私有成员使用->警告
+    // 禁用第三方库误报
+    "reportArgumentType": "none", // 参数类型检查->禁用
+    "reportGeneralTypeIssues": "none", // 通用类型问题->禁用
+    "reportMissingTypeStubs": "none", // 缺少类型存根->禁用
+    "reportUnknownMemberType": "none", // 未知成员类型->禁用
+    "reportUnknownArgumentType": "none", // 未知参数类型->禁用
+    "reportUnknownVariableType": "none", // 未知变量类型->禁用
+    "reportCallInDefaultInitializer": "none", // 默认初始化器调用->禁用
+    "reportUnnecessaryIsInstance": "none", // 不必要的isinstance->禁用
+    // 降级为信息
+    "reportOptionalMemberAccess": "information", // 可选成员访问->信息
+    "reportUnnecessaryComparison": "information", // 不必要比较->信息
+    "reportAttributeAccessIssue": "information" // 属性访问问题->信息
   },
-  // ==================== 测试配置 (pytest) ====================
-  "python.testing.pytestEnabled": true,
-  "python.testing.unittestEnabled": false,
-  // Pytest 测试参数配置
-  // 重要提示: 不同项目的测试文件路径可能不同,请根据实际项目结构修改第一个参数
-  // 常见测试路径: "tests", "test", "src/tests", "app/tests" 等
-  "python.testing.pytestArgs": [
-    "tests", // 测试文件所在目录(需根据项目实际路径修改)
-    "-s", // 显示print输出,不捕获标准输出
-    "-v", // 详细输出,显示每个测试用例名称
-    "--tb=short" // 简短的traceback格式,出错时显示简洁的错误信息
+  // -------------------- 测试配置 --------------------
+  "python.testing.pytestEnabled": true, // 启用pytest测试框架
+  "python.testing.unittestEnabled": false, // 禁用unittest框架
+  "python.testing.pytestArgs": [ // pytest命令行参数
+    "tests", // 测试目录
+    "-s", // 显示print输出
+    "-v", // 详细输出模式
+    "--tb=short" // 简短traceback格式
   ],
-  // ==================== 文件关联 ====================
-  "files.associations": {
-    "*.yaml": "yaml",
-    "*.yml": "yaml",
-    "*.j2": "jinja",
-    "*.jinja2": "jinja"
+  // -------------------- 文件关联 --------------------
+  "files.associations": { // 文件类型关联
+    "*.yaml": "yaml", // .yaml文件关联到YAML语言
+    "*.yml": "yaml", // .yml文件关联到YAML语言
+    "*.j2": "jinja", // .j2文件关联到Jinja模板
+    "*.jinja2": "jinja" // .jinja2文件关联到Jinja模板
   },
-  // ==================== 文件排除 ====================
-  "files.exclude": {
-    "**/__pycache__": true,
-    "**/*.pyc": true,
-    "**/*.pyo": true,
-    "**/.pytest_cache": true,
-    "**/.ruff_cache": true,
-    "**/*.egg-info": true,
-    "**/.mypy_cache": true
+  // -------------------- 文件排除 --------------------
+  "files.exclude": { // 文件资源管理器排除项
+    "**/__pycache__": true, // 排除Python缓存目录
+    "**/*.pyc": true, // 排除编译后的Python文件
+    "**/*.pyo": true, // 排除优化后的Python文件
+    "**/.pytest_cache": true, // 排除pytest缓存
+    "**/.ruff_cache": true, // 排除Ruff缓存
+    "**/*.egg-info": true, // 排除包信息目录
+    "**/.mypy_cache": true // 排除MyPy缓存
   },
-  // ==================== 搜索排除 ====================
-  "search.exclude": {
-    "**/__pycache__": true,
-    "**/node_modules": true,
-    "**/.venv": true,
-    "**/uv.lock": true,
-    "**/*.lock": true
+  // -------------------- 搜索排除 --------------------
+  "search.exclude": { // 搜索功能排除项
+    "**/__pycache__": true, // 排除缓存目录
+    "**/node_modules": true, // 排除Node.js模块
+    "**/.venv": true, // 排除虚拟环境目录
+    "**/uv.lock": true, // 排除uv锁文件
+    "**/*.lock": true // 排除其他锁文件
   },
-  // ==================== YAML 配置 ====================
+  // -------------------- YAML 语言配置 --------------------
   "[yaml]": {
-    "editor.tabSize": 2,
-    "editor.insertSpaces": true,
-    "editor.autoIndent": "advanced"
+    "editor.tabSize": 2, // YAML使用2空格缩进
+    "editor.insertSpaces": true, // 使用空格缩进
+    "editor.autoIndent": "advanced" // 高级自动缩进
   },
-  // ==================== JSON 配置 ====================
+  // -------------------- JSON 语言配置 --------------------
   "[json]": {
-    "editor.tabSize": 2,
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "vscode.json-language-features"
+    "editor.tabSize": 2, // JSON使用2空格缩进
+    "editor.formatOnSave": true, // 保存时自动格式化
+    "editor.defaultFormatter": "vscode.json-language-features" // 使用VS Code内置格式化器
   },
   "[jsonc]": {
-    "editor.tabSize": 2,
-    "editor.formatOnSave": true
+    "editor.tabSize": 2, // JSONC使用2空格缩进
+    "editor.formatOnSave": true // 保存时自动格式化
   },
-  // ==================== Git 配置 ====================
-  "git.enableSmartCommit": true,
-  "git.confirmSync": false,
-  // 禁用自动拉取，避免后台重复执行 Git 命令
-  "git.autofetch": false,
-  // 启用 Git 自动刷新
-  "git.autorefresh": true,
-  // 启用装饰器（显示文件的Git状态标记）
-  "git.decorations.enabled": true,
-  // 禁止跳过 Git Hooks 验证(pre-commit/commit-msg等)
-  "git.allowNoVerifyCommit": true,
-  "git.inputValidation": true,
-  // ==================== Git Graph 扩展配置 ====================
-  // 日期格式
-  "git-graph.date.format": "ISO Date & Time",
-  // 日期类型: Author Date / Commit Date
-  "git-graph.date.type": "Commit Date",
-  // ==================== 终端配置 ====================
-  "terminal.integrated.env.windows": {
-    "PYTHONIOENCODING": "utf-8"
-  },
-  // 终端字体大小
-  "terminal.integrated.fontSize": 13,
-  // 终端字体家族(使用与编辑器相同的等宽字体)
-  "terminal.integrated.fontFamily": "'Source Code Pro', 'Courier New', monospace",
-  // 终端字体粗细(normal, bold, 100-900)
-  "terminal.integrated.fontWeight": "normal",
-  // 终端行高(像素值,1.0为默认)
-  "terminal.integrated.lineHeight": 1.0,
-  // 终端右键行为: default(显示菜单), copyPaste(选中则复制否则粘贴), paste(粘贴), selectWord(选中单词并显示菜单)
-  "terminal.integrated.rightClickBehavior": "default",
-  // ==================== 其他 ====================
-  "editor.bracketPairColorization.enabled": true,
-  "editor.guides.bracketPairs": "active",
-  "editor.stickyScroll.enabled": true,
-  // ==================== 编辑器增强配置 ====================
-  // 自动保存(窗口失去焦点时)
-  "files.autoSave": "onFocusChange",
-  // 自动补全括号/引号
-  "editor.autoClosingBrackets": "always",
-  "editor.autoClosingQuotes": "always",
-  // 括号内自动补全空格
-  "editor.autoSurround": "languageDefined",
-  // 光标闪烁样式(line/block/underline)
-  "editor.cursorBlinking": "smooth",
-  // 光标平滑动画
-  "editor.cursorSmoothCaretAnimation": "on",
-  // 小地图配置
-  "editor.minimap.enabled": true,
-  "editor.minimap.maxColumn": 80,
-  "editor.minimap.renderCharacters": false,
-  // 滚动平滑动画
-  "editor.smoothScrolling": true,
-  // 显示空白字符(boundary:仅在单词边界显示)
-  "editor.renderWhitespace": "boundary",
-  // 显示缩进参考线
-  "editor.guides.indentation": true,
-  // 高亮显示当前行
-  "editor.renderLineHighlight": "all",
-  // 启用内联建议
-  "editor.inlineSuggest.enabled": true,
-  // 编辑器圆角边框
-  "editor.roundedSelection": true,
-  // ==================== 空格与换行控制 ====================
-  // 文件末尾自动添加空行
-  "files.insertFinalNewline": true,
-  // 自动删除文件末尾多余的空行
-  "files.trimFinalNewlines": true,
-  // 保存时自动删除行尾空格
-  "files.trimTrailingWhitespace": true,
-  // 文件编码(UTF-8)
-  "files.encoding": "utf8",
-  // 行结束符(Linux/macOS使用LF)
-  "files.eol": "\n",
-  // 自动检测缩进(从打开的文件内容检测)
-  "editor.detectIndentation": true,
-  // 自动缩进策略
-  "editor.autoIndent": "full",
-  // 自动换行(off/on/wordWrapColumn/bounded)
-  "editor.wordWrap": "off",
-  // 换行列宽度(当wordWrap为wordWrapColumn时生效)
-  "editor.wordWrapColumn": 120,
-  // 显示控制字符(如\t\n)
-  "editor.renderControlCharacters": true,
-  // ==================== 字体配置 ====================
-  // 编辑器字体家族（推荐使用等宽字体）
-  "editor.fontFamily": "'Source Code Pro', 'Courier New', monospace",
-  // 字体大小
-  "editor.fontSize": 13,
-  // 启用字体连字（仅支持 Fira Code、JetBrains Mono 等字体）
-  "editor.fontLigatures": true,
-  // 字体粗细（100-900，400为正常，700为粗体）
-  "editor.fontWeight": "400",
-  // 行高（0为自动，或指定像素值如18）
-  "editor.lineHeight": 0,
-  // 字母间距（像素值，0为默认）
-  "editor.letterSpacing": 0,
-  // ==================== 标题栏显示优化 ====================
-  // 窗口标题栏：只显示文件名和工作区名称（更简洁）
-  "window.title": "${dirty}${activeEditorShort}${separator}${rootName}",
-  // 标签页显示：短格式（只显示文件名）
-  "workbench.editor.labelFormat": "short",
-  // 限制打开的编辑器数量：最多5个，超出自动关闭最久未使用的
-  "workbench.editor.limit.enabled": true,
-  "workbench.editor.limit.value": 5,
-  "workbench.editor.limit.perEditorGroup": true,
-  // ==================== 主题配置 ====================
-  // 颜色主题 - Qoder Dark (Qoder 专用暗色主题)
-  "workbench.colorTheme": "Qoder Dark",
-  // 文件图标主题 - A File Icon (清晰易辨识的文件图标)
-  "workbench.iconTheme": "material-icon-theme",
-  // 产品图标主题 - 默认
-  "workbench.productIconTheme": "material-product-icons",
-  "workbench.editor.tabActionLocation": "right",
-  // ==================== 标签页颜色自定义 ====================
+  // =============================================================================
+  // 🎨 编辑器核心配置
+  // =============================================================================
+  // -------------------- 基础编辑器设置 --------------------
+  "editor.bracketPairColorization.enabled": true, // 启用括号对彩色高亮
+  "editor.guides.bracketPairs": "active", // 仅高亮活跃的括号对
+  "editor.stickyScroll.enabled": true, // 启用粘性滚动(显示嵌套作用域)
+  // -------------------- 自动补全与智能提示 --------------------
+  "editor.autoClosingBrackets": "always", // 总是自动闭合括号
+  "editor.autoClosingQuotes": "always", // 总是自动闭合引号
+  "editor.autoSurround": "languageDefined", // 根据语言定义自动包围
+  "editor.inlineSuggest.enabled": true, // 启用内联建议
+  // -------------------- 光标与滚动 --------------------
+  "editor.cursorBlinking": "smooth", // 光标平滑闪烁
+  "editor.cursorSmoothCaretAnimation": "on", // 启用光标平滑动画
+  "editor.smoothScrolling": true, // 启用平滑滚动
+  // -------------------- 显示与视觉效果 --------------------
+  "editor.renderWhitespace": "boundary", // 仅在边界显示空白字符
+  "editor.renderLineHighlight": "all", // 高亮整行
+  "editor.renderControlCharacters": true, // 显示控制字符(\t,\n等)
+  "editor.roundedSelection": true, // 圆角选择区域
+  "editor.guides.indentation": true, // 显示缩进参考线
+  // -------------------- 小地图配置 --------------------
+  "editor.minimap.enabled": true, // 启用小地图
+  "editor.minimap.maxColumn": 80, // 小地图最大列数
+  "editor.minimap.renderCharacters": false, // 不渲染字符(仅显示轮廓)
+  // -------------------- 文件操作 --------------------
+  "files.autoSave": "onFocusChange", // 焦点切换时自动保存
+  "files.insertFinalNewline": true, // 文件末尾插入新行
+  "files.trimFinalNewlines": true, // 删除末尾多余空行
+  "files.trimTrailingWhitespace": true, // 删除行尾空格
+  "files.encoding": "utf8", // 文件编码UTF-8
+  "files.eol": "\n", // 行结束符使用LF
+  // -------------------- 缩进与格式化 --------------------
+  "editor.detectIndentation": true, // 自动检测缩进设置
+  "editor.autoIndent": "full", // 完全自动缩进
+  "editor.wordWrap": "off", // 关闭自动换行
+  "editor.wordWrapColumn": 120, // 换行列宽(120字符)
+  // -------------------- 字体配置 --------------------
+  "editor.fontFamily": "'Source Code Pro', 'Courier New', monospace", // 编辑器字体族
+  "editor.fontSize": 13, // 字体大小13px
+  "editor.fontLigatures": true, // 启用字体连字
+  "editor.fontWeight": "400", // 字体粗细(正常)
+  "editor.lineHeight": 0, // 行高(自动计算)
+  "editor.letterSpacing": 0, // 字母间距(默认)
+  // -------------------- 工作台与窗口 --------------------
+  "window.title": "${dirty}${activeEditorShort}${separator}${rootName}", // 窗口标题格式
+  "workbench.editor.labelFormat": "short", // 编辑器标签显示短格式
+  "workbench.editor.limit.enabled": true, // 启用编辑器数量限制
+  "workbench.editor.limit.value": 5, // 最多同时打开5个编辑器
+  "workbench.editor.limit.perEditorGroup": true, // 每个编辑器组独立限制
+  "workbench.editor.tabActionLocation": "right", // 标签页操作按钮位置
+  // -------------------- 主题配置 --------------------
+  "workbench.colorTheme": "Qoder Dark", // 颜色主题
+  "workbench.iconTheme": "material-icon-theme", // 文件图标主题
+  "workbench.productIconTheme": "material-product-icons", // 产品图标主题
+  // -------------------- 标签页颜色自定义 --------------------
   "workbench.colorCustomizations": {
-    // 激活标签页的背景色(显眼的深蓝灰色)
-    "tab.activeBackground": "#3a4f6b",
-    // 激活标签页的前景色(文字颜色 - 纯白色加粗效果)
-    "tab.activeForeground": "#ffffff",
-    // 激活标签页的边框(明亮的蓝色高亮条)
-    "tab.activeBorder": "#61afef",
-    // 激活标签页顶部边框(3px粗的亮蓝色高亮)
-    "tab.activeBorderTop": "#4fa8ff",
-    // 未激活标签页的背景色(更暗以增强对比)
-    "tab.inactiveBackground": "#181b20",
-    // 未激活标签页的前景色(较暗的文字)
-    "tab.inactiveForeground": "#6b7280"
+    "tab.activeBackground": "#3a4f6b", // 激活标签页背景色
+    "tab.activeForeground": "#ffffff", // 激活标签页文字颜色
+    "tab.activeBorder": "#61afef", // 激活标签页边框色
+    "tab.activeBorderTop": "#4fa8ff", // 激活标签页顶边框
+    "tab.inactiveBackground": "#181b20", // 非激活标签页背景色
+    "tab.inactiveForeground": "#6b7280" // 非激活标签页文字颜色
   },
-  "commentTranslate.multiLineMerge": false,
-  "commentTranslate.targetLanguage": "zh-CN",
-  // ==================== GitLens自定义（优化版）====================
+  // -------------------- 终端配置 --------------------
+  "terminal.integrated.env.windows": { // Windows终端环境变量
+    "PYTHONIOENCODING": "utf-8" // Python IO编码设为UTF-8
+  },
+  "terminal.integrated.fontSize": 13, // 终端字体大小
+  "terminal.integrated.fontFamily": "'Source Code Pro', 'Courier New', monospace", // 终端字体族
+  "terminal.integrated.fontWeight": "normal", // 终端字体粗细
+  "terminal.integrated.lineHeight": 1.0, // 终端行高
+  "terminal.integrated.rightClickBehavior": "default", // 终端右键行为
+  // -------------------- Git 核心配置 --------------------
+  "git.enableSmartCommit": true, // 启用智能提交
+  "git.confirmSync": false, // 同步时不弹确认对话框
+  "git.autofetch": false, // 禁用自动fetch(性能考虑)
+  "git.autorefresh": true, // 启用自动刷新
+  "git.decorations.enabled": true, // 启用Git装饰器
+  "git.allowNoVerifyCommit": true, // 允许跳过验证提交
+  "git.inputValidation": true, // 启用输入验证
+  // =============================================================================
+  // 🔌 插件扩展配置
+  // =============================================================================
+  // -------------------- GitLens 配置 --------------------
   // 设计原则：最小干扰 + 按需获取 + 性能优化
-  // 1) ❌ 关闭高干扰功能（行尾标注、CodeLens）
-  "gitlens.currentLine.enabled": false, // 当前行责备注释
-  "gitlens.blame.highlight.enabled": true, // blame高亮干扰
-  "gitlens.codeLens.enabled": false, // 函数/文件顶部CodeLens
-  // 2) ✅ 保留轻量级交互（按需悬浮提示）
-  "gitlens.hovers.enabled": true, // 启用悬浮提示
-  "gitlens.hovers.currentLine.over": "line", // 精确控制触发范围
-  "gitlens.hovers.annotations.enabled": true, // 允许hover展示注释信息
-  // 3) 🔧 性能和体验优化
-  "gitlens.advanced.messages": { // 消息提示控制
-    "suppressCommitHasNoPreviousCommitWarning": false, // 保留重要警告
-    "suppressCreatePullRequestPrompt": true // 关闭PR创建提示
+  "gitlens.currentLine.enabled": false, // 禁用当前行责任注释
+  "gitlens.blame.highlight.enabled": true, // 启用blame高亮
+  "gitlens.codeLens.enabled": false, // 禁用CodeLens显示
+  "gitlens.hovers.enabled": true, // 启用悬停提示
+  "gitlens.hovers.currentLine.over": "line", // 悬停触发范围
+  "gitlens.hovers.annotations.enabled": true, // 启用注释悬停
+  "gitlens.advanced.messages": { // 高级消息设置
+    "suppressCommitHasNoPreviousCommitWarning": false, // 不抑制提交警告
+    "suppressCreatePullRequestPrompt": true // 抑制PR创建提示
   },
-  "gitlens.defaultDateFormat": "YYYY-MM-DD HH:mm", // 统一日期格式
+  "gitlens.defaultDateFormat": "YYYY-MM-DD HH:mm", // 默认日期格式
   "gitlens.defaultDateShortFormat": "YY-MM-DD", // 短日期格式
   "gitlens.telemetry.enabled": false, // 禁用遥测数据收集
-  // 用户体验优化（可根据GitLens版本调整具体配置项）
-  // 4) 📊 视图管理（收敛侧边栏占用）
   "gitlens.views.commitDetails.files.layout": "auto", // 提交详情布局
-  "gitlens.views.repositories.showBranchComparison": false,
-  "gitlens.views.repositories.showContributors": false,
-  "gitlens.views.repositories.showIncomingActivity": false,
-  "gitlens.views.repositories.showRemotes": false,
-  "gitlens.views.repositories.showStashes": false,
-  "gitlens.views.repositories.showTags": false,
-  "gitlens.views.repositories.showWorktrees": false,
+  "gitlens.views.repositories.showBranchComparison": false, // 不显示分支比较
+  "gitlens.views.repositories.showContributors": false, // 不显示贡献者
+  "gitlens.views.repositories.showIncomingActivity": false, // 不显示传入活动
+  "gitlens.views.repositories.showRemotes": false, // 不显示远程仓库
+  "gitlens.views.repositories.showStashes": false, // 不显示stash
+  "gitlens.views.repositories.showTags": false, // 不显示标签
+  "gitlens.views.repositories.showWorktrees": false, // 不显示工作树
+  // -------------------- Git Graph 配置 --------------------
+  "git-graph.date.format": "ISO Date & Time", // Git Graph日期格式
+  "git-graph.date.type": "Commit Date", // 使用提交日期
+  // -------------------- 翻译插件配置 --------------------
+  "commentTranslate.multiLineMerge": false, // 不合并多行翻译
+  "commentTranslate.targetLanguage": "zh-CN" // 目标翻译语言(中文)
 }
