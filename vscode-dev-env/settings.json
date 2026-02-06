@@ -107,9 +107,6 @@
   "gitlens.views.repositories.showStashes": false, // 不显示stash
   "gitlens.views.repositories.showTags": false, // 不显示标签
   "gitlens.views.repositories.showWorktrees": false, // 不显示工作树
-  "gitlens.views.fileHistory.enabled": true, // 启用文件历史视图
-  "gitlens.views.lineHistory.enabled": true, // 启用行历史视图
-  "gitlens.graph.autoRefresh": false, // 禁止自动刷新（减少后台更新/闪动）
   "gitlens.graph.scrollRowPadding": 6, // 让滚动更稳一点（非必须）
   "gitlens.graph.showDetailsView": "selection", // 只在你选中提交时更新详情（避免 hover 就变化）
   "gitlens.graph.minimap.enabled": false, // 关掉小地图（Minimap），更清爽
