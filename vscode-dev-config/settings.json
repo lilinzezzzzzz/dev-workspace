@@ -95,7 +95,7 @@
   // =============================================================================
   // -------------------- GitLens 配置 --------------------
   // 设计原则：最小干扰 + 按需获取 + 性能优化
-  "gitlens.currentLine.enabled": false, // 禁用当前行责任注释
+  "gitlens.currentLine.enabled": true, // 启用当前行责任注释
   "gitlens.blame.highlight.enabled": true, // 启用blame高亮
   "gitlens.codeLens.enabled": false, // 禁用CodeLens显示
   "gitlens.statusBar.enabled": false, // 禁用状态栏显示
