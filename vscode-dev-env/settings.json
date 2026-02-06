@@ -1,0 +1,122 @@
+{
+  // =============================================================================
+  // 🎨 编辑器核心配置
+  // =============================================================================
+  // -------------------- 基础编辑器设置 --------------------
+  "editor.bracketPairColorization.enabled": true, // 启用括号对彩色高亮
+  "editor.guides.bracketPairs": "active", // 仅高亮活跃的括号对
+  "editor.stickyScroll.enabled": true, // 启用粘性滚动(显示嵌套作用域)
+  // -------------------- 自动补全与智能提示 --------------------
+  "editor.autoClosingBrackets": "always", // 总是自动闭合括号
+  "editor.autoClosingQuotes": "always", // 总是自动闭合引号
+  "editor.autoSurround": "languageDefined", // 根据语言定义自动包围
+  "editor.inlineSuggest.enabled": true, // 启用内联建议
+  // -------------------- 光标与滚动 --------------------
+  "editor.cursorBlinking": "smooth", // 光标平滑闪烁
+  "editor.cursorSmoothCaretAnimation": "on", // 启用光标平滑动画
+  "editor.smoothScrolling": true, // 启用平滑滚动
+  // -------------------- 显示与视觉效果 --------------------
+  "editor.renderWhitespace": "boundary", // 仅在边界显示空白字符
+  "editor.renderLineHighlight": "all", // 高亮整行
+  "editor.renderControlCharacters": true, // 显示控制字符(\t,\n等)
+  "editor.roundedSelection": true, // 圆角选择区域
+  "editor.guides.indentation": true, // 显示缩进参考线
+  // -------------------- 小地图配置 --------------------
+  "editor.minimap.enabled": true, // 启用小地图
+  "editor.minimap.maxColumn": 80, // 小地图最大列数
+  "editor.minimap.renderCharacters": false, // 不渲染字符(仅显示轮廓)
+  // -------------------- 文件操作 --------------------
+  "files.autoSave": "onFocusChange", // 焦点切换时自动保存
+  "files.insertFinalNewline": true, // 文件末尾插入新行
+  "files.trimFinalNewlines": true, // 删除末尾多余空行
+  "files.trimTrailingWhitespace": true, // 删除行尾空格
+  "files.encoding": "utf8", // 文件编码UTF-8
+  "files.eol": "\n", // 行结束符使用LF
+  // -------------------- 缩进与格式化 --------------------
+  "editor.detectIndentation": true, // 自动检测缩进设置
+  "editor.autoIndent": "full", // 完全自动缩进
+  "editor.wordWrap": "off", // 关闭自动换行
+  "editor.wordWrapColumn": 120, // 换行列宽(120字符)
+  // -------------------- 字体配置 --------------------
+  "editor.fontFamily": "'Source Code Pro', 'Courier New', monospace", // 编辑器字体族
+  "editor.fontSize": 13, // 字体大小13px
+  "editor.fontLigatures": true, // 启用字体连字
+  "editor.fontWeight": "400", // 字体粗细(正常)
+  "editor.lineHeight": 0, // 行高(自动计算)
+  "editor.letterSpacing": 0, // 字母间距(默认)
+  // -------------------- 工作台与窗口 --------------------
+  "window.title": "${dirty}${activeEditorShort}${separator}${rootName}", // 窗口标题格式
+  "workbench.editor.labelFormat": "short", // 编辑器标签显示短格式
+  "workbench.editor.limit.enabled": true, // 启用编辑器数量限制
+  "workbench.editor.limit.value": 5, // 最多同时打开5个编辑器
+  "workbench.editor.limit.perEditorGroup": true, // 每个编辑器组独立限制
+  "workbench.editor.tabActionLocation": "right", // 标签页操作按钮位置
+  // -------------------- 主题配置 --------------------
+  "workbench.colorTheme": "Qoder Dark", // 颜色主题
+  "workbench.iconTheme": "material-icon-theme", // 文件图标主题
+  "workbench.productIconTheme": "material-product-icons", // 产品图标主题
+  // -------------------- 标签页颜色自定义 --------------------
+  "workbench.colorCustomizations": {
+    "tab.activeBackground": "#3a4f6b", // 激活标签页背景色
+    "tab.activeForeground": "#ffffff", // 激活标签页文字颜色
+    "tab.activeBorder": "#61afef", // 激活标签页边框色
+    "tab.activeBorderTop": "#4fa8ff", // 激活标签页顶边框
+    "tab.inactiveBackground": "#181b20", // 非激活标签页背景色
+    "tab.inactiveForeground": "#6b7280" // 非激活标签页文字颜色
+  },
+  // -------------------- 终端配置 --------------------
+  "terminal.integrated.env.windows": { // Windows终端环境变量
+    "PYTHONIOENCODING": "utf-8" // Python IO编码设为UTF-8
+  },
+  "terminal.integrated.fontSize": 13, // 终端字体大小
+  "terminal.integrated.fontFamily": "'Source Code Pro', 'Courier New', monospace", // 终端字体族
+  "terminal.integrated.fontWeight": "normal", // 终端字体粗细
+  "terminal.integrated.lineHeight": 1.0, // 终端行高
+  "terminal.integrated.rightClickBehavior": "default", // 终端右键行为
+  // -------------------- Git 核心配置 --------------------
+  "git.enableSmartCommit": true, // 启用智能提交
+  "git.confirmSync": false, // 同步时不弹确认对话框
+  "git.autofetch": false, // 禁用自动fetch(性能考虑)
+  "git.autorefresh": true, // 启用自动刷新
+  "git.decorations.enabled": true, // 启用Git装饰器
+  "git.allowNoVerifyCommit": true, // 允许跳过验证提交
+  "git.inputValidation": true, // 启用输入验证
+  // =============================================================================
+  // 🔌 插件扩展配置
+  // =============================================================================
+  // -------------------- GitLens 配置 --------------------
+  // 设计原则：最小干扰 + 按需获取 + 性能优化
+  "gitlens.currentLine.enabled": false, // 禁用当前行责任注释
+  "gitlens.blame.highlight.enabled": true, // 启用blame高亮
+  "gitlens.codeLens.enabled": false, // 禁用CodeLens显示
+  "gitlens.hovers.enabled": true, // 启用悬停提示
+  "gitlens.hovers.currentLine.over": "line", // 悬停触发范围
+  "gitlens.hovers.annotations.enabled": true, // 启用注释悬停
+  "gitlens.advanced.messages": { // 高级消息设置
+    "suppressCommitHasNoPreviousCommitWarning": false, // 不抑制提交警告
+    "suppressCreatePullRequestPrompt": true // 抑制PR创建提示
+  },
+  "gitlens.defaultDateFormat": "YYYY-MM-DD HH:mm", // 默认日期格式
+  "gitlens.defaultDateShortFormat": "YY-MM-DD", // 短日期格式
+  "gitlens.telemetry.enabled": false, // 禁用遥测数据收集
+  "gitlens.views.commitDetails.files.layout": "auto", // 提交详情布局
+  "gitlens.views.repositories.showBranchComparison": false, // 不显示分支比较
+  "gitlens.views.repositories.showContributors": false, // 不显示贡献者
+  "gitlens.views.repositories.showIncomingActivity": false, // 不显示传入活动
+  "gitlens.views.repositories.showRemotes": false, // 不显示远程仓库
+  "gitlens.views.repositories.showStashes": false, // 不显示stash
+  "gitlens.views.repositories.showTags": false, // 不显示标签
+  "gitlens.views.repositories.showWorktrees": false, // 不显示工作树
+  "gitlens.views.fileHistory.enabled": true, // 启用文件历史视图
+  "gitlens.views.lineHistory.enabled": true, // 启用行历史视图
+  "gitlens.graph.autoRefresh": false, // 禁止自动刷新（减少后台更新/闪动）
+  "gitlens.graph.scrollRowPadding": 6, // 让滚动更稳一点（非必须）
+  "gitlens.graph.showDetailsView": "selection", // 只在你选中提交时更新详情（避免 hover 就变化）
+  "gitlens.graph.minimap.enabled": false, // 关掉小地图（Minimap），更清爽
+  // -------------------- Git Graph 配置 --------------------
+  "git-graph.date.format": "ISO Date & Time", // Git Graph日期格式
+  "git-graph.date.type": "Commit Date", // 使用提交日期
+  // -------------------- 翻译插件配置 --------------------
+  "commentTranslate.multiLineMerge": false, // 不合并多行翻译
+  "commentTranslate.targetLanguage": "zh-CN" // 目标翻译语言(中文)
+}
