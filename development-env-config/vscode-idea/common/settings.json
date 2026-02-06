@@ -21,6 +21,7 @@
   "editor.renderControlCharacters": true, // 显示控制字符(\t,\n等)
   "editor.roundedSelection": true, // 圆角选择区域
   "editor.guides.indentation": true, // 显示缩进参考线
+  "editor.guides.highlightActiveIndentation": true, // 高亮活动缩进参考线"
   // -------------------- 小地图配置 --------------------
   "editor.minimap.enabled": true, // 启用小地图
   "editor.minimap.maxColumn": 80, // 小地图最大列数
