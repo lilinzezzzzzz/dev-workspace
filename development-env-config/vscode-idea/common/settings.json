@@ -137,5 +137,18 @@
   "git-graph.date.type": "Commit Date", // 使用提交日期
   // -------------------- 翻译插件配置 --------------------
   "commentTranslate.multiLineMerge": false, // 不合并多行翻译
-  "commentTranslate.targetLanguage": "zh-CN" // 目标翻译语言(中文)
+  "commentTranslate.targetLanguage": "zh-CN", // 目标翻译语言(中文)
+  // -------------------- Indent Rainbow 配置 --------------------
+  "indentRainbow.includedLanguages": [], // 启用 Indent Rainbow 的语言列表(为空表示所有语言)
+  "indentRainbow.excludedLanguages": [ // 禁用 Indent Rainbow 的语言列表
+    "plaintext"
+  ],
+  "indentRainbow.indicatorStyle": "light", // 缩进指示器样式(亮色模式)
+  "indentRainbow.lightIndicatorStyleLineWidth": 2, // 亮色指示器线宽(1像素)
+  "indentRainbow.colors": [ // 缩进层级颜色配置(带透明度的RGBA)
+    "rgba(255,255,64,0.3)",
+    "rgba(127,255,127,0.3)",
+    "rgba(255,127,255,0.3)",
+    "rgba(79,236,236,0.3)"
+  ]
 }

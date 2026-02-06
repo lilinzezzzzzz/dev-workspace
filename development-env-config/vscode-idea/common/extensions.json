@@ -68,6 +68,9 @@
     // Path Intellisense：路径补全
     "christian-kohler.path-intellisense",
 
+    // Indent Rainbow：缩进着色
+    "oderwat.indent-rainbow",
+
     // ==================================================
     // Markdown / 文档
     // ==================================================
