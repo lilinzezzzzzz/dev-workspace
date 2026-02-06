@@ -65,15 +65,22 @@
   * Naming: Use MixedCaps (exported) and mixedCaps (unexported); avoid underscores.
   * Context: Pass context.Context as the first parameter; propagate cancellation and deadlines.
 
-## Git Workflow
+## Git Commit Specification
 
 * **Branch Naming:**
   * feature/<description>, bugfix/<description>, hotfix/<description>, release/<version>.
-* **Commit Message:**
-  * Format: `<type>(<scope>): <subject>` (Conventional Commits).
-  * Types: feat, fix, docs, style, refactor, perf, test, chore, ci.
-  * Subject: imperative mood, lowercase, no period, max 50 chars.
-  * Body (optional): explain "what" and "why", wrap at 72 chars.
+
+* **Commit Message Specification:**
+  * **Format:** `<type>(<scope>): <subject>` (Conventional Commits)
+  * **Types:** feat, fix, chore, docs, style, refactor, test, perf, ci
+  * **Subject Rules:**
+    * Use imperative mood (e.g., "add" not "added")
+    * Lowercase, no period at the end
+    * Keep within 50 characters
+  * **Body (optional):**
+    * Explain "what" changes were made
+    * Keep within 72 characters per line when possible
+
 * **Merge Strategy:**
   * feature → develop: Squash or rebase.
   * develop → main: Merge commit (preserve history).
