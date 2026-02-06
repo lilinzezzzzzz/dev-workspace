@@ -89,6 +89,7 @@
   "gitlens.currentLine.enabled": false, // 禁用当前行责任注释
   "gitlens.blame.highlight.enabled": true, // 启用blame高亮
   "gitlens.codeLens.enabled": false, // 禁用CodeLens显示
+  "gitlens.statusBar.enabled": false, // 禁用状态栏显示
   "gitlens.hovers.enabled": true, // 启用悬停提示
   "gitlens.hovers.currentLine.over": "line", // 悬停触发范围
   "gitlens.hovers.annotations.enabled": true, // 启用注释悬停
