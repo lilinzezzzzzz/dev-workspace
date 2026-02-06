@@ -144,7 +144,7 @@
     "plaintext"
   ],
   "indentRainbow.indicatorStyle": "light", // 缩进指示器样式(亮色模式)
-  "indentRainbow.lightIndicatorStyleLineWidth": 2, // 亮色指示器线宽(1像素)
+  "indentRainbow.lightIndicatorStyleLineWidth": 1.5, // 亮色指示器线宽(1像素)
   "indentRainbow.colors": [ // 缩进层级颜色配置(带透明度的RGBA)
     "rgba(255,255,64,0.3)",
     "rgba(127,255,127,0.3)",
