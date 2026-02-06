@@ -254,8 +254,7 @@
   "gitlens.defaultDateFormat": "YYYY-MM-DD HH:mm", // 统一日期格式
   "gitlens.defaultDateShortFormat": "YY-MM-DD", // 短日期格式
   "gitlens.telemetry.enabled": false, // 禁用遥测数据收集
-  "gitlens.showWelcomeOnInstall": false, // 禁用安装欢迎页面
-  "gitlens.showWhatsNewAfterUpgrades": false, // 禁用升级后的更新说明
+  // 用户体验优化（可根据GitLens版本调整具体配置项）
   // 4) 📊 视图管理（收敛侧边栏占用）
   "gitlens.views.commitDetails.files.layout": "auto", // 提交详情布局
   "gitlens.views.repositories.showBranchComparison": false,
@@ -264,5 +263,5 @@
   "gitlens.views.repositories.showRemotes": false,
   "gitlens.views.repositories.showStashes": false,
   "gitlens.views.repositories.showTags": false,
-  "gitlens.views.repositories.showWorktrees": false
+  "gitlens.views.repositories.showWorktrees": false,
 }
