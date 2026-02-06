@@ -1,5 +1,7 @@
 {
   "recommendations": [
+    // 中文（简体）
+    "ms-ceintl.vscode-language-pack-zh-hans",
     // ==================================================
     // Remote / Dev Containers（远程容器开发）
     // ==================================================
@@ -80,9 +82,6 @@
     // EditorConfig：统一代码风格
     "editorconfig.editorconfig",
 
-    // Makefile Tools：Makefile 任务支持
-    "ms-vscode.makefile-tools",
-
     // ==================================================
     // 主题 / 图标
     // ==================================================
@@ -91,6 +90,9 @@
     "romanrei.material-dark",
 
     // Material Icon Theme：文件图标
-    "pkief.material-icon-theme"
+    "pkief.material-icon-theme",
+
+    // Material Product Icons：产品图标
+    "pkief.material-product-icons"
   ]
 }
