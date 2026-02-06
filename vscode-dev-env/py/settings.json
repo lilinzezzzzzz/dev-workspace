@@ -210,9 +210,15 @@
   "gitlens.views.repositories.showStashes": false, // 不显示stash
   "gitlens.views.repositories.showTags": false, // 不显示标签
   "gitlens.views.repositories.showWorktrees": false, // 不显示工作树
+  "gitlens.views.fileHistory.enabled": true,
+  "gitlens.views.lineHistory.enabled": true,
   // -------------------- Git Graph 配置 --------------------
   "git-graph.date.format": "ISO Date & Time", // Git Graph日期格式
   "git-graph.date.type": "Commit Date", // 使用提交日期
+  "gitlens.graph.autoRefresh": false, // 禁止自动刷新（减少后台更新/闪动）
+  "gitlens.graph.scrollRowPadding": 6, // 让滚动更稳一点（非必须）
+  "gitlens.graph.showDetailsView": "selection", // 只在你选中提交时更新详情（避免 hover 就变化）
+  "gitlens.graph.minimap.enabled": false, // 关掉小地图（Minimap），更清爽
   // -------------------- 翻译插件配置 --------------------
   "commentTranslate.multiLineMerge": false, // 不合并多行翻译
   "commentTranslate.targetLanguage": "zh-CN" // 目标翻译语言(中文)

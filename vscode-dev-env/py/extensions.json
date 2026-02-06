@@ -9,8 +9,10 @@
     "charliermarsh.ruff",
     // 测试
     "littlefoxteam.vscode-python-test-adapter",
-    // Git
+    // GitLens
     "eamodio.gitlens",
+    // Git Graph
+    "eamodio.git-graph",
     // YAML/TOML 支持
     "redhat.vscode-yaml",
     "tamasfe.even-better-toml",
