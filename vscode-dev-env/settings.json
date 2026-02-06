@@ -81,6 +81,12 @@
   "git.decorations.enabled": true, // 启用Git装饰器
   "git.allowNoVerifyCommit": true, // 允许跳过验证提交
   "git.inputValidation": true, // 启用输入验证
+  // VS Code SCM 面板配置
+  "scm.defaultViewMode": "tree",     // 默认树形视图模式
+  "scm.countBadge": "all",           // 显示所有变更计数
+  "scm.providerCountBadge": "hidden", // 隐藏提供商计数
+  "scm.alwaysShowRepositories": true, // 总是显示仓库列表
+  "scm.repositories.visible": 10,    // 最多显示10个仓库
   // =============================================================================
   // 🔌 插件扩展配置
   // =============================================================================
