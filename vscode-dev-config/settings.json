@@ -55,7 +55,7 @@
   "workbench.activityBar.visible": true,        // 显示活动栏
   "workbench.sideBar.location": "left",         // 侧边栏位置
   // -------------------- 主题配置 --------------------
-  "workbench.colorTheme": "Qoder Dark", // 颜色主题
+  "workbench.colorTheme": "Material Dark Theme", // 颜色主题
   "workbench.iconTheme": "material-icon-theme", // 文件图标主题
   "workbench.productIconTheme": "material-product-icons", // 产品图标主题
   // -------------------- 标签页颜色自定义 --------------------
