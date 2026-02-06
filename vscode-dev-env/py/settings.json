@@ -55,10 +55,14 @@
   // ==================== 测试配置 (pytest) ====================
   "python.testing.pytestEnabled": true,
   "python.testing.unittestEnabled": false,
+  // Pytest 测试参数配置
+  // 重要提示: 不同项目的测试文件路径可能不同,请根据实际项目结构修改第一个参数
+  // 常见测试路径: "tests", "test", "src/tests", "app/tests" 等
   "python.testing.pytestArgs": [
-    "dev/tests",
-    "-v",
-    "--tb=short"
+    "tests", // 测试文件所在目录(需根据项目实际路径修改)
+    "-s", // 显示print输出,不捕获标准输出
+    "-v", // 详细输出,显示每个测试用例名称
+    "--tb=short" // 简短的traceback格式,出错时显示简洁的错误信息
   ],
   // ==================== 文件关联 ====================
   "files.associations": {
@@ -231,5 +235,34 @@
     "tab.inactiveForeground": "#6b7280"
   },
   "commentTranslate.multiLineMerge": false,
-  "commentTranslate.targetLanguage": "zh-CN"
+  "commentTranslate.targetLanguage": "zh-CN",
+  // ==================== GitLens自定义（优化版）====================
+  // 设计原则：最小干扰 + 按需获取 + 性能优化
+  // 1) ❌ 关闭高干扰功能（行尾标注、CodeLens）
+  "gitlens.currentLine.enabled": false, // 当前行责备注释
+  "gitlens.blame.highlight.enabled": true, // blame高亮干扰
+  "gitlens.codeLens.enabled": false, // 函数/文件顶部CodeLens
+  // 2) ✅ 保留轻量级交互（按需悬浮提示）
+  "gitlens.hovers.enabled": true, // 启用悬浮提示
+  "gitlens.hovers.currentLine.over": "line", // 精确控制触发范围
+  "gitlens.hovers.annotations.enabled": true, // 允许hover展示注释信息
+  // 3) 🔧 性能和体验优化
+  "gitlens.advanced.messages": { // 消息提示控制
+    "suppressCommitHasNoPreviousCommitWarning": false, // 保留重要警告
+    "suppressCreatePullRequestPrompt": true // 关闭PR创建提示
+  },
+  "gitlens.defaultDateFormat": "YYYY-MM-DD HH:mm", // 统一日期格式
+  "gitlens.defaultDateShortFormat": "YY-MM-DD", // 短日期格式
+  "gitlens.telemetry.enabled": false, // 禁用遥测数据收集
+  "gitlens.showWelcomeOnInstall": false, // 禁用安装欢迎页面
+  "gitlens.showWhatsNewAfterUpgrades": false, // 禁用升级后的更新说明
+  // 4) 📊 视图管理（收敛侧边栏占用）
+  "gitlens.views.commitDetails.files.layout": "auto", // 提交详情布局
+  "gitlens.views.repositories.showBranchComparison": false,
+  "gitlens.views.repositories.showContributors": false,
+  "gitlens.views.repositories.showIncomingActivity": false,
+  "gitlens.views.repositories.showRemotes": false,
+  "gitlens.views.repositories.showStashes": false,
+  "gitlens.views.repositories.showTags": false,
+  "gitlens.views.repositories.showWorktrees": false
 }
