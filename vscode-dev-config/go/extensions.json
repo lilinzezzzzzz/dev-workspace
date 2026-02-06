@@ -1,41 +1,96 @@
 {
   "recommendations": [
-    // ==================== Go 核心 ====================
-    // Go 官方扩展 (必装)
-    "golang.go",
-    // ==================== 代码质量 ====================
-    // Error Lens - 内联显示错误/警告
-    "usernamehw.errorlens",
-    // Go Test Explorer - 测试管理
-    "premparihar.gotestexplorer",
-    // ==================== Git ====================
+    // ==================================================
+    // Remote / Dev Containers（远程容器开发）
+    // ==================================================
+
+    // Dev Containers：容器内开发
+    "ms-vscode-remote.remote-containers",
+
+    // Docker：容器与镜像管理
+    "ms-azuretools.vscode-docker",
+
+    // ==================================================
+    // Python 核心工具链（ruff + basedpyright）
+    // ==================================================
+
+    // Python：解释器、调试、测试集成
+    "ms-python.python",
+
+    // Ruff：lint + import 排序 + format
+    "charliermarsh.ruff",
+
+    // basedpyright：静态类型检查
+    "detachhead.basedpyright",
+
+    // ==================================================
+    // Git
+    // ==================================================
+
+    // GitLens：历史追溯与提交分析
     "eamodio.gitlens",
-    // ==================== 配置文件支持 ====================
-    // YAML
+
+    // ==================================================
+    // 配置文件 / 接口定义
+    // ==================================================
+
+    // YAML：schema 校验与补全
     "redhat.vscode-yaml",
-    // TOML
+
+    // TOML：pyproject.toml 等
     "tamasfe.even-better-toml",
-    // Protocol Buffers (Protobuf)
-    "zxh404.vscode-proto3",
-    // ENV 环境变量
+
+    // Protobuf：Buf 工具链支持
+    "bufbuild.vscode-buf",
+
+    // dotenv：.env 文件高亮
     "mikestead.dotenv",
-    // ==================== 代码增强 ====================
-    // Better Comments - 彩色注释
+
+    // ==================================================
+    // 代码质量 / 标记
+    // ==================================================
+
+    // Error Lens：内联显示错误/警告
+    "usernamehw.errorlens",
+
+    // Tree：TODO/FIXME 聚合
+    "gruntfuggly.todo-tree",
+
+    // ==================================================
+    // 编辑体验增强（低噪音）
+    // ==================================================
+
+    // Better Comments：注释关键字高亮
     "aaron-bond.better-comments",
-    // Indent Rainbow - 缩进高亮
-    "oderwat.indent-rainbow",
-    // Path Intellisense - 路径补全
+
+    // Path Intellisense：路径补全
     "christian-kohler.path-intellisense",
-    // Highlight - TODO/FIXME 高亮
-    "wayou.vscode-todo-highlight",
-    // ==================== Markdown ====================
+
+    // ==================================================
+    // Markdown / 文档
+    // ==================================================
+
+    // Markdown All in One：Markdown 编辑增强
     "yzhang.markdown-all-in-one",
-    // ==================== 主题/图标 ====================
-    // Material Dark Theme
+
+    // ==================================================
+    // 工程化基础
+    // ==================================================
+
+    // EditorConfig：统一代码风格
+    "editorconfig.editorconfig",
+
+    // Makefile Tools：Makefile 任务支持
+    "ms-vscode.makefile-tools",
+
+    // ==================================================
+    // 主题 / 图标
+    // ==================================================
+
+    // Material Dark Theme：主题
     "romanrei.material-dark",
-    // Material Icon Theme
-    "pkief.material-icon-theme",
-    // Material Product Icons
-    "pkief.material-product-icons"
+
+    // Material Icon Theme：文件图标
+    "pkief.material-icon-theme"
   ]
 }
