@@ -1,12 +1,12 @@
 [
   // ==================== 格式化文档快捷键 ====================
-  // 将格式化文档快捷键从 Shift+Alt+F 改为 Ctrl+Alt+F
+  // 将格式化文档快捷键改为 PyCharm macOS 风格: Cmd+Option+L
   {
-    "key": "ctrl+alt+f",
+    "key": "cmd+alt+l",
     "command": "editor.action.formatDocument",
     "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
   },
-  // 移除原有的 Shift+Alt+F 快捷键(可选)
+  // 移除 VS Code 默认的 Shift+Option+F 快捷键
   {
     "key": "shift+alt+f",
     "command": "-editor.action.formatDocument"
