@@ -6,7 +6,7 @@
     // Remote / Dev Containers（远程容器开发）
     // ==================================================
 
-    // Dev Containers：容器内开发
+    // Dev Containers：容器内开发（windows 需要）
     "ms-vscode-remote.remote-containers",
 
     // Docker：容器与镜像管理
