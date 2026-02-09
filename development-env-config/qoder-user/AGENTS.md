@@ -7,7 +7,6 @@
   * AI: LLMs, GenAI, Multi-modal Models, RAG, Fine-tuning, Inference Optimization, MLOps.
   * Backend: AI Platform / Middle-end Development, Distributed Systems.
 
-
 ## Coding Standards
 
 ### General
@@ -68,7 +67,7 @@
 ## Git Commit Specification
 
 * **Branch Naming:**
-  * feature/<description>, bugfix/<description>, hotfix/<description>, release/<version>.
+  * `feature/<description>`, `bugfix/<description>`, `hotfix/<description>`, `release/<version>`.
 
 * **Commit Message Specification:**
   * **Format:** `<type>(<scope>): <subject>` (Conventional Commits)
@@ -88,7 +87,6 @@
 * **Language Preference:**
   * Prioritize Chinese when appropriate for better readability
 
-
 ## Response Preferences
 
 * **Conciseness:**
@@ -100,7 +98,6 @@
 * **Format:**
   * Use structured Markdown for technical comparisons or pros/cons analysis.
 
-
 ## Analysis & Verification Protocol
 
 * **Challenge Assumptions:**
@@ -110,7 +107,6 @@
   * Proactively highlight potential logical flaws, scalability bottlenecks, concurrency issues, or security vulnerabilities.
 * **Constructive Feedback Loop:**
   * If a proposed solution is suboptimal or an anti-pattern, propose superior, industry-standard alternatives before proceeding.
-
 
 ## Timeliness & Web Search
 
