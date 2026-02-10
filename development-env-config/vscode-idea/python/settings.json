@@ -3,7 +3,7 @@
   // 🐍 PYTHON 编程语言相关配置
   // =============================================================================
   // -------------------- Python 解释器配置 --------------------
-  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python3", // 默认Python解释器路径
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python", // 默认Python解释器路径
   "python.terminal.activateEnvironment": true, // 终端启动时激活虚拟环境
   "python.terminal.activateEnvInCurrentTerminal": true, // 在当前终端中激活环境
   "python.envFile": "${workspaceFolder}/.env", // Python环境变量文件路径
