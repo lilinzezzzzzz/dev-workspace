@@ -1,5 +1,6 @@
 services:
   dev-workspace:
+    profiles: ["workspace"]  # 仅 Windows 环境需要启动，通过 --profile workspace 激活
     image: dev-workspace:latest
     container_name: dev-workspace
     build:

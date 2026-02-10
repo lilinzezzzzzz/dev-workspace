@@ -137,7 +137,7 @@ Write-Step "构建 Docker 镜像 (可能需要几分钟)..."
 
 # 临时允许 stderr 输出，因为 Docker 的进度信息会输出到 stderr
 $ErrorActionPreference = "Continue"
-& docker-compose build --no-cache
+& docker-compose --profile workspace build --no-cache
 $buildExitCode = $LASTEXITCODE
 $ErrorActionPreference = "Stop"
 
@@ -154,7 +154,7 @@ Write-Success "Docker 镜像构建完成"
 Write-Step "启动服务..."
 
 $ErrorActionPreference = "Continue"
-& docker-compose up -d
+& docker-compose --profile workspace up -d
 $upExitCode = $LASTEXITCODE
 $ErrorActionPreference = "Stop"
 
@@ -172,7 +172,7 @@ Write-Step "等待服务就绪..."
 
 Start-Sleep -Seconds 5
 
-$status = docker-compose ps --format json 2>&1 | ConvertFrom-Json
+$status = docker-compose --profile workspace ps --format json 2>&1 | ConvertFrom-Json
 $allHealthy = $true
 
 foreach ($service in $status) {

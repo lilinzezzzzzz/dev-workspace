@@ -57,12 +57,12 @@ fi
 docker_version=$(docker --version 2>&1)
 print_success "Docker 已安装: $docker_version"
 
-if ! command -v docker-compose &> /dev/null; then
+if ! docker compose version &> /dev/null; then
     print_error "Docker Compose 未安装"
     exit 1
 fi
 
-compose_version=$(docker-compose --version 2>&1)
+compose_version=$(docker compose version 2>&1)
 print_success "Docker Compose 已安装: $compose_version"
 
 # ============================================================
@@ -136,7 +136,7 @@ print_success "私钥权限设置完成"
 # ============================================================
 print_step "构建 Docker 镜像 (可能需要几分钟)..."
 
-if docker-compose build --no-cache 2>&1 | while read line; do echo -e "  ${GRAY}$line${NC}"; done; then
+if docker compose build --no-cache 2>&1 | while read line; do echo -e "  ${GRAY}$line${NC}"; done; then
     print_success "Docker 镜像构建完成"
 else
     print_error "Docker 镜像构建失败"
@@ -148,7 +148,7 @@ fi
 # ============================================================
 print_step "启动服务..."
 
-if docker-compose up -d 2>&1 | while read line; do echo -e "  ${GRAY}$line${NC}"; done; then
+if docker compose up -d 2>&1 | while read line; do echo -e "  ${GRAY}$line${NC}"; done; then
     print_success "服务启动完成"
 else
     print_error "服务启动失败"
@@ -162,7 +162,7 @@ print_step "等待服务就绪..."
 
 sleep 5
 
-docker-compose ps --format "table {{.Name}}\t{{.Status}}" | while read line; do
+docker compose ps --format "table {{.Name}}\t{{.Status}}" | while read line; do
     if echo "$line" | grep -q "running\|Up"; then
         echo -e "  ${GREEN}✓ $line${NC}"
     else
