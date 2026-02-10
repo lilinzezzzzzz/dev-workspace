@@ -150,5 +150,14 @@
     "rgba(127,255,127,0.3)",
     "rgba(255,127,255,0.3)",
     "rgba(79,236,236,0.3)"
+  ],
+    // -------------------- YAML 配置 --------------------
+  "yaml.schemaStore.enable": true, // 启用schema store,但允许自定义覆盖
+  "yaml.schemas": {
+    // 使用 Docker Compose schema 进行验证
+    "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": ["docker-compose.yaml", "docker-compose.yml"]
+  },
+  "yaml.customTags": [ // 支持 Docker Compose 的自定义标签
+    "!reference sequence"
   ]
 }
