@@ -4,7 +4,9 @@
 
 此目录包含用于容器SSH连接的密钥文件：
 
-- `id_rsa` - SSH私钥
+- `id_ed25519` - SSH私钥 (推荐)
+- `id_ed25519.pub` - SSH公钥
+- `id_rsa` - SSH私钥 (兼容旧系统)
 - `id_rsa.pub` - SSH公钥
 - `config` - SSH配置文件
 - `known_hosts` - 已知主机列表
@@ -41,11 +43,14 @@ chmod +x copy-ssh-keys.sh
 如果是首次使用或需要为容器生成专用密钥，在当前目录执行：
 
 ```bash
-# 生成新的SSH密钥对
-ssh-keygen -t rsa -b 4096 -f ./id_rsa -N "" -C "docker-container"
+# 生成新的SSH密钥对 (推荐 ED25519)
+ssh-keygen -t ed25519 -f ./id_ed25519 -N "" -C "docker-container"
 
 # Windows PowerShell 中执行
-ssh-keygen -t rsa -b 4096 -f ".\id_rsa" -N '""' -C "docker-container"
+ssh-keygen -t ed25519 -f ".\id_ed25519" -N '""' -C "docker-container"
+
+# 兼容旧系统可使用 RSA
+ssh-keygen -t rsa -b 4096 -f ./id_rsa -N "" -C "docker-container"
 ```
 
 ### 2. 复制现有密钥
@@ -53,10 +58,14 @@ ssh-keygen -t rsa -b 4096 -f ".\id_rsa" -N '""' -C "docker-container"
 如果要使用主机的SSH密钥：
 
 ```bash
-# Linux/Mac
+# Linux/Mac (推荐 ED25519)
+cp ~/.ssh/id_ed25519* ./
+# 或复制 RSA 密钥
 cp ~/.ssh/id_rsa* ./
 
-# Windows PowerShell
+# Windows PowerShell (推荐 ED25519)
+Copy-Item -Path "$env:USERPROFILE\.ssh\id_ed25519*" -Destination ".\" -Force
+# 或复制 RSA 密钥
 Copy-Item -Path "$env:USERPROFILE\.ssh\id_rsa*" -Destination ".\" -Force
 ```
 
@@ -65,7 +74,10 @@ Copy-Item -Path "$env:USERPROFILE\.ssh\id_rsa*" -Destination ".\" -Force
 容器启动后，使用SSH连接：
 
 ```bash
-# 使用密钥连接（端口10022）
+# 使用 ED25519 密钥连接（端口10022，推荐）
+ssh -i ./id_ed25519 root@localhost -p 10022
+
+# 或使用 RSA 密钥连接
 ssh -i ./id_rsa root@localhost -p 10022
 
 # 或使用密码连接（默认密码: 123456）
@@ -77,11 +89,14 @@ ssh root@localhost -p 10022
 将公钥添加到目标服务器：
 
 ```bash
-# 复制公钥到目标服务器
+# 复制 ED25519 公钥到目标服务器（推荐）
+ssh-copy-id -i ./id_ed25519.pub -p 10022 root@localhost
+
+# 或复制 RSA 公钥
 ssh-copy-id -i ./id_rsa.pub -p 10022 root@localhost
 
 # 或手动添加
-cat ./id_rsa.pub | ssh -p 10022 root@localhost "cat >> ~/.ssh/authorized_keys"
+cat ./id_ed25519.pub | ssh -p 10022 root@localhost "cat >> ~/.ssh/authorized_keys"
 ```
 
 ## 权限说明
@@ -96,11 +111,11 @@ cat ./id_rsa.pub | ssh -p 10022 root@localhost "cat >> ~/.ssh/authorized_keys"
 ## 安全建议
 
 1. **不要提交私钥到Git仓库**
-   - 在 `.gitignore` 中添加 `ssh-keys/id_rsa`
-   
+   - 在 `.gitignore` 中添加 `ssh-keys/id_ed25519` 和 `ssh-keys/id_rsa`
+
 2. **使用专用密钥**
    - 为容器生成独立的密钥对，不要使用个人主密钥
-   
+
 3. **定期轮换密钥**
    - 建议每3-6个月更换一次SSH密钥
 
@@ -124,10 +139,13 @@ docker logs python-venv
 ```bash
 # 重新设置密钥权限
 chmod 700 ~/.ssh
+chmod 600 ~/.ssh/id_ed25519
+chmod 644 ~/.ssh/id_ed25519.pub
+# 如果使用 RSA
 chmod 600 ~/.ssh/id_rsa
 chmod 644 ~/.ssh/id_rsa.pub
 ```
 
 ### 密钥不匹配
 
-确保 `id_rsa.pub` 的内容已添加到目标服务器的 `~/.ssh/authorized_keys` 文件中。
+确保 `id_ed25519.pub` 或 `id_rsa.pub` 的内容已添加到目标服务器的 `~/.ssh/authorized_keys` 文件中。

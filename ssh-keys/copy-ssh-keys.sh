@@ -27,17 +27,17 @@ echo ""
 # 检查源目录是否存在
 if [ ! -d "$SSH_SOURCE_DIR" ]; then
     echo -e "${RED}错误: SSH目录不存在: $SSH_SOURCE_DIR${NC}"
-    echo -e "${YELLOW}请先生成SSH密钥: ssh-keygen -t rsa -b 4096${NC}"
+    echo -e "${YELLOW}请先生成SSH密钥: ssh-keygen -t ed25519${NC}"
     exit 1
 fi
 
 # 检查私钥文件是否存在
-if [ ! -f "$SSH_SOURCE_DIR/id_rsa" ] && [ ! -f "$SSH_SOURCE_DIR/id_ed25519" ]; then
-    echo -e "${RED}错误: 未找到SSH密钥文件 (id_rsa 或 id_ed25519)${NC}"
+if [ ! -f "$SSH_SOURCE_DIR/id_ed25519" ] && [ ! -f "$SSH_SOURCE_DIR/id_rsa" ]; then
+    echo -e "${RED}错误: 未找到SSH密钥文件 (id_ed25519 或 id_rsa)${NC}"
     echo -e "${YELLOW}请先生成SSH密钥:${NC}"
-    echo -e "  ${GREEN}ssh-keygen -t rsa -b 4096${NC}"
-    echo -e "  或"
     echo -e "  ${GREEN}ssh-keygen -t ed25519${NC}"
+    echo -e "  或"
+    echo -e "  ${GREEN}ssh-keygen -t rsa -b 4096${NC}"
     exit 1
 fi
 
@@ -82,15 +82,15 @@ done
 echo ""
 if [ $copied_count -eq 0 ]; then
     echo -e "${YELLOW}警告: 没有找到任何SSH密钥文件${NC}"
-    echo -e "${YELLOW}建议生成新密钥: ssh-keygen -t rsa -b 4096 -f $SCRIPT_DIR/id_rsa${NC}"
+    echo -e "${YELLOW}建议生成新密钥: ssh-keygen -t ed25519 -f $SCRIPT_DIR/id_ed25519${NC}"
 else
     echo -e "${GREEN}✓ 成功复制 $copied_count 个文件${NC}"
     echo ""
     echo -e "${YELLOW}提示:${NC}"
     echo "  1. 这些密钥文件已被 .gitignore 排除，不会提交到Git"
-    echo "  2. 私钥文件(id_rsa)包含敏感信息，请妥善保管"
+    echo "  2. 私钥文件包含敏感信息，请妥善保管"
     echo "  3. 可以使用以下命令连接到容器:"
-    echo "     ssh -i $SCRIPT_DIR/id_rsa root@localhost -p 10022"
+    echo "     ssh -i $SCRIPT_DIR/id_ed25519 root@localhost -p 10022"
 fi
 
 echo ""

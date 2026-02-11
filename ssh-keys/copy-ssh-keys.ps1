@@ -31,20 +31,20 @@ Write-Output ""
 # 检查源目录是否存在
 if (-not (Test-Path $SshSourceDir)) {
     Write-ColorOutput Red "错误: SSH目录不存在: $SshSourceDir"
-    Write-ColorOutput Yellow "请先生成SSH密钥: ssh-keygen -t rsa -b 4096"
+    Write-ColorOutput Yellow "请先生成SSH密钥: ssh-keygen -t ed25519"
     exit 1
 }
 
 # 检查私钥文件是否存在
-$rsaKey = Join-Path $SshSourceDir "id_rsa"
 $ed25519Key = Join-Path $SshSourceDir "id_ed25519"
+$rsaKey = Join-Path $SshSourceDir "id_rsa"
 
-if (-not (Test-Path $rsaKey) -and -not (Test-Path $ed25519Key)) {
-    Write-ColorOutput Red "错误: 未找到SSH密钥文件 (id_rsa 或 id_ed25519)"
+if (-not (Test-Path $ed25519Key) -and -not (Test-Path $rsaKey)) {
+    Write-ColorOutput Red "错误: 未找到SSH密钥文件 (id_ed25519 或 id_rsa)"
     Write-ColorOutput Yellow "请先生成SSH密钥:"
-    Write-Output "  ssh-keygen -t rsa -b 4096"
-    Write-Output "  或"
     Write-Output "  ssh-keygen -t ed25519"
+    Write-Output "  或"
+    Write-Output "  ssh-keygen -t rsa -b 4096"
     exit 1
 }
 
@@ -112,15 +112,15 @@ foreach ($file in $filesToCopy) {
 Write-Output ""
 if ($copiedCount -eq 0) {
     Write-ColorOutput Yellow "警告: 没有找到任何SSH密钥文件"
-    Write-ColorOutput Yellow "建议生成新密钥: ssh-keygen -t rsa -b 4096 -f `"$ScriptDir\id_rsa`""
+    Write-ColorOutput Yellow "建议生成新密钥: ssh-keygen -t ed25519 -f `"$ScriptDir\id_ed25519`""
 } else {
     Write-ColorOutput Green "✓ 成功复制 $copiedCount 个文件"
     Write-Output ""
     Write-ColorOutput Yellow "提示:"
     Write-Output "  1. 这些密钥文件已被 .gitignore 排除，不会提交到Git"
-    Write-Output "  2. 私钥文件(id_rsa)包含敏感信息，请妥善保管"
+    Write-Output "  2. 私钥文件包含敏感信息，请妥善保管"
     Write-Output "  3. 可以使用以下命令连接到容器:"
-    Write-Output "     ssh -i `"$ScriptDir\id_rsa`" root@localhost -p 10022"
+    Write-Output "     ssh -i `"$ScriptDir\id_ed25519`" root@localhost -p 10022"
 }
 
 Write-Output ""

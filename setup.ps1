@@ -67,13 +67,13 @@ $rsaKey = Join-Path $SshSourceDir "id_rsa"
 $ed25519Key = Join-Path $SshSourceDir "id_ed25519"
 
 # 检查是否存在 SSH 密钥
-if (-not (Test-Path $rsaKey) -and -not (Test-Path $ed25519Key)) {
+if (-not (Test-Path $ed25519Key) -and -not (Test-Path $rsaKey)) {
     Write-Error "未找到 SSH 密钥文件"
     Write-Host ""
     Write-Host "请先生成 SSH 密钥:" -ForegroundColor Yellow
-    Write-Host "  ssh-keygen -t rsa -b 4096" -ForegroundColor White
-    Write-Host "  或" -ForegroundColor Yellow
     Write-Host "  ssh-keygen -t ed25519" -ForegroundColor White
+    Write-Host "  或" -ForegroundColor Yellow
+    Write-Host "  ssh-keygen -t rsa -b 4096" -ForegroundColor White
     exit 1
 }
 
@@ -193,9 +193,9 @@ Write-Host "  部署完成!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "连接方式:" -ForegroundColor Cyan
-Write-Host "  SSH 免密登录:  ssh -i ./ssh-keys/id_rsa root@localhost -p 10022" -ForegroundColor White
+Write-Host "  SSH 免密登录:  ssh -i ./ssh-keys/id_ed25519 root@localhost -p 10022" -ForegroundColor White
 Write-Host "  SSH 密码登录:  ssh root@localhost -p 10022  (密码: 123456)" -ForegroundColor White
-Write-Host "  进入容器:      docker exec -it python-venv bash" -ForegroundColor White
+Write-Host "  进入容器:      docker exec -it dev-workspace bash" -ForegroundColor White
 Write-Host ""
 Write-Host "Redis 连接:" -ForegroundColor Cyan
 Write-Host "  redis-cli -h localhost -p 6379 -a 123456" -ForegroundColor White

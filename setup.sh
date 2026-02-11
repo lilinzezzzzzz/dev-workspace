@@ -75,13 +75,13 @@ SSH_TARGET_DIR="$SCRIPT_DIR/ssh-keys"
 RSA_KEY="$SSH_SOURCE_DIR/id_rsa"
 ED25519_KEY="$SSH_SOURCE_DIR/id_ed25519"
 
-if [ ! -f "$RSA_KEY" ] && [ ! -f "$ED25519_KEY" ]; then
+if [ ! -f "$ED25519_KEY" ] && [ ! -f "$RSA_KEY" ]; then
     print_error "未找到 SSH 密钥文件"
     echo ""
     echo -e "${YELLOW}请先生成 SSH 密钥:${NC}"
-    echo "  ssh-keygen -t rsa -b 4096"
-    echo "  或"
     echo "  ssh-keygen -t ed25519"
+    echo "  或"
+    echo "  ssh-keygen -t rsa -b 4096"
     exit 1
 fi
 
@@ -179,9 +179,9 @@ echo -e "${GREEN}  部署完成!${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo ""
 echo -e "${CYAN}连接方式:${NC}"
-echo "  SSH 免密登录:  ssh -i ./ssh-keys/id_rsa root@localhost -p 10022"
+echo "  SSH 免密登录:  ssh -i ./ssh-keys/id_ed25519 root@localhost -p 10022"
 echo "  SSH 密码登录:  ssh root@localhost -p 10022  (密码: 123456)"
-echo "  进入容器:      docker exec -it python-venv bash"
+echo "  进入容器:      docker exec -it dev-workspace bash"
 echo ""
 echo -e "${CYAN}Redis 连接:${NC}"
 echo "  redis-cli -h localhost -p 6379 -a 123456"
