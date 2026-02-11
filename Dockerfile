@@ -66,8 +66,6 @@ RUN sed -ri 's/^#?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config 
 COPY scripts/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-EXPOSE 22
-
 # 轻量健康检查：确认 22 已监听
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD sh -c "ss -lnt | grep -q ':22 ' || exit 1"
