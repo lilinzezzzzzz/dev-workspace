@@ -19,7 +19,7 @@
 2. 确保本机已生成 SSH 密钥：
    ```bash
    # 如果没有，先生成
-   ssh-keygen -t rsa -b 4096
+   ssh-keygen -t ed25519
    ```
 
 ### 一键部署
@@ -46,8 +46,9 @@ chmod +x setup.sh
 
 | 服务 | 容器名 | 端口映射 | 说明 |
 |-----|-------|---------|------|
-| dev-env | dev-env | 10022→22, 8000, 8070, 8080, 8090 | Python 开发环境 |
+| dev-workspace | dev-workspace | 10022→22, 8000-8099 | Python 开发环境 |
 | redis | redis | 6379→6379 | Redis 缓存服务 |
+| mysql | mysql | 3306→3306 | MySQL 数据库服务 |
 
 ### 基础设施配置
 
@@ -67,7 +68,7 @@ chmod +x setup.sh
 
 ```bash
 # 免密登录（推荐）
-ssh -i ./ssh-keys/id_rsa root@localhost -p 10022
+ssh -i ./ssh-keys/id_ed25519 root@localhost -p 10022
 
 # 密码登录（密码: 123456）
 ssh root@localhost -p 10022
@@ -76,13 +77,19 @@ ssh root@localhost -p 10022
 ### 进入容器
 
 ```bash
-docker exec -it dev-env bash
+docker exec -it dev-workspace bash
 ```
 
 ### Redis 连接
 
 ```bash
 redis-cli -h localhost -p 6379 -a 123456
+```
+
+### MySQL 连接
+
+```bash
+mysql -h localhost -P 3306 -u root -p123456
 ```
 
 ## Python 版本管理
@@ -151,11 +158,11 @@ dev-workspace/
 │   └── README.md           # SSH 使用说明
 ├── docs/                   # 文档目录
 │   └── UV_USAGE.md         # uv 使用指南
-├── vscode-dev-env/         # VSCode 配置模板
+├── development-env-config/ # VSCode 配置模板
 │   ├── golang/             # Go 开发配置
-│   ├── py/                 # Python 开发配置
-│   ├── AGENTS.md           # AI Agent 配置说明
-│   └── keybindings.json    # 快捷键配置
+│   ├── python/             # Python 开发配置
+│   ├── qoder-user/         # AI Agent 配置
+│   └── common/             # 通用配置
 └── infras/                 # 基础设施配置
     ├── clickhouse/         # ClickHouse 配置
     ├── mongodb/            # MongoDB 配置
@@ -222,17 +229,17 @@ uv run python main.py
 
 ```bash
 # 检查容器日志
-docker logs dev-env
+docker logs dev-workspace
 
 # 确认 SSH 服务状态
-docker exec dev-env ss -lnt | grep 22
+docker exec dev-workspace ss -lnt | grep 22
 ```
 
 ### 私钥权限问题 (Windows)
 
 ```powershell
 # 重新设置权限
-icacls .\ssh-keys\id_rsa /inheritance:r /grant:r "$($env:USERNAME):(R)"
+icacls .\ssh-keys\id_ed25519 /inheritance:r /grant:r "$($env:USERNAME):(R)"
 ```
 
 ### 镜像构建失败
