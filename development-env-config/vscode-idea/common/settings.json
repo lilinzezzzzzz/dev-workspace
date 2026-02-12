@@ -10,7 +10,14 @@
   "editor.autoClosingBrackets": "always", // 总是自动闭合括号
   "editor.autoClosingQuotes": "always", // 总是自动闭合引号
   "editor.autoSurround": "languageDefined", // 根据语言定义自动包围
-  "editor.inlineSuggest.enabled": true, // 启用内联建议
+  "editor.inlineSuggest.enabled": true, // 启用内联建议（如 Copilot 补全）
+  "editor.suggestSelection": "first", // 补全时默认选中第一项（提高效率）
+  "editor.acceptSuggestionOnEnter": "on", // Enter 键接受建议（除了 Enter 外的其他情况）
+  "editor.quickSuggestions": {
+    "other": true, // 普通代码中启用智能提示
+    "comments": false, // 注释中禁用智能提示
+    "strings": true // 字符串中也启用补全（便于填写路径等）
+  },
   // -------------------- 光标与滚动 --------------------
   "editor.cursorBlinking": "smooth", // 光标平滑闪烁
   "editor.cursorSmoothCaretAnimation": "on", // 启用光标平滑动画
@@ -21,7 +28,7 @@
   "editor.renderControlCharacters": true, // 显示控制字符(\t,\n等)
   "editor.roundedSelection": true, // 圆角选择区域
   "editor.guides.indentation": true, // 显示缩进参考线
-  "editor.guides.highlightActiveIndentation": true, // 高亮活动缩进参考线"
+  "editor.guides.highlightActiveIndentation": true, // 高亮活动缩进参考线
   // -------------------- 小地图配置 --------------------
   "editor.minimap.enabled": true, // 启用小地图
   "editor.minimap.maxColumn": 80, // 小地图最大列数
@@ -32,29 +39,59 @@
   "files.trimFinalNewlines": true, // 删除末尾多余空行
   "files.trimTrailingWhitespace": true, // 删除行尾空格
   "files.encoding": "utf8", // 文件编码UTF-8
-  "files.eol": "\n", // 行结束符使用LF
+  "files.eol": "\n", // 行结束符使用LF（跨平台统一，避免 Git diff 问题）
+  "files.simpleDialog.enable": true, // 使用简单对话框（替代模态对话框，减少干扰）
+  // -------------------- 通用文件排除 --------------------
+  // 这些目录/文件不会显示在资源管理器中（减少视觉干扰）
+  "files.exclude": {
+    "**/.git": true, // Git 目录
+    "**/.svn": true, // SVN 目录
+    "**/.hg": true, // Mercurial 目录
+    "**/CVS": true, // CVS 目录
+    "**/.DS_Store": true, // macOS 系统文件
+    "**/Thumbs.db": true, // Windows 缩略图缓存
+    "**/node_modules": true // Node.js 依赖目录
+  },
+  // -------------------- 搜索排除 --------------------
+  // 搜索时跳过这些目录/文件（提高搜索性能）
+  "search.exclude": {
+    "**/node_modules": true, // Node.js 依赖
+    "**/bower_components": true, // Bower 依赖
+    "**/*.code-search": true, // VS Code 搜索结果
+    "**/.git": true // Git 目录
+  },
+  "search.followSymlinks": false, // 搜索时不跟随符号链接（提高搜索性能）
   // -------------------- 缩进与格式化 --------------------
   "editor.detectIndentation": true, // 自动检测缩进设置
   "editor.autoIndent": "full", // 完全自动缩进
   "editor.wordWrap": "off", // 关闭自动换行
   "editor.wordWrapColumn": 120, // 换行列宽(120字符)
-  // -------------------- 字体配置 --------------------
-  "editor.fontFamily": "'Source Code Pro', 'Courier New', monospace", // 编辑器字体族
-  "editor.fontSize": 13, // 字体大小13px
-  "editor.fontLigatures": true, // 启用字体连字
+  // -------------------- 字体配置（跨平台）--------------------
+  // 字体优先级: Source Code Pro > JetBrains Mono > Fira Code > 系统等宽字体
+  "editor.fontFamily": "'Source Code Pro', 'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace",
+  "editor.fontSize": 12.5, // 字体大小12.5px
+  "editor.fontLigatures": false, // 启用字体连字（如 != → ≠，需要支持连字的字体）
   "editor.fontWeight": "400", // 字体粗细(正常)
-  "editor.lineHeight": 0, // 行高(自动计算)
-  "editor.letterSpacing": 0, // 字母间距(默认)
+  "editor.lineHeight": 22, // 行高(固定值，比自动计算更清晰易读)
+  "editor.letterSpacing": 0.5, // 字母间距(略微加宽，提高代码可读性)
   // -------------------- 工作台与窗口 --------------------
   "window.title": "${dirty}${activeEditorShort}${separator}${rootName}", // 窗口标题格式
+  "window.restoreWindows": "one", // 启动时恢复一个窗口（避免多窗口混乱）
   "workbench.editor.labelFormat": "short", // 编辑器标签显示短格式
   "workbench.editor.limit.enabled": true, // 启用编辑器数量限制
-  "workbench.editor.limit.value": 5, // 最多同时打开5个编辑器
-  "workbench.editor.limit.perEditorGroup": true, // 每个编辑器组独立限制
+  "workbench.editor.limit.value": 6, // 最多同时打开6个编辑器
+  "workbench.editor.limit.perEditorGroup": false, // 全局限制（非每个组）
   "workbench.editor.tabActionLocation": "right", // 标签页操作按钮位置
+  "workbench.editor.showTabs": "multiple", // 显示多标签页（非单标签模式）
+  "workbench.startupEditor": "none", // 启动时不显示欢迎页（直接显示编辑器）
   // 活动栏配置
-  "workbench.activityBar.visible": true,        // 显示活动栏
-  "workbench.sideBar.location": "left",         // 侧边栏位置
+  "workbench.activityBar.visible": true, // 显示活动栏
+  "workbench.sideBar.location": "left", // 侧边栏位置
+  // -------------------- 资源管理器配置 --------------------
+  "explorer.confirmDelete": true, // 删除文件需要确认（防止误删）
+  "explorer.confirmDragAndDrop": true, // 拖拽文件需要确认（防止误操作）
+  "explorer.compactFolders": false, // 不压缩文件夹显示（展开空文件夹）
+  "explorer.sortOrder": "type", // 按类型排序（文件夹优先于文件）
   // -------------------- 主题配置 --------------------
   "workbench.colorTheme": "Material Dark Theme", // 颜色主题
   "workbench.iconTheme": "material-icon-theme", // 文件图标主题
@@ -78,29 +115,47 @@
     "list.focusOutline": "#ff9f1c", // 焦点轮廓 - 橙色
     "list.activeSelectionIconForeground": "#ff9f1c" // 激活选中项图标 - 橙色
   },
-  // -------------------- 终端配置 --------------------
-  "terminal.integrated.env.windows": { // Windows终端环境变量
-    "PYTHONIOENCODING": "utf-8" // Python IO编码设为UTF-8
+  // -------------------- 终端配置（跨平台）--------------------
+  // 跨平台终端环境变量配置，确保各系统行为一致
+  // Windows 终端环境变量
+  "terminal.integrated.env.windows": {
+    "PYTHONIOENCODING": "utf-8" // Python IO 编码（解决 Windows 中文输出问题）
   },
-  "terminal.integrated.fontSize": 13, // 终端字体大小
-  "terminal.integrated.fontFamily": "'Source Code Pro', 'Courier New', monospace", // 终端字体族
+  // Linux 终端环境变量
+  "terminal.integrated.env.linux": {
+    "PYTHONIOENCODING": "utf-8"
+  },
+  // macOS 终端环境变量
+  "terminal.integrated.env.osx": {
+    "PYTHONIOENCODING": "utf-8"
+  },
+  "terminal.integrated.fontSize": 14, // 终端字体大小
+  "terminal.integrated.fontFamily": "'Source Code Pro', 'JetBrains Mono', 'Fira Code', monospace", // 终端字体族
   "terminal.integrated.fontWeight": "normal", // 终端字体粗细
-  "terminal.integrated.lineHeight": 1.0, // 终端行高
-  "terminal.integrated.rightClickBehavior": "default", // 终端右键行为
+  "terminal.integrated.lineHeight": 1.2, // 终端行高（略微加高，更易阅读）
+  "terminal.integrated.rightClickBehavior": "default", // 终端右键行为（显示菜单）
+  "terminal.integrated.scrollback": 10000, // 终端滚动缓冲区行数（支持更长的历史记录）
+  "terminal.integrated.cursorBlinking": true, // 终端光标闪烁（更容易定位光标）
+  "terminal.integrated.cursorStyle": "line", // 终端光标样式（竖线，比块状更清晰）
   // -------------------- Git 核心配置 --------------------
   "git.enableSmartCommit": true, // 启用智能提交
   "git.confirmSync": false, // 同步时不弹确认对话框
-  "git.autofetch": false, // 禁用自动fetch(性能考虑)
+  "git.autofetch": false, // 禁用自动fetch（性能考虑）
   "git.autorefresh": true, // 启用自动刷新
   "git.decorations.enabled": true, // 启用Git装饰器
   "git.allowNoVerifyCommit": true, // 允许跳过验证提交
   "git.inputValidation": true, // 启用输入验证
+  "git.openRepositoryInParentFolders": "always", // 自动打开父目录的仓库（便于多项目工作区）
+  "git.showPushSuccessNotification": true, // 显示推送成功通知
   // VS Code SCM 面板配置
-  "scm.defaultViewMode": "tree",     // 默认树形视图模式
-  "scm.countBadge": "all",           // 显示所有变更计数
+  "scm.defaultViewMode": "tree", // 默认树形视图模式
+  "scm.countBadge": "all", // 显示所有变更计数
   "scm.providerCountBadge": "hidden", // 隐藏提供商计数
   "scm.alwaysShowRepositories": true, // 总是显示仓库列表
-  "scm.repositories.visible": 10,    // 最多显示10个仓库
+  "scm.repositories.visible": 10, // 最多显示10个仓库
+  // -------------------- 遥测配置 --------------------
+  "telemetry.telemetryLevel": "off", // 禁用 VS Code 遥测（保护隐私）
+  "redhat.telemetry.enabled": false, // 禁用 RedHat 扩展遥测（如 YAML 扩展）
   // =============================================================================
   // 🔌 插件扩展配置
   // =============================================================================
@@ -113,25 +168,25 @@
   "gitlens.hovers.enabled": true, // 启用悬停提示
   "gitlens.hovers.currentLine.over": "line", // 悬停触发范围
   "gitlens.hovers.annotations.enabled": true, // 启用注释悬停
-  "gitlens.advanced.messages": { // 高级消息设置
-    "suppressCommitHasNoPreviousCommitWarning": false, // 不抑制提交警告
+  "gitlens.advanced.messages": {
+    "suppressCommitHasNoPreviousCommitWarning": false,
     "suppressCreatePullRequestPrompt": true // 抑制PR创建提示
   },
   "gitlens.defaultDateFormat": "YYYY-MM-DD HH:mm", // 默认日期格式
-  "gitlens.defaultDateShortFormat": "YY-MM-DD",    // 短日期格式
-  "gitlens.defaultTimeFormat": "HH:mm:ss",         // 默认时间格式
+  "gitlens.defaultDateShortFormat": "YY-MM-DD", // 短日期格式
+  "gitlens.defaultTimeFormat": "HH:mm:ss", // 默认时间格式
   "gitlens.telemetry.enabled": false, // 禁用遥测数据收集
   "gitlens.views.commitDetails.files.layout": "auto", // 提交详情布局
-  "gitlens.views.repositories.showBranchComparison": false, // 不显示分支比较
-  "gitlens.views.repositories.showContributors": false, // 不显示贡献者
-  "gitlens.views.repositories.showIncomingActivity": false, // 不显示传入活动
-  "gitlens.views.repositories.showRemotes": false, // 不显示远程仓库
-  "gitlens.views.repositories.showStashes": false, // 不显示stash
-  "gitlens.views.repositories.showTags": false, // 不显示标签
-  "gitlens.views.repositories.showWorktrees": false, // 不显示工作树
-  "gitlens.graph.scrollRowPadding": 6, // 让滚动更稳一点（非必须）
-  "gitlens.graph.showDetailsView": "selection", // 只在你选中提交时更新详情（避免 hover 就变化）
-  "gitlens.graph.minimap.enabled": false, // 关掉小地图（Minimap），更清爽
+  "gitlens.views.repositories.showBranchComparison": false,
+  "gitlens.views.repositories.showContributors": false,
+  "gitlens.views.repositories.showIncomingActivity": false,
+  "gitlens.views.repositories.showRemotes": false,
+  "gitlens.views.repositories.showStashes": false,
+  "gitlens.views.repositories.showTags": false,
+  "gitlens.views.repositories.showWorktrees": false,
+  "gitlens.graph.scrollRowPadding": 6,
+  "gitlens.graph.showDetailsView": "selection", // 只在选中提交时更新详情
+  "gitlens.graph.minimap.enabled": false, // 关掉小地图
   // -------------------- Git Graph 配置 --------------------
   "git-graph.date.format": "ISO Date & Time", // Git Graph日期格式
   "git-graph.date.type": "Commit Date", // 使用提交日期
@@ -139,25 +194,27 @@
   "commentTranslate.multiLineMerge": false, // 不合并多行翻译
   "commentTranslate.targetLanguage": "zh-CN", // 目标翻译语言(中文)
   // -------------------- Indent Rainbow 配置 --------------------
-  "indentRainbow.includedLanguages": [], // 启用 Indent Rainbow 的语言列表(为空表示所有语言)
-  "indentRainbow.excludedLanguages": [ // 禁用 Indent Rainbow 的语言列表
+  "indentRainbow.includedLanguages": [], // 启用 Indent Rainbow 的语言列表（为空表示所有语言）
+  "indentRainbow.excludedLanguages": [
     "plaintext"
   ],
-  "indentRainbow.indicatorStyle": "light", // 缩进指示器样式(亮色模式)
-  "indentRainbow.lightIndicatorStyleLineWidth": 1.5, // 亮色指示器线宽(1像素)
-  "indentRainbow.colors": [ // 缩进层级颜色配置(带透明度的RGBA)
+  "indentRainbow.indicatorStyle": "light",
+  "indentRainbow.lightIndicatorStyleLineWidth": 1.5,
+  "indentRainbow.colors": [
     "rgba(255,255,64,0.3)",
     "rgba(127,255,127,0.3)",
     "rgba(255,127,255,0.3)",
     "rgba(79,236,236,0.3)"
   ],
-    // -------------------- YAML 配置 --------------------
-  "yaml.schemaStore.enable": true, // 启用schema store,但允许自定义覆盖
+  // -------------------- YAML 配置 --------------------
+  "yaml.schemaStore.enable": true, // 启用schema store
   "yaml.schemas": {
-    // 使用 Docker Compose schema 进行验证
-    "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": ["docker-compose.yaml", "docker-compose.yml"]
+    "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": [
+      "docker-compose.yaml",
+      "docker-compose.yml"
+    ]
   },
-  "yaml.customTags": [ // 支持 Docker Compose 的自定义标签
+  "yaml.customTags": [
     "!reference sequence"
   ]
 }
