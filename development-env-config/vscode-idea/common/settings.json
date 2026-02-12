@@ -153,7 +153,6 @@
   "scm.alwaysShowRepositories": true, // 总是显示仓库列表
   "scm.repositories.visible": 10, // 最多显示10个仓库
   // -------------------- 遥测配置 --------------------
-  "telemetry.telemetryLevel": "off", // 禁用 VS Code 遥测（保护隐私）
   "redhat.telemetry.enabled": false, // 禁用 RedHat 扩展遥测（如 YAML 扩展）
   // =============================================================================
   // 🔌 插件扩展配置
@@ -206,9 +205,16 @@
     "rgba(79,236,236,0.3)"
   ],
   // -------------------- Stats Bar 配置 --------------------
-  // 状态栏系统资源监控
-  "statsBar.cpu.format": "$(chip) ${percent}%", // CPU 格式：显示芯片图标+百分比
-  "statsBar.memory.format": "$(dashboard) ${used}/${total} ${unit}, ${percent}%", // 内存格式：显示仪表盘图标+使用量/总量+百分比
+  "statsBar.enabled": true, // 启用扩展
+  "statsBar.location": "Right", // 位置：Left 或 Right
+  "statsBar.refreshInterval": 1800, // 刷新间隔
+  "statsBar.priority": -1, // 优先级（数值越大越靠左）
+  "statsBar.modules": [ // 启用的模块及顺序
+    "cpuLoad",
+    "memoUsage"
+  ],
+  "statsBar.memoUsage.format": "$$(database) ${used}/${total} ${unit}, ${percent}%",
+  "statsBar.cpuLoad.format": "$(chip) ${percent}%",
   // -------------------- YAML 配置 --------------------
   "yaml.schemaStore.enable": true, // 启用schema store
   "yaml.schemas": {
