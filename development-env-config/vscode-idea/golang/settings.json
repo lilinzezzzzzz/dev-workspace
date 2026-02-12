@@ -4,44 +4,54 @@
   // =============================================================================
   // -------------------- Go 基础配置 --------------------
   "go.useLanguageServer": true, // 启用 Go 语言服务器 (gopls)
-  "go.toolsManagement.autoUpdate": true, // 自动更新 Go 工具
+  "go.toolsManagement.autoUpdate": true, // 自动更新 Go 工具（如 goimports、dlv 等）
+  "go.toolsGopath": "", // Go 工具安装路径（默认为 GOPATH/bin，留空使用默认）
   // -------------------- Go 语言特定设置 --------------------
   "[go]": {
     "editor.formatOnSave": true, // 保存时自动格式化
-    "editor.codeActionsOnSave": { // 保存时执行的操作
+    "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit" // 自动整理导入语句
     },
-    "editor.rulers": [ // 显示标尺线
-      80, // 推荐行长
+    "editor.rulers": [
+      80, // Go 官方推荐行长
       120 // 最大行长限制
     ],
-    "editor.tabSize": 4, // Tab宽度为4个空格
-    "editor.insertSpaces": false, // 使用Tab而非空格
-    "editor.defaultFormatter": "golang.go" // 使用Go官方格式化器
+    "editor.tabSize": 4, // Tab 宽度为 4
+    "editor.insertSpaces": false, // Go 官方风格：使用 Tab 而非空格
+    "editor.defaultFormatter": "golang.go", // 使用 Go 官方格式化器
+    "editor.suggest.snippetsPreventQuickSuggestions": false, // 允许 snippet 中显示建议（提高补全效率）
+    "editor.quickSuggestions": {
+      "other": true, // 普通代码中启用智能提示
+      "comments": false, // 注释中禁用智能提示
+      "strings": true // 字符串中也启用补全（便于填写 JSON 标签等）
+    }
   },
   "[go.mod]": {
-    "editor.formatOnSave": true, // go.mod文件保存时格式化
-    "editor.defaultFormatter": "golang.go" // 使用Go官方格式化器
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "golang.go"
   },
   "[go.sum]": {
-    "editor.formatOnSave": false // go.sum文件不格式化
+    "editor.formatOnSave": false // go.sum 文件不格式化
   },
   // -------------------- gopls 语言服务器配置 --------------------
   "gopls": {
     // 静态分析
     "staticcheck": true, // 启用静态检查
-    // 代码补全
-    "completeUnimported": true, // 补全未导入的包
-    "usePlaceholders": true, // 使用占位符
-    // 代码分析
     "analyses": {
       "unusedparams": true, // 检查未使用的参数
       "shadow": true, // 检查变量遮蔽
-      "fieldalignment": false, // 不检查字段对齐
-      "nilness": true, // 检查nil安全性
+      "fieldalignment": false, // 不检查字段对齐（太严格）
+      "nilness": true, // 检查 nil 安全性
       "unusedwrite": true, // 检查未使用的写操作
-      "useany": true // 建议使用any类型
+      "useany": true, // 建议使用 any 类型（替代 interface{}）
+      "fillreturns": true, // 自动填充返回值（补全函数返回）
+      "nonewreturns": true, // 检查不必要的 new 返回
+      "undeclaredname": true // 检查未声明的名称
     },
+    // 代码补全
+    "completeUnimported": true, // 补全未导入的包（自动添加 import）
+    "usePlaceholders": true, // 使用占位符（补全时显示参数名）
+    "completionBudget": "100ms", // 补全超时时间（控制响应速度）
     // 提示配置
     "hints": {
       "assignVariableTypes": false, // 不显示赋值变量类型
@@ -50,92 +60,111 @@
       "constantValues": true, // 显示常量值
       "functionTypeParameters": false, // 不显示函数类型参数
       "parameterNames": true, // 显示参数名
-      "rangeVariableTypes": false // 不显示range变量类型
+      "rangeVariableTypes": false // 不显示 range 变量类型
     },
     // 代码导航
     "importShortcut": "Both", // 导入快捷方式
     // 语义高亮
-    "semanticTokens": true, // 启用语义高亮
+    "semanticTokens": true,
     // 诊断延迟
-    "diagnosticsDelay": "500ms" // 诊断延迟500毫秒
+    "diagnosticsDelay": "500ms",
+    // 构建标签
+    "buildFlags": [],
+    // 环境变量
+    "env": {}
   },
   // -------------------- 代码格式化 --------------------
-  "go.formatTool": "goimports", // 使用goimports格式化工具
+  "go.formatTool": "goimports", // 使用 goimports（自动处理导入）
   // Lint 工具配置
-  "go.lintTool": "golangci-lint", // 使用golangci-lint
-  "go.lintFlags": [ // Lint参数
+  "go.lintTool": "golangci-lint", // 使用 golangci-lint
+  "go.lintFlags": [
     "--fast" // 快速模式
   ],
-  "go.lintOnSave": "package", // 保存时对包进行lint
+  "go.lintOnSave": "package", // 保存时对包进行 lint
   // -------------------- 测试配置 --------------------
-  "go.testFlags": [ // 测试参数
+  "go.testFlags": [
     "-v", // 详细输出
     "-race" // 启用竞态检测
   ],
   "go.testTimeout": "30s", // 测试超时时间
+  "go.testEnvVars": {}, // 测试环境变量（根据项目添加）
   "go.coverOnSave": false, // 保存时不显示覆盖率
   "go.coverOnSingleTest": true, // 单个测试显示覆盖率
   "go.coverOnSingleTestFile": true, // 单个测试文件显示覆盖率
-  "go.coverageDecorator": { // 覆盖率装饰器配置
+  "go.coverageDecorator": {
     "type": "gutter", // 在装订线显示
-    "coveredHighlightColor": "rgba(64,128,64,0.5)", // 覆盖行高亮颜色
-    "uncoveredHighlightColor": "rgba(128,64,64,0.5)", // 未覆盖行高亮颜色
-    "coveredGutterStyle": "blockgreen", // 覆盖行装订线样式
-    "uncoveredGutterStyle": "blockred" // 未覆盖行装订线样式
+    "coveredHighlightColor": "rgba(64,128,64,0.5)",
+    "uncoveredHighlightColor": "rgba(128,64,64,0.5)",
+    "coveredGutterStyle": "blockgreen",
+    "uncoveredGutterStyle": "blockred"
   },
   // -------------------- 构建配置 --------------------
   "go.buildOnSave": "off", // 保存时不自动构建
-  "go.buildFlags": [], // 构建参数
-  "go.buildTags": "", // 构建标签
+  "go.buildFlags": [],
+  "go.buildTags": "",
   // -------------------- 调试配置 --------------------
   "go.delveConfig": {
-    "dlvLoadConfig": { // Delve调试器配置
+    "dlvLoadConfig": {
       "followPointers": true, // 跟踪指针
       "maxVariableRecurse": 1, // 变量递归深度
       "maxStringLen": 512, // 字符串最大长度
       "maxArrayValues": 64, // 数组最大值数量
       "maxStructFields": -1 // 结构体字段无限制
     },
-    "apiVersion": 2, // API版本
+    "apiVersion": 2,
     "showGlobalVariables": false, // 不显示全局变量
-    "debugAdapter": "dlv-dap" // 使用DAP适配器
+    "debugAdapter": "dlv-dap" // 使用 DAP 适配器
   },
   // -------------------- 文件关联 --------------------
-  "files.associations": { // 文件类型关联
-    "*.go": "go", // .go文件关联到Go语言
-    "go.mod": "go.mod", // go.mod文件
-    "go.sum": "go.sum", // go.sum文件
-    "*.tmpl": "html", // .tmpl模板文件
-    "*.gohtml": "html", // .gohtml模板文件
-    "*.yaml": "yaml", // .yaml文件关联到YAML语言
-    "*.yml": "yaml" // .yml文件关联到YAML语言
+  // 扩展名与语言的映射关系
+  "files.associations": {
+    "*.go": "go",
+    "go.mod": "go.mod",
+    "go.sum": "go.sum",
+    "*.tmpl": "html", // Go 模板文件（HTML 模板）
+    "*.gohtml": "html", // Go HTML 模板
+    "*.gotmpl": "go", // Go 模板文件（语法高亮）
+    "*.yaml": "yaml",
+    "*.yml": "yaml"
   },
   // -------------------- 文件排除 --------------------
-  "files.exclude": { // 文件资源管理器排除项
-    "**/vendor": true, // 排除vendor目录
-    "**/.git": true, // 排除.git目录
-    "**/bin": true, // 排除bin目录
-    "**/dist": true // 排除dist目录
+  // 这些目录/文件不会显示在资源管理器中（减少视觉干扰）
+  "files.exclude": {
+    "**/vendor": true, // 排除 vendor 目录（依赖管理）
+    "**/.git": true,
+    "**/bin": true, // 编译输出目录
+    "**/dist": true
   },
   // -------------------- 搜索排除 --------------------
-  "search.exclude": { // 搜索功能排除项
-    "**/vendor": true, // 排除vendor目录
-    "**/node_modules": true, // 排除Node.js模块
-    "**/*.lock": true, // 排除锁文件
-    "**/go.sum": true // 排除go.sum文件
+  // 搜索时跳过这些目录/文件（提高搜索性能）
+  "search.exclude": {
+    "**/vendor": true,
+    "**/node_modules": true,
+    "**/*.lock": true,
+    "**/go.sum": true // go.sum 文件（大文件）
   },
   // -------------------- Makefile 配置 --------------------
   "[makefile]": {
-    "editor.insertSpaces": false, // Makefile使用Tab
-    "editor.tabSize": 4 // Tab宽度为4
+    "editor.insertSpaces": false, // Makefile 必须使用 Tab
+    "editor.tabSize": 4
   },
   // -------------------- Dockerfile 配置 --------------------
   "[dockerfile]": {
-    "editor.tabSize": 4, // Dockerfile使用4空格缩进
-    "editor.insertSpaces": true // 使用空格缩进
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true
   },
-  // -------------------- 终端配置 --------------------
-  "terminal.integrated.env.windows": { // Windows终端环境变量
-    "GOFLAGS": "-mod=mod" // Go模块模式
+  // -------------------- 终端配置（跨平台）--------------------
+  // 跨平台终端环境变量配置，确保各系统行为一致
+  // Windows 终端环境变量
+  "terminal.integrated.env.windows": {
+    "GOFLAGS": "-mod=mod" // Go 模块模式（确保模块感知）
+  },
+  // Linux 终端环境变量
+  "terminal.integrated.env.linux": {
+    "GOFLAGS": "-mod=mod"
+  },
+  // macOS 终端环境变量
+  "terminal.integrated.env.osx": {
+    "GOFLAGS": "-mod=mod"
   }
 }

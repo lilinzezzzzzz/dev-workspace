@@ -85,7 +85,7 @@
   "workbench.editor.showTabs": "multiple", // 显示多标签页（非单标签模式）
   "workbench.startupEditor": "none", // 启动时不显示欢迎页（直接显示编辑器）
   // 活动栏配置
-  "workbench.activityBar.visible": true, // 显示活动栏
+  "workbench.activityBar.location": "default", // 显示活动栏（默认位置）
   "workbench.sideBar.location": "left", // 侧边栏位置
   // -------------------- 资源管理器配置 --------------------
   "explorer.confirmDelete": true, // 删除文件需要确认（防止误删）
