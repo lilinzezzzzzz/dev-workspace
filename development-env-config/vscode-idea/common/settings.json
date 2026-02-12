@@ -41,6 +41,15 @@
   "files.encoding": "utf8", // 文件编码UTF-8
   "files.eol": "\n", // 行结束符使用LF（跨平台统一，避免 Git diff 问题）
   "files.simpleDialog.enable": true, // 使用简单对话框（替代模态对话框，减少干扰）
+  // 文件监听排除（提高文件变更检测性能）
+  "files.watcherExclude": {
+    "**/.git/objects/**": true, // Git 对象目录
+    "**/.git/subtree-cache/**": true, // Git 子树缓存
+    "**/node_modules/**": true, // Node.js 依赖
+    "**/.venv/**": true, // Python 虚拟环境
+    "**/venv/**": true, // Python 虚拟环境
+    "**/__pycache__/**": true // Python 缓存
+  },
   // -------------------- 通用文件排除 --------------------
   // 这些目录/文件不会显示在资源管理器中（减少视觉干扰）
   "files.exclude": {
@@ -147,6 +156,11 @@
   "git.openRepositoryInParentFolders": "always", // 自动打开父目录的仓库（便于多项目工作区）
   "git.showPushSuccessNotification": true, // 显示推送成功通知
   "git.pruneOnFetch": true, // fetch时自动清理已删除的远程分支
+  // Git 性能优化
+  "git.autoRepositoryDetection": true, // 自动检测 Git 仓库
+  "git.enableStatusBarSync": true, // 状态栏显示同步状态
+  "git.statusSortOrder": "file", // 状态排序：按文件名排序（提高大仓库性能）
+  "git.repositoryScanMaxDepth": 1, // 仓库扫描最大深度（减少扫描范围）
   // VS Code SCM 面板配置
   "scm.defaultViewMode": "tree", // 默认树形视图模式
   "scm.countBadge": "all", // 显示所有变更计数
