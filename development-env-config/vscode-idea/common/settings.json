@@ -69,14 +69,13 @@
   // -------------------- 字体配置（跨平台）--------------------
   // 字体优先级: Source Code Pro > JetBrains Mono > Fira Code > 系统等宽字体
   "editor.fontFamily": "'Source Code Pro', 'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace",
-  "editor.fontSize": 12.5, // 字体大小12.5px
+  "editor.fontSize": 12.0, // 字体大小12.5px
   "editor.fontLigatures": false, // 启用字体连字（如 != → ≠，需要支持连字的字体）
   "editor.fontWeight": "400", // 字体粗细(正常)
   "editor.lineHeight": 22, // 行高(固定值，比自动计算更清晰易读)
   "editor.letterSpacing": 0.5, // 字母间距(略微加宽，提高代码可读性)
   // -------------------- 工作台与窗口 --------------------
   "window.title": "${dirty}${activeEditorShort}${separator}${rootName}", // 窗口标题格式
-  "window.restoreWindows": "one", // 启动时恢复一个窗口（避免多窗口混乱）
   "workbench.editor.labelFormat": "short", // 编辑器标签显示短格式
   "workbench.editor.limit.enabled": true, // 启用编辑器数量限制
   "workbench.editor.limit.value": 6, // 最多同时打开6个编辑器
@@ -129,7 +128,7 @@
   "terminal.integrated.env.osx": {
     "PYTHONIOENCODING": "utf-8"
   },
-  "terminal.integrated.fontSize": 14, // 终端字体大小
+  "terminal.integrated.fontSize": 12.0, // 终端字体大小
   "terminal.integrated.fontFamily": "'Source Code Pro', 'JetBrains Mono', 'Fira Code', monospace", // 终端字体族
   "terminal.integrated.fontWeight": "normal", // 终端字体粗细
   "terminal.integrated.lineHeight": 1.2, // 终端行高（略微加高，更易阅读）
@@ -196,10 +195,10 @@
   // -------------------- Indent Rainbow 配置 --------------------
   "indentRainbow.includedLanguages": [], // 启用 Indent Rainbow 的语言列表（为空表示所有语言）
   "indentRainbow.excludedLanguages": [
-    "plaintext"
+    "plaintext" // 禁用纯文本语言
   ],
-  "indentRainbow.indicatorStyle": "light",
-  "indentRainbow.lightIndicatorStyleLineWidth": 1.5,
+  "indentRainbow.indicatorStyle": "light", // 使用浅色指示器样式
+  "indentRainbow.lightIndicatorStyleLineWidth": 1.5, // 浅色指示器样式线宽
   "indentRainbow.colors": [
     "rgba(255,255,64,0.3)",
     "rgba(127,255,127,0.3)",

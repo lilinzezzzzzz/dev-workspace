@@ -181,3 +181,9 @@ cython_debug/
 
 # Qoder
 .qoder/
+
+################################################################################
+# VS Code Merged Settings (Auto-generated)
+################################################################################
+development-env-config/vscode-idea/settings-python.json
+development-env-config/vscode-idea/settings-golang.json
