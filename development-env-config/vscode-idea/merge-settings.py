@@ -184,7 +184,7 @@ def main():
     if generate_python:
         print("📄 正在合并 Python 配置...")
         merged = merge_settings(script_dir, "python")
-        output_path = script_dir / "settings-python.json"
+        output_path = script_dir / "settings-python.jsonc"
 
         # 生成 JSONC 内容
         content = generate_jsonc_with_comments(merged, "Python 开发环境配置")
@@ -196,7 +196,7 @@ def main():
     if generate_golang:
         print("📄 正在合并 Golang 配置...")
         merged = merge_settings(script_dir, "golang")
-        output_path = script_dir / "settings-golang.json"
+        output_path = script_dir / "settings-golang.jsonc"
 
         # 生成 JSONC 内容
         content = generate_jsonc_with_comments(merged, "Golang 开发环境配置")
@@ -208,7 +208,7 @@ def main():
     print(f"\n🎉 完成! 共生成 {len(generated_files)} 个配置文件")
     print("\n使用方法:")
     print("  将生成的配置文件复制到项目的 .vscode/settings.json 即可使用")
-    print("  或创建符号链接: ln -s /path/to/settings-python.json .vscode/settings.json")
+    print("  或创建符号链接: ln -s /path/to/settings-python.jsonc .vscode/settings.json")
 
 
 if __name__ == "__main__":
