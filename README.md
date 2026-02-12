@@ -179,8 +179,11 @@ dev-workspace/
 # 构建镜像
 docker-compose build
 
-# 启动服务
+# 启动服务（仅基础设施：Redis、MySQL）
 docker-compose up -d
+
+# 启动服务（包含开发环境容器）
+docker-compose --profile workspace up -d
 
 # 停止服务
 docker-compose down

@@ -34,12 +34,12 @@
 - **性能优化**: 标签页限制、自动保存、平滑滚动
 
 ### 🔧 Git 工作流
-- **提交验证**: 强制 commit message (最少 5 字符)
+- **提交验证**: 启用输入验证
 - **状态监控**: 禁用自动拉取，手动控制同步
-- **装饰器优化**: 5 秒刷新间隔，避免重复命令
+- **装饰器优化**: 禁用 GitLens CodeLens 和状态栏，避免干扰
 
 ### 🎯 其他亮点
-- **快捷键优化**: `Ctrl+Alt+F` 格式化文档
+- **快捷键优化**: `Cmd+Option+L` 格式化文档（PyCharm macOS 风格）
 - **文件管理**: 自动排除缓存、智能搜索过滤
 - **多格式支持**: YAML、TOML、Jinja2、JSON、Markdown
 
@@ -107,8 +107,8 @@ code --install-extension ms-python.python
 code --install-extension charliermarsh.ruff
 code --install-extension detachhead.basedpyright
 code --install-extension eamodio.gitlens
-
-code --install-extension golang.go  # Go 项目需要
+code --install-extension ms-vscode-remote.remote-containers
+code --install-extension ms-azuretools.vscode-docker
 ```
 
 ### 2️⃣ 配置开发环境
@@ -177,7 +177,7 @@ cp development-env-config/vscode-idea/golang/settings.json .vscode/
 ### 核心设置
 ```json
 {
-  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python3",
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
   "ruff.enable": true,
   "ruff.fixAll": true,
   "basedpyright.analysis.typeCheckingMode": "basic"
@@ -198,7 +198,7 @@ cp development-env-config/vscode-idea/golang/settings.json .vscode/
 ```json
 {
   "go.useLanguageServer": true,
-  "go.formatTool": "gofmt",
+  "go.formatTool": "goimports",
   "go.lintTool": "golangci-lint"
 }
 ```
@@ -209,9 +209,8 @@ cp development-env-config/vscode-idea/golang/settings.json .vscode/
 ```json
 {
   "git.autofetch": false,              // 禁用自动拉取
-  "git.refreshInterval": 5000,         // 5 秒刷新间隔
-  "git.inputValidation": "always",      // 强制验证 commit message
-  "git.inputValidationLength": 5       // 最少 5 字符
+  "git.enableSmartCommit": true,       // 启用智能提交
+  "git.inputValidation": true          // 启用输入验证
 }
 ```
 
@@ -221,7 +220,7 @@ cp development-env-config/vscode-idea/golang/settings.json .vscode/
   "files.autoSave": "onFocusChange",        // 失焦自动保存
   "workbench.editor.limit.value": 5,       // 标签页限制
   "editor.smoothScrolling": true,          // 平滑滚动
-  "workbench.colorTheme": "One Dark Pro"   // 主题设置
+  "workbench.colorTheme": "Material Dark Theme"   // 主题设置
 }
 ```
 
@@ -236,22 +235,43 @@ cp development-env-config/vscode-idea/golang/settings.json .vscode/
 | [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) | Python 语言支持 | Python |
 | [Ruff](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) | 现代化 Linter + Formatter | Python |
 | [Basedpyright](https://marketplace.visualstudio.com/items?itemName=detachhead.basedpyright) | 严格类型检查 | Python |
-| [Go](https://marketplace.visualstudio.com/items?itemName=golang.go) | Go 语言支持 | Go |
 | [GitLens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens) | Git 增强工具 | All |
+
+### 开发容器
+
+| 扩展 | 功能 |
+|------|------|
+| [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) | 容器内开发 |
+| [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker) | 容器与镜像管理 |
 
 ### 通用语言支持
 
 - **YAML**: `redhat.vscode-yaml`
 - **TOML**: `tamasfe.even-better-toml`
-- **Jinja2**: `samuelcolvin.jinjahtml`
-- **Markdown**: `yzhang.markdown-all-in-one`
+- **Protobuf**: `bufbuild.vscode-buf`
+- **dotenv**: `mikestead.dotenv`
+
+### 代码质量与标记
+
+- **Error Lens**: `usernamehw.errorlens`（内联显示错误/警告）
+- **TODO Tree**: `gruntfuggly.todo-tree`（TODO/FIXME 聚合）
 
 ### 辅助工具
 
-- **Docker**: `ms-azuretools.vscode-docker`
-- **REST Client**: `humao.rest-client`（测试 API）
 - **Better Comments**: `aaron-bond.better-comments`（彩色注释）
 - **Path Intellisense**: `christian-kohler.path-intellisense`（路径补全）
+- **Indent Rainbow**: `oderwat.indent-rainbow`（缩进着色）
+- **EditorConfig**: `editorconfig.editorconfig`（统一代码风格）
+
+### Markdown / 文档
+
+- **Markdown All in One**: `yzhang.markdown-all-in-one`
+
+### 主题 / 图标
+
+- **Material Dark Theme**: `romanrei.material-dark`
+- **Material Icon Theme**: `pkief.material-icon-theme`
+- **Material Product Icons**: `pkief.material-product-icons`
 
 ---
 
@@ -268,12 +288,12 @@ cp development-env-config/vscode-idea/golang/settings.json .vscode/
 }
 ```
 
-### 调整 Commit Message 长度
+### 启用/禁用 Git 输入验证
 
 ```json
 {
-  "git.inputValidationLength": 10,          // 最小长度改为 10
-  "git.inputValidationSubjectLength": 72   // 主题行改为 72 字符
+  "git.inputValidation": true,   // 启用输入验证
+  "git.confirmSync": false       // 同步时不弹确认对话框
 }
 ```
 
@@ -281,8 +301,8 @@ cp development-env-config/vscode-idea/golang/settings.json .vscode/
 
 ```json
 {
-  "workbench.colorTheme": "GitHub Dark Default",  // 替换主题
-  "workbench.iconTheme": "vscode-icons"          // 替换图标
+  "workbench.colorTheme": "One Dark Pro",     // 替换主题
+  "workbench.iconTheme": "material-icon-theme" // 文件图标主题
 }
 ```
 
@@ -293,9 +313,8 @@ cp development-env-config/vscode-idea/golang/settings.json .vscode/
 {
   "args": [
     "main:app",
-    "--reload",
-    "--host", "127.0.0.1",  // 改为 localhost
-    "--port", "3000"         // 改为 3000 端口
+    "--host", "0.0.0.0",  // 监听所有网卡
+    "--port", "8000"      // 默认端口 8000
   ]
 }
 ```
@@ -308,8 +327,10 @@ cp development-env-config/vscode-idea/golang/settings.json .vscode/
 
 **A**: 根据项目类型选择：
 - **Python 项目**: 复制 `common/` + `python/` 目录下的所有文件
-- **Go 项目**: 复制 `common/` + `golang/` 目录下的所有文件
+- **Go 项目**: 复制 `common/` + `golang/` 目录下的所有文件（需单独安装 Go 扩展）
 - **混合项目**: 可以同时使用多个语言的配置
+
+> **注意**: Go 扩展 `golang.go` 需要单独安装，不在默认推荐扩展列表中。
 
 ### Q2: Ruff 和 Basedpyright 冲突？
 
@@ -319,14 +340,17 @@ cp development-env-config/vscode-idea/golang/settings.json .vscode/
 
 配置中已禁用 Basedpyright 的格式化功能，避免冲突。
 
-### Q3: Git 提交时显示 "Input validation failed"？
+### Q3: Git 提交验证如何配置？
 
-**A**: Commit message 少于 5 个字符。解决方法：
+**A**: 配置中已启用输入验证：
+```json
+{
+  "git.inputValidation": true  // 启用输入验证
+}
+```
+
+如需跳过验证（不推荐）：
 ```bash
-# 写一个有意义的 message
-git commit -m "Fix: 修复用户登录bug"
-
-# 如需临时跳过验证（不推荐）
 git commit -m "wip" --no-verify
 ```
 
@@ -367,11 +391,14 @@ pip install uv
 
 **A**: 已通过以下配置解决：
 - 禁用 `git.autofetch`
-- 增加 `git.refreshInterval` 到 5000ms
+- 禁用 GitLens 的 CodeLens 和状态栏显示
 
-如仍有问题，可进一步增加刷新间隔：
+如仍有问题，可进一步调整 GitLens 配置：
 ```json
-{"git.refreshInterval": 10000}  // 10 秒
+{
+  "gitlens.currentLine.enabled": false,  // 禁用当前行责任注释
+  "gitlens.hovers.enabled": false        // 禁用悬停提示
+}
 ```
 
 ---
