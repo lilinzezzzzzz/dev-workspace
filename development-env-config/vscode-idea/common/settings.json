@@ -146,6 +146,7 @@
   "git.inputValidation": true, // 启用输入验证
   "git.openRepositoryInParentFolders": "always", // 自动打开父目录的仓库（便于多项目工作区）
   "git.showPushSuccessNotification": true, // 显示推送成功通知
+  "git.pruneOnFetch": true, // fetch时自动清理已删除的远程分支
   // VS Code SCM 面板配置
   "scm.defaultViewMode": "tree", // 默认树形视图模式
   "scm.countBadge": "all", // 显示所有变更计数
