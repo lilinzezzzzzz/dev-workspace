@@ -48,7 +48,9 @@
     "**/node_modules/**": true, // Node.js 依赖
     "**/.venv/**": true, // Python 虚拟环境
     "**/venv/**": true, // Python 虚拟环境
-    "**/__pycache__/**": true // Python 缓存
+    "**/__pycache__/**": true, // Python 缓存
+    "**/.pytest_cache/**": true, // Pytest 缓存
+    "**/.idea/**": true // IDE 配置目录
   },
   // -------------------- 通用文件排除 --------------------
   // 这些目录/文件不会显示在资源管理器中（减少视觉干扰）
@@ -59,7 +61,10 @@
     "**/CVS": true, // CVS 目录
     "**/.DS_Store": true, // macOS 系统文件
     "**/Thumbs.db": true, // Windows 缩略图缓存
-    "**/node_modules": true // Node.js 依赖目录
+    "**/node_modules": true, // Node.js 依赖目录
+    "**/__pycache__": true, // Python 缓存目录
+    "**/.pytest_cache": true, // Pytest 缓存目录
+    "**/.idea": true // IDE 配置目录
   },
   // -------------------- 搜索排除 --------------------
   // 搜索时跳过这些目录/文件（提高搜索性能）
