@@ -43,6 +43,8 @@
 - **文件管理**: 自动排除缓存、智能搜索过滤
 - **多格式支持**: YAML、TOML、Jinja2、JSON、Markdown
 
+> ⚠️ **注意**: `keybindings.json` 只支持用户级别配置，不支持工作区级别。详见 [配置文件说明](#-配置文件说明)。
+
 ---
 
 ## 🗂️ 目录结构
@@ -52,7 +54,7 @@ vscode-idea/
 ├── common/               # 通用配置（跨语言共享）
 │   ├── settings.json     # 编辑器核心设置、主题、Git等
 │   ├── extensions.json   # 推荐扩展列表
-│   └── keybindings.json  # 自定义快捷键映射
+│   └── keybindings.json  # 自定义快捷键映射（⚠️ 仅支持用户级别）
 ├── python/               # Python 专用配置
 │   ├── settings.json     # Python 工具链配置（Ruff、Basedpyright等）
 │   └── launch.json       # Python 调试配置
@@ -74,22 +76,32 @@ project-root/
 └── .vscode/
     ├── settings.json     # 来自 common/
     ├── extensions.json   # 来自 common/
-    ├── keybindings.json  # 来自 common/
     └── launch.json       # 来自 python/
 ```
+
+> ⚠️ **注意**: `keybindings.json` 不支持工作区级别，必须放在用户目录。
 
 Go 项目：
 ```bash
 project-root/
 └── .vscode/
     ├── settings.json     # 来自 common/ 和 golang/ 合并
-    ├── extensions.json   # 来自 common/
-    └── keybindings.json  # 来自 common/
+    └── extensions.json   # 来自 common/
 ```
 
 **方式二：用户级配置**
 - `common/settings.json` → VS Code 用户设置
-- `common/keybindings.json` → 用户快捷键设置
+- `common/keybindings.json` → 用户快捷键设置（⚠️ 必须使用用户级别）
+
+> **配置文件级别支持对照表**:
+>
+> | 配置文件 | 用户级别 | 工作区级别 |
+> |---------|:-------:|:---------:|
+> | `settings.json` | ✅ | ✅ |
+> | `keybindings.json` | ✅ | ❌ |
+> | `extensions.json` | ✅ | ✅ |
+> | `launch.json` | ✅ | ✅ |
+> | `tasks.json` | ✅ | ✅ |
 
 ---
 
@@ -399,6 +411,24 @@ pip install uv
   "gitlens.currentLine.enabled": false,  // 禁用当前行责任注释
   "gitlens.hovers.enabled": false        // 禁用悬停提示
 }
+```
+
+### Q7: 快捷键配置不生效？
+
+**A**: `keybindings.json` 只支持用户级别配置，不支持工作区级别。请将配置复制到用户目录：
+
+```bash
+# Qoder (macOS)
+cp keybindings.json ~/Library/Application\ Support/Qoder/User/keybindings.json
+
+# VS Code (macOS)
+cp keybindings.json ~/Library/Application\ Support/Code/User/keybindings.json
+
+# VS Code (Windows)
+copy keybindings.json %APPDATA%\Code\User\keybindings.json
+
+# VS Code (Linux)
+cp keybindings.json ~/.config/Code/User/keybindings.json
 ```
 
 ---

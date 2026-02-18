@@ -1,4 +1,14 @@
 [
+  // ==================== 重要说明 ====================
+  // ⚠️ keybindings.json 只能放在用户级别目录才生效，不支持工作区级别！
+  //
+  // macOS 用户目录: ~/Library/Application Support/Qoder/User/keybindings.json
+  // VS Code 用户目录: ~/Library/Application Support/Code/User/keybindings.json
+  //
+  // 应用配置:
+  // cp keybindings.json ~/Library/Application\ Support/Qoder/User/keybindings.json
+  // ==================================================
+
   // ==================== 导航快捷键 ====================
   // 后退: Windows/Linux 使用 Ctrl+Alt+Left, macOS 使用 Cmd+Opt+Left
   {
@@ -12,18 +22,20 @@
     "mac": "cmd+alt+right",
     "command": "workbench.action.navigateForward"
   },
-
   // ==================== 格式化文档快捷键 ====================
-  // 格式化文档: Windows/Linux 使用 Ctrl+Alt+L, macOS 使用 Cmd+Opt+L (PyCharm 风格)
+  // 格式化文档：Windows/Linux 使用 Ctrl+Alt+L, macOS 使用 Cmd+Opt+L (PyCharm 风格)
   {
     "key": "ctrl+alt+l",
     "mac": "cmd+alt+l",
-    "command": "editor.action.formatDocument",
-    "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
+    "command": "editor.action.formatDocument"
   },
-  // 移除 VS Code 默认的 Shift+Alt+F 快捷键（跨平台）
+  // 移除 VS Code 默认的 Shift+Alt+F 和 Cmd+Shift+F 快捷键（跨平台）
   {
     "key": "shift+alt+f",
+    "command": "-editor.action.formatDocument"
+  },
+  {
+    "key": "shift+cmd+f",
     "command": "-editor.action.formatDocument"
   }
 ]
