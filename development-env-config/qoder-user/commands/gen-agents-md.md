@@ -1,9 +1,9 @@
 ## 概述
-创建并保存结构化的 markdown 文件 (agents.md),定义 AI 代理规范以供模型理解。
+创建并保存结构化的 markdown 文件 (AGENTS.md),定义 AI 代理规范以供模型理解。
 
 ## 生成工作流
 1. **文件创建**
-   - 设置文件路径: ./docs/agents.md
+   - 设置文件路径: ./AGENTS.md
    - 如目录不存在则创建
    - 初始化 markdown 文件
    - 设置文件权限
