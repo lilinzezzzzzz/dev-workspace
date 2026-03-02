@@ -9,8 +9,8 @@
     // Dev Containers：容器内开发（windows 需要）
     "ms-vscode-remote.remote-containers",
 
-    // Docker：容器与镜像管理
-    "ms-azuretools.vscode-docker",
+    // Container Tools：容器与镜像管理（Docker 的继任者）
+    "ms-azuretools.vscode-containers",
 
     // ==================================================
     // Python 核心工具链（ruff + basedpyright）
