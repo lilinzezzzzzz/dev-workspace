@@ -50,7 +50,7 @@
 ## 🗂️ 目录结构
 
 ```
-vscode-idea/
+vscode/
 ├── common/               # 通用配置（跨语言共享）
 │   ├── settings.json     # 编辑器核心设置、主题、Git等
 │   ├── extensions.json   # 推荐扩展列表
@@ -156,13 +156,13 @@ go mod tidy
 
 ```bash
 # 复制通用配置
-cp -r development-env-config/vscode-idea/common/* .vscode/
+cp -r development-env-config/vscode/common/* .vscode/
 
 # Python 项目额外复制
-cp development-env-config/vscode-idea/python/* .vscode/
+cp development-env-config/vscode/python/* .vscode/
 
 # Go 项目额外复制
-cp development-env-config/vscode-idea/golang/settings.json .vscode/
+cp development-env-config/vscode/golang/settings.json .vscode/
 ```
 
 ### 4️⃣ 验证配置

@@ -161,7 +161,7 @@ dev-workspace/
 ├── development-env-config/ # VSCode 配置模板
 │   ├── golang/             # Go 开发配置
 │   ├── python/             # Python 开发配置
-│   ├── qoder-user/         # AI Agent 配置
+│   ├── qoder/              # AI Agent 配置
 │   └── common/             # 通用配置
 └── infras/                 # 基础设施配置
     ├── clickhouse/         # ClickHouse 配置

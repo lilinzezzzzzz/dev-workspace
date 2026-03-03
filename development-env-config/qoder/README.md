@@ -9,7 +9,7 @@
 ## 📋 目录结构
 
 ```
-qoder/
+development-env-config/qoder/
 ├── AGENTS.md           # 核心 Agent 指令和开发规范
 ├── commands/           # 可执行命令配置
 │   └── git-commit.md   # Git 提交信息生成命令

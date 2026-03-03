@@ -137,7 +137,7 @@ def merge_settings(base_dir: Path, lang: str) -> Dict[str, Any]:
     合并通用配置和语言特定配置
 
     Args:
-        base_dir: vscode-idea 目录路径
+        base_dir: vscode 目录路径
         lang: 语言名称 (python 或 golang)
 
     Returns:

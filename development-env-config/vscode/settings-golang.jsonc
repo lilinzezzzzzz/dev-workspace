@@ -1,0 +1,330 @@
+{
+  // Golang 开发环境配置
+  // 此文件由 merge-settings.py 自动生成，请勿手动编辑
+  // 源配置: common/settings.json + {lang}/settings.json
+
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.stickyScroll.enabled": true,
+  "editor.autoClosingBrackets": "always",
+  "editor.autoClosingQuotes": "always",
+  "editor.autoSurround": "languageDefined",
+  "editor.inlineSuggest.enabled": true,
+  "editor.suggestSelection": "first",
+  "editor.acceptSuggestionOnEnter": "on",
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": true
+  },
+  "editor.cursorBlinking": "smooth",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.smoothScrolling": true,
+  "editor.renderWhitespace": "boundary",
+  "editor.renderLineHighlight": "all",
+  "editor.renderControlCharacters": true,
+  "editor.roundedSelection": true,
+  "editor.guides.indentation": true,
+  "editor.guides.highlightActiveIndentation": true,
+  "editor.minimap.enabled": true,
+  "editor.minimap.maxColumn": 80,
+  "editor.minimap.renderCharacters": false,
+  "files.autoSave": "onFocusChange",
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "files.encoding": "utf8",
+  "files.eol": "\n",
+  "files.simpleDialog.enable": true,
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/.venv/**": true,
+    "**/venv/**": true,
+    "**/__pycache__/**": true
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/node_modules": true,
+    "**/vendor": true,
+    "**/bin": true,
+    "**/dist": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true,
+    "**/.git": true,
+    "**/vendor": true,
+    "**/*.lock": true,
+    "**/go.sum": true
+  },
+  "search.followSymlinks": false,
+  "editor.detectIndentation": true,
+  "editor.autoIndent": "full",
+  "editor.wordWrap": "off",
+  "editor.wordWrapColumn": 120,
+  "editor.fontFamily": "'Source Code Pro', 'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace",
+  "editor.fontSize": 12.0,
+  "editor.fontLigatures": false,
+  "editor.fontWeight": "400",
+  "editor.lineHeight": 22,
+  "editor.letterSpacing": 0.5,
+  "window.title": "${dirty}${activeEditorShort}${separator}${rootName}",
+  "workbench.editor.labelFormat": "short",
+  "workbench.editor.limit.enabled": true,
+  "workbench.editor.limit.value": 6,
+  "workbench.editor.limit.perEditorGroup": false,
+  "workbench.editor.tabActionLocation": "right",
+  "workbench.editor.showTabs": "multiple",
+  "workbench.startupEditor": "none",
+  "workbench.activityBar.location": "default",
+  "workbench.sideBar.location": "left",
+  "explorer.confirmDelete": true,
+  "explorer.confirmDragAndDrop": true,
+  "explorer.compactFolders": false,
+  "explorer.sortOrder": "type",
+  "workbench.colorTheme": "Material Dark Theme",
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.productIconTheme": "material-product-icons",
+  "workbench.colorCustomizations": {
+    "tab.activeBackground": "#2d5a88",
+    "tab.activeForeground": "#ffffff",
+    "tab.activeBorder": "#61afef",
+    "tab.activeBorderTop": "#ff9f1c",
+    "tab.inactiveBackground": "#1a1d23",
+    "tab.inactiveForeground": "#5a6270",
+    "tab.unfocusedActiveBorder": "#61afef",
+    "tab.unfocusedActiveBorderTop": "#ff9f1c",
+    "list.activeSelectionBackground": "#2d5a88",
+    "list.activeSelectionForeground": "#ffffff",
+    "list.inactiveSelectionBackground": "#37415a",
+    "list.inactiveSelectionForeground": "#e0e0e0",
+    "list.hoverBackground": "#2a3a4d",
+    "list.focusOutline": "#ff9f1c",
+    "list.activeSelectionIconForeground": "#ff9f1c"
+  },
+  "terminal.integrated.env.windows": {
+    "PYTHONIOENCODING": "utf-8",
+    "GOFLAGS": "-mod=mod"
+  },
+  "terminal.integrated.env.linux": {
+    "PYTHONIOENCODING": "utf-8",
+    "GOFLAGS": "-mod=mod"
+  },
+  "terminal.integrated.env.osx": {
+    "PYTHONIOENCODING": "utf-8",
+    "GOFLAGS": "-mod=mod"
+  },
+  "terminal.integrated.fontSize": 12.0,
+  "terminal.integrated.fontFamily": "'Source Code Pro', 'JetBrains Mono', 'Fira Code', monospace",
+  "terminal.integrated.fontWeight": "normal",
+  "terminal.integrated.lineHeight": 1.2,
+  "terminal.integrated.rightClickBehavior": "default",
+  "terminal.integrated.scrollback": 10000,
+  "terminal.integrated.cursorBlinking": true,
+  "terminal.integrated.cursorStyle": "line",
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  "git.autofetch": false,
+  "git.autorefresh": true,
+  "git.decorations.enabled": true,
+  "git.allowNoVerifyCommit": true,
+  "git.inputValidation": true,
+  "git.openRepositoryInParentFolders": "always",
+  "git.showPushSuccessNotification": true,
+  "git.pruneOnFetch": true,
+  "git.autoRepositoryDetection": true,
+  "git.enableStatusBarSync": true,
+  "git.statusSortOrder": "file",
+  "git.repositoryScanMaxDepth": 1,
+  "scm.defaultViewMode": "tree",
+  "scm.countBadge": "all",
+  "scm.providerCountBadge": "hidden",
+  "scm.alwaysShowRepositories": true,
+  "scm.repositories.visible": 10,
+  "redhat.telemetry.enabled": false,
+  "gitlens.currentLine.enabled": true,
+  "gitlens.blame.highlight.enabled": true,
+  "gitlens.codeLens.enabled": false,
+  "gitlens.statusBar.enabled": false,
+  "gitlens.hovers.enabled": true,
+  "gitlens.hovers.currentLine.over": "line",
+  "gitlens.hovers.annotations.enabled": true,
+  "gitlens.advanced.messages": {
+    "suppressCommitHasNoPreviousCommitWarning": false,
+    "suppressCreatePullRequestPrompt": true
+  },
+  "gitlens.defaultDateFormat": "YYYY-MM-DD HH:mm",
+  "gitlens.defaultDateShortFormat": "YY-MM-DD",
+  "gitlens.defaultTimeFormat": "HH:mm:ss",
+  "gitlens.telemetry.enabled": false,
+  "gitlens.views.commitDetails.files.layout": "auto",
+  "gitlens.views.repositories.showBranchComparison": false,
+  "gitlens.views.repositories.showContributors": false,
+  "gitlens.views.repositories.showIncomingActivity": false,
+  "gitlens.views.repositories.showRemotes": false,
+  "gitlens.views.repositories.showStashes": false,
+  "gitlens.views.repositories.showTags": false,
+  "gitlens.views.repositories.showWorktrees": false,
+  "gitlens.graph.scrollRowPadding": 6,
+  "gitlens.graph.showDetailsView": "selection",
+  "gitlens.graph.minimap.enabled": false,
+  "git-graph.date.format": "ISO Date & Time",
+  "git-graph.date.type": "Commit Date",
+  "commentTranslate.multiLineMerge": false,
+  "commentTranslate.targetLanguage": "zh-CN",
+  "indentRainbow.includedLanguages": [],
+  "indentRainbow.excludedLanguages": [
+    "plaintext"
+  ],
+  "indentRainbow.indicatorStyle": "light",
+  "indentRainbow.lightIndicatorStyleLineWidth": 1.5,
+  "indentRainbow.colors": [
+    "rgba(255,255,64,0.3)",
+    "rgba(127,255,127,0.3)",
+    "rgba(255,127,255,0.3)",
+    "rgba(79,236,236,0.3)"
+  ],
+  "statsBar.enabled": true,
+  "statsBar.location": "Right",
+  "statsBar.refreshInterval": 1800,
+  "statsBar.priority": -1,
+  "statsBar.modules": [
+    "cpuLoad",
+    "memoUsage"
+  ],
+  "statsBar.memoUsage.format": "$$(database) ${used}/${total} ${unit}, ${percent}%",
+  "statsBar.cpuLoad.format": "$(chip) ${percent}%",
+  "yaml.schemaStore.enable": true,
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": [
+      "docker-compose.yaml",
+      "docker-compose.yml"
+    ]
+  },
+  "yaml.customTags": [
+    "!reference sequence"
+  ],
+  "go.useLanguageServer": true,
+  "go.toolsManagement.autoUpdate": true,
+  "go.toolsGopath": "",
+  "[go]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    "editor.rulers": [
+      80,
+      120
+    ],
+    "editor.tabSize": 4,
+    "editor.insertSpaces": false,
+    "editor.defaultFormatter": "golang.go",
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "editor.quickSuggestions": {
+      "other": true,
+      "comments": false,
+      "strings": true
+    }
+  },
+  "[go.mod]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "golang.go"
+  },
+  "[go.sum]": {
+    "editor.formatOnSave": false
+  },
+  "gopls": {
+    "staticcheck": true,
+    "analyses": {
+      "unusedparams": true,
+      "shadow": true,
+      "fieldalignment": false,
+      "nilness": true,
+      "unusedwrite": true,
+      "useany": true,
+      "fillreturns": true,
+      "nonewreturns": true,
+      "undeclaredname": true
+    },
+    "completeUnimported": true,
+    "usePlaceholders": true,
+    "completionBudget": "100ms",
+    "hints": {
+      "assignVariableTypes": false,
+      "compositeLiteralFields": true,
+      "compositeLiteralTypes": false,
+      "constantValues": true,
+      "functionTypeParameters": false,
+      "parameterNames": true,
+      "rangeVariableTypes": false
+    },
+    "importShortcut": "Both",
+    "semanticTokens": true,
+    "diagnosticsDelay": "500ms",
+    "buildFlags": [],
+    "env": {}
+  },
+  "go.formatTool": "goimports",
+  "go.lintTool": "golangci-lint",
+  "go.lintFlags": [
+    "--fast"
+  ],
+  "go.lintOnSave": "package",
+  "go.testFlags": [
+    "-v",
+    "-race"
+  ],
+  "go.testTimeout": "30s",
+  "go.testEnvVars": {},
+  "go.coverOnSave": false,
+  "go.coverOnSingleTest": true,
+  "go.coverOnSingleTestFile": true,
+  "go.coverageDecorator": {
+    "type": "gutter",
+    "coveredHighlightColor": "rgba(64,128,64,0.5)",
+    "uncoveredHighlightColor": "rgba(128,64,64,0.5)",
+    "coveredGutterStyle": "blockgreen",
+    "uncoveredGutterStyle": "blockred"
+  },
+  "go.buildOnSave": "off",
+  "go.buildFlags": [],
+  "go.buildTags": "",
+  "go.delveConfig": {
+    "dlvLoadConfig": {
+      "followPointers": true,
+      "maxVariableRecurse": 1,
+      "maxStringLen": 512,
+      "maxArrayValues": 64,
+      "maxStructFields": -1
+    },
+    "apiVersion": 2,
+    "showGlobalVariables": false,
+    "debugAdapter": "dlv-dap"
+  },
+  "files.associations": {
+    "*.go": "go",
+    "go.mod": "go.mod",
+    "go.sum": "go.sum",
+    "*.tmpl": "html",
+    "*.gohtml": "html",
+    "*.gotmpl": "go",
+    "*.yaml": "yaml",
+    "*.yml": "yaml"
+  },
+  "[makefile]": {
+    "editor.insertSpaces": false,
+    "editor.tabSize": 4
+  },
+  "[dockerfile]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true
+  }
+}
