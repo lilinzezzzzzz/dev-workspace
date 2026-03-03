@@ -156,13 +156,13 @@ go mod tidy
 
 ```bash
 # 复制通用配置
-cp -r development-env-config/vscode/common/* .vscode/
+cp -r development-config/vscode/common/* .vscode/
 
 # Python 项目额外复制
-cp development-env-config/vscode/python/* .vscode/
+cp development-config/vscode/python/* .vscode/
 
 # Go 项目额外复制
-cp development-env-config/vscode/golang/settings.json .vscode/
+cp development-config/vscode/golang/settings.json .vscode/
 ```
 
 ### 4️⃣ 验证配置

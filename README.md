@@ -158,7 +158,7 @@ dev-workspace/
 │   └── README.md           # SSH 使用说明
 ├── docs/                   # 文档目录
 │   └── UV_USAGE.md         # uv 使用指南
-├── development-env-config/ # VSCode 配置模板
+├── development-config/   # VSCode 配置模板
 │   ├── golang/             # Go 开发配置
 │   ├── python/             # Python 开发配置
 │   ├── qoder/              # AI Agent 配置
