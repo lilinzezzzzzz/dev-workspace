@@ -59,7 +59,7 @@
   "python.analysis.autoImportCompletions": true, // 启用自动导入补全
   "python.analysis.inlayHints.functionReturnTypes": true, // 显示函数返回类型提示
   "python.analysis.inlayHints.variableTypes": true, // 不显示变量类型提示（避免干扰）
-  "python.analysis.inlayHints.callArgumentNames": "all", // 显示调用参数名提示（提高可读性）
+  "python.analysis.inlayHints.callArgumentNames": "partial", // 显示调用参数名提示（提高可读性）
   "python.analysis.diagnosticSeverityOverrides": {
     // 降为警告
     "reportUnusedImport": "warning",
