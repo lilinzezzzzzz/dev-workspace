@@ -66,6 +66,7 @@
     "reportUnusedFunction": "warning",
     "reportUnusedClass": "warning",
     "reportPrivateUsage": "warning",
+    "reportAssignmentType": "warning",
     // 禁用第三方库误报
     "reportArgumentType": "none",
     "reportGeneralTypeIssues": "none",
