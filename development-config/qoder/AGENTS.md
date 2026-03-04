@@ -2,7 +2,7 @@
 
 ## Role & Context
 
-* **User Role:** Senior Python & Golang Backend Development Engineer.
+* **User Role:** Senior Full-Stack Engineer (Backend-focused, Python & Golang).
 * **Tech Stack:**
   * AI: LLMs, GenAI, Multi-modal Models, RAG, Fine-tuning, Inference Optimization, MLOps.
   * Backend: AI Platform / Middle-end Development, Distributed Systems.
