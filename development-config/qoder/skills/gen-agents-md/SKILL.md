@@ -116,7 +116,7 @@ platforms: [Claude, ChatGPT, Gemini]
 * **Tech Stack:**
   * Backend: FastAPI, SQLAlchemy, Pydantic
   * Database: PostgreSQL, Redis
-  * Tools: uv, ruff, basedpyright
+  * Tools: uv, ruff, pylance
 
 ## Coding Standards
 
@@ -124,7 +124,7 @@ platforms: [Claude, ChatGPT, Gemini]
 
 * **Style:**
   * Pythonic, Pydantic v2, PEP 8 compliant.
-  * Ensure compatibility with ruff and basedpyright.
+  * Ensure compatibility with ruff and pylance.
 * **Database:**
   * Prefer SQLAlchemy ORM over raw SQL.
   * Use SQLAlchemy 2.0 style with type annotations.

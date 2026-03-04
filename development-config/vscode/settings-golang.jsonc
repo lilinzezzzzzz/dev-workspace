@@ -42,7 +42,9 @@
     "**/node_modules/**": true,
     "**/.venv/**": true,
     "**/venv/**": true,
-    "**/__pycache__/**": true
+    "**/__pycache__/**": true,
+    "**/.pytest_cache/**": true,
+    "**/.idea/**": true
   },
   "files.exclude": {
     "**/.git": true,
@@ -52,6 +54,9 @@
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
     "**/node_modules": true,
+    "**/__pycache__": true,
+    "**/.pytest_cache": true,
+    "**/.idea": true,
     "**/vendor": true,
     "**/bin": true,
     "**/dist": true
@@ -204,10 +209,7 @@
   "statsBar.cpuLoad.format": "$(chip) ${percent}%",
   "yaml.schemaStore.enable": true,
   "yaml.schemas": {
-    "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": [
-      "docker-compose.yaml",
-      "docker-compose.yml"
-    ]
+    "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "docker-compose.y*ml"
   },
   "yaml.customTags": [
     "!reference sequence"

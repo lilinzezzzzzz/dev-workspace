@@ -1,4 +1,5 @@
 {
+    "python.languageServer": "Pylance",
   // =============================================================================
   // 🐍 PYTHON 编程语言相关配置
   // =============================================================================
@@ -53,13 +54,13 @@
   "ruff.lint.ignore": [
     "E501" // 行过长（由 formatter 处理）
   ],
-  // -------------------- Basedpyright 类型检查 --------------------
-  "basedpyright.analysis.typeCheckingMode": "basic", // 类型检查模式（基础）
-  "basedpyright.analysis.autoImportCompletions": true, // 启用自动导入补全
-  "basedpyright.analysis.inlayHints.functionReturnTypes": true, // 显示函数返回类型提示
-  "basedpyright.analysis.inlayHints.variableTypes": false, // 不显示变量类型提示（避免干扰）
-  "basedpyright.analysis.inlayHints.callArgumentNames": true, // 显示调用参数名提示（提高可读性）
-  "basedpyright.analysis.diagnosticSeverityOverrides": {
+  // -------------------- Pylance 类型检查 --------------------
+  "python.analysis.typeCheckingMode": "basic", // 类型检查模式（基础）
+  "python.analysis.autoImportCompletions": true, // 启用自动导入补全
+  "python.analysis.inlayHints.functionReturnTypes": true, // 显示函数返回类型提示
+  "python.analysis.inlayHints.variableTypes": true, // 不显示变量类型提示（避免干扰）
+  "python.analysis.inlayHints.callArgumentNames": "all", // 显示调用参数名提示（提高可读性）
+  "python.analysis.diagnosticSeverityOverrides": {
     // 降为警告
     "reportUnusedImport": "warning",
     "reportUnusedVariable": "warning",
@@ -110,7 +111,7 @@
     "**/.ruff_cache": true, // Ruff 缓存
     "**/*.egg-info": true, // 包信息目录
     "**/.mypy_cache": true, // MyPy 缓存
-    "**/.basedpyright": true // Basedpyright 缓存
+    "**/.pylance": true // Pylance 缓存
   },
   // -------------------- 搜索排除 --------------------
   // 搜索时跳过这些目录/文件（提高搜索性能）

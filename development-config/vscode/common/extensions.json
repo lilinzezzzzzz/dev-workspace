@@ -13,7 +13,7 @@
     "ms-azuretools.vscode-containers",
 
     // ==================================================
-    // Python 核心工具链（ruff + basedpyright）
+    // Python 核心工具链（ruff + pylance）
     // ==================================================
 
     // Python：解释器、调试、测试集成
@@ -22,8 +22,8 @@
     // Ruff：lint + import 排序 + format
     "charliermarsh.ruff",
 
-    // basedpyright：静态类型检查
-    "detachhead.basedpyright",
+    // Pylance：静态类型检查（微软官方，包含 Pyright 功能 + IntelliSense 增强）
+    "ms-python.vscode-pylance",
 
     // ==================================================
     // Git

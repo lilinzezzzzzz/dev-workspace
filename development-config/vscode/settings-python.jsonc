@@ -62,7 +62,7 @@
     "**/.ruff_cache": true,
     "**/*.egg-info": true,
     "**/.mypy_cache": true,
-    "**/.basedpyright": true
+    "**/.pylance": true
   },
   "search.exclude": {
     "**/node_modules": true,
@@ -259,17 +259,18 @@
   "ruff.lint.ignore": [
     "E501"
   ],
-  "basedpyright.analysis.typeCheckingMode": "basic",
-  "basedpyright.analysis.autoImportCompletions": true,
-  "basedpyright.analysis.inlayHints.functionReturnTypes": true,
-  "basedpyright.analysis.inlayHints.variableTypes": false,
-  "basedpyright.analysis.inlayHints.callArgumentNames": true,
-  "basedpyright.analysis.diagnosticSeverityOverrides": {
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.variableTypes": false,
+  "python.analysis.inlayHints.callArgumentNames": true,
+  "python.analysis.diagnosticSeverityOverrides": {
     "reportUnusedImport": "warning",
     "reportUnusedVariable": "warning",
     "reportUnusedFunction": "warning",
     "reportUnusedClass": "warning",
     "reportPrivateUsage": "warning",
+    "reportAssignmentType": "warning",
     "reportArgumentType": "none",
     "reportGeneralTypeIssues": "none",
     "reportMissingTypeStubs": "none",

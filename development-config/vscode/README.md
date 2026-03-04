@@ -23,7 +23,7 @@
 ## ✨ 特性
 
 ### 🐍 多语言支持
-- **Python 开发**: Ruff + Basedpyright 工具链，uv 依赖管理
+- **Python 开发**: Ruff + Pylance 工具链，uv 依赖管理
 - **Go 开发**: Go 语言专用配置和调试支持
 - **通用配置**: 编辑器核心设置、主题、快捷键等跨语言共享
 
@@ -56,7 +56,7 @@ vscode/
 │   ├── extensions.json   # 推荐扩展列表
 │   └── keybindings.json  # 自定义快捷键映射（⚠️ 仅支持用户级别）
 ├── python/               # Python 专用配置
-│   ├── settings.json     # Python 工具链配置（Ruff、Basedpyright等）
+│   ├── settings.json     # Python 工具链配置（Ruff、Pylance等）
 │   └── launch.json       # Python 调试配置
 ├── golang/               # Go 专用配置
 │   └── settings.json     # Go 语言配置
@@ -117,7 +117,7 @@ code --list-extensions
 # 批量安装核心扩展
 code --install-extension ms-python.python
 code --install-extension charliermarsh.ruff
-code --install-extension detachhead.basedpyright
+code --install-extension ms-python.vscode-pylance
 code --install-extension eamodio.gitlens
 code --install-extension ms-vscode-remote.remote-containers
 code --install-extension ms-azuretools.vscode-docker
@@ -182,7 +182,7 @@ cp development-config/vscode/golang/settings.json .vscode/
 | 工具 | 作用 | 配置位置 |
 |------|------|----------|
 | **Ruff** | Python Linter + Formatter | `python/settings.json` |
-| **Basedpyright** | 类型检查器 | `python/settings.json` |
+| **Pylance** | 类型检查器 | `python/settings.json` |
 | **uv** | 依赖管理器 | `python/settings.json` |
 | **调试配置** | FastAPI/Uvicorn 调试 | `python/launch.json` |
 
@@ -192,7 +192,7 @@ cp development-config/vscode/golang/settings.json .vscode/
   "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
   "ruff.enable": true,
   "ruff.fixAll": true,
-  "basedpyright.analysis.typeCheckingMode": "basic"
+  "python.analysis.typeCheckingMode": "basic"
 }
 ```
 
@@ -246,7 +246,7 @@ cp development-config/vscode/golang/settings.json .vscode/
 |------|------|----------|
 | [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) | Python 语言支持 | Python |
 | [Ruff](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) | 现代化 Linter + Formatter | Python |
-| [Basedpyright](https://marketplace.visualstudio.com/items?itemName=detachhead.basedpyright) | 严格类型检查 | Python |
+| [Pylance](https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance) | 静态类型检查 | Python |
 | [GitLens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens) | Git 增强工具 | All |
 
 ### 开发容器
@@ -344,13 +344,13 @@ cp development-config/vscode/golang/settings.json .vscode/
 
 > **注意**: Go 扩展 `golang.go` 需要单独安装，不在默认推荐扩展列表中。
 
-### Q2: Ruff 和 Basedpyright 冲突？
+### Q2: Ruff 和 Pylance 冲突？
 
 **A**: 两者职责不同：
 - **Ruff**: 负责代码风格（格式化、导入排序、简单错误）
-- **Basedpyright**: 负责类型检查（类型注解、函数签名）
+- **Pylance**: 负责类型检查（类型注解、函数签名）
 
-配置中已禁用 Basedpyright 的格式化功能，避免冲突。
+配置中已禁用 Pylance 的格式化功能，避免冲突。
 
 ### Q3: Git 提交验证如何配置？
 
@@ -437,7 +437,7 @@ cp keybindings.json ~/.config/Code/User/keybindings.json
 
 ### Python 相关
 - [Ruff 官方文档](https://docs.astral.sh/ruff/)
-- [Basedpyright GitHub](https://github.com/DetachHead/basedpyright)
+- [Pylance GitHub](https://github.com/microsoft/pylance-release)
 - [uv 官方文档](https://docs.astral.sh/uv/)
 - [VS Code Python 教程](https://code.visualstudio.com/docs/python/python-tutorial)
 - [FastAPI 调试指南](https://fastapi.tiangolo.com/tutorial/debugging/)

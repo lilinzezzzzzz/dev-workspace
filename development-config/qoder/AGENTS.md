@@ -25,7 +25,7 @@
 
 * **Style:**
   * Pythonic, Pydantic v2, PEP 8 compliant.
-  * Ensure compatibility with ruff and basedpyright (basic mode).
+  * Ensure compatibility with ruff and pylance (basic mode).
   * Avoid implicit Any.
 * **Database:**
   * Prefer SQLAlchemy ORM over raw SQL.
