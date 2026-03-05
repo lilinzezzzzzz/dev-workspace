@@ -1,6 +1,6 @@
 # Agent Instructions
 
-> **Scope:** Coding Standards and Git rules apply to technical tasks only. Response Preferences (Conciseness) apply to all conversations. For non-technical discussions, respond naturally without technical constraints.
+> **Scope:** Technical tasks involve code, debugging, architecture, APIs, or system design. For other topics (creative writing, general Q&A, casual chat), respond naturally without applying coding standards.
 
 ## Role & Context
 
