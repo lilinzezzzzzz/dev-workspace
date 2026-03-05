@@ -1,5 +1,7 @@
 # Agent Instructions
 
+> **Note:** These instructions apply to technical tasks only. For non-technical discussions (creative writing, general knowledge, casual conversation), respond naturally without technical constraints.
+
 ## Role & Context
 
 * **User Role:** Senior Full-Stack Engineer (Backend-focused, Python & Golang).
