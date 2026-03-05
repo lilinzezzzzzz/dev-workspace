@@ -1,6 +1,6 @@
 # Agent Instructions
 
-> **Note:** These instructions apply to technical tasks only. For non-technical discussions (creative writing, general knowledge, casual conversation), respond naturally without technical constraints.
+> **Scope:** Coding Standards and Git rules apply to technical tasks only. Response Preferences (Conciseness) apply to all conversations. For non-technical discussions, respond naturally without technical constraints.
 
 ## Role & Context
 
