@@ -3,115 +3,63 @@
 ## Role & Context
 
 * **User Role:** Senior Full-Stack Engineer (Backend-focused, Python & Golang).
-* **Tech Stack:**
-  * AI: LLMs, GenAI, Multi-modal Models, RAG, Fine-tuning, Inference Optimization, MLOps.
-  * Backend: AI Platform / Middle-end Development, Distributed Systems.
+* **Tech Stack:** AI (LLMs, GenAI, RAG, Fine-tuning, MLOps) + Backend (Distributed Systems).
 
 ## Coding Standards
 
 ### General
 
-* **Quality:**
-  * High performance, production-ready.
-  * Prioritize security, avoid undefined behavior, and minimize logical flaws.
-  * Do NOT include instructions to run linters; compliance is assumed at generation time.
-* **Architecture:**
-  * Modular, scalable, and clean code structure suitable for AI enterprise applications.
-* **Type Safety:**
-  * Ensure public APIs are fully type-annotated.
-  * Prefer explicit, precise types over permissive or ambiguous typing.
+* **Quality:** Production-ready, secure, no undefined behavior. Linter compliance assumed at generation time.
+* **Architecture:** Modular, scalable, clean code for AI enterprise applications.
+* **Type Safety:** Public APIs fully type-annotated. Explicit types over permissive typing.
 
 ### Python
 
-* **Style:**
-  * Pythonic, Pydantic v2, PEP 8 compliant.
-  * Ensure compatibility with ruff and pylance (basic mode).
-  * Avoid implicit Any.
-* **Database:**
-  * Prefer SQLAlchemy ORM over raw SQL.
-  * Use SQLAlchemy 2.0 style with type annotations.
-* **Async:**
-  * Prefer anyio over raw asyncio for async primitives (tasks, locks, events).
-  * Use httpx for async HTTP requests; avoid aiohttp.
-  * Use anyio.create_task_group for structured concurrency.
-  * Avoid mixing sync and async code; use anyio.to_thread.run_sync or anyio.to_process.run_sync for blocking calls.
-* **Logging:**
-  * Use structlog for structured logging; avoid print statements.
-  * Log levels: DEBUG for development, INFO for operations, WARNING/ERROR for issues.
-* **API Design:**
-  * Use FastAPI for REST APIs; prefer Pydantic V2 models for request/response schemas.
-  * Prefer GET and POST methods; use PUT/DELETE/PATCH only when explicitly required.
-  * Implement consistent error responses with error codes and messages.
-* **Runtime & Environment:**
-  * Use uv (Astral) for project environment and dependency management.
-  * Define dependencies via pyproject.toml (PEP 621), resolve with uv.lock.
-  * Do not assume requirements.txt, pip, pip-tools, poetry, or conda.
-  * Ensure compatibility with uv run and uv pip.
+* **Style:** Pythonic, PEP 8, Pydantic v2. Compatible with ruff + pylance (basic mode). No implicit `Any`.
+* **Database:** SQLAlchemy 2.0+ ORM with type annotations (no raw SQL).
+* **Async:** Use anyio (not asyncio). Use httpx for HTTP, anyio.create_task_group for concurrency. Isolate I/O blocking via anyio.to_thread.run_sync, CPU-bound via anyio.to_process.run_sync.
+* **Error Handling:** Custom exceptions with error codes. Never bare `except:`. Log with context before re-raising.
+* **Logging:** loguru for structured logging. Levels: DEBUG (dev), INFO (ops), WARNING/ERROR (issues). No print.
+* **API Design:** FastAPI + Pydantic v2. Prefer GET/POST. Consistent error responses with codes and messages.
+* **Testing:** pytest + pytest-asyncio. >80% coverage on critical paths. Mock external services.
+* **Runtime:** uv for dependency management. pyproject.toml (PEP 621) + uv.lock. No pip/poetry/conda.
 
 ### Golang
 
-* **Style:**
-  * Follow Effective Go and Go Code Review Comments.
-  * Ensure code passes go vet, staticcheck, and golangci-lint.
-  * Use gofmt / goimports for formatting.
-* **Runtime & Environment:**
-  * Use Go Modules (go.mod / go.sum) for dependency management.
-  * Prefer standard library; minimize third-party dependencies.
-  * Ensure compatibility with go build and go run.
+* **Style:** Effective Go + Go Code Review Comments. Pass go vet, staticcheck, golangci-lint. Use gofmt/goimports.
+* **Runtime:** Go Modules (go.mod/go.sum). Prefer stdlib, minimize dependencies.
 * **Conventions:**
-  * Error handling: Check and handle errors explicitly; avoid _ for error returns.
-  * Concurrency: Use goroutines and channels idiomatically; prefer sync primitives for shared state.
-  * Naming: Use MixedCaps (exported) and mixedCaps (unexported); avoid underscores.
-  * Context: Pass context.Context as the first parameter; propagate cancellation and deadlines.
+  * Errors: Handle explicitly, no `_` for error returns.
+  * Concurrency: Idiomatic goroutines/channels; sync primitives for shared state.
+  * Naming: MixedCaps (exported), mixedCaps (unexported), no underscores.
+  * Context: First parameter, propagate cancellation/deadlines.
 
-## Git Commit Specification
+## Git
 
-* **Branch Naming:**
-  * `feature/<description>`, `bugfix/<description>`, `hotfix/<description>`, `release/<version>`.
-
-* **Commit Message Specification:**
-  * **Format:** `<type>(<scope>): <subject>` (Conventional Commits)
-  * **Types:** feat, fix, chore, docs, style, refactor, test, perf, ci
-  * **Subject Rules:**
-    * Use imperative mood (e.g., "add" not "added")
-    * Lowercase, no period at the end
-    * Keep within 50 characters
-  * **Body (optional):**
-    * Explain "what" changes were made
-    * Keep within 72 characters per line when possible
-
-* **Merge Strategy:**
-  * feature → develop: Squash or rebase.
-  * develop → main: Merge commit (preserve history).
-
-* **Language Preference:**
-  * Prioritize Chinese when appropriate for better readability
+* **Branches:** `feature/`, `bugfix/`, `hotfix/`, `release/<version>`
+* **Commits:** `<type>(<scope>): <subject>` (Conventional Commits, imperative mood, <50 chars)
+* **Merge:** feature→develop: squash/rebase; develop→main: merge commit
+* **Language:** Chinese preferred for readability
 
 ## Response Preferences
 
-* **Conciseness:**
-  * Be direct and brief. Prefer responding in Chinese.
-  * When professional terminology is involved, provide both Chinese and English terms.
-  * Focus on the "Why" and "How" of complex architectural decisions.
-* **Solution-Oriented:**
-  * When providing code, prioritize robustness and edge-case handling over quick-and-dirty scripts.
-* **Format:**
-  * Use structured Markdown for technical comparisons or pros/cons analysis.
+* **Conciseness:** Direct, brief, Chinese preferred. Technical terms in both Chinese + English.
+* **Solution-Oriented:** Robust code with edge-case handling. No quick-and-dirty scripts.
+* **Format:** Structured Markdown for comparisons and analysis.
 
-## Analysis & Verification Protocol
+## Verification
 
-* **Challenge Assumptions:**
-  * Rigorously stress-test and critique all proposed designs, technical solutions, and underlying assumptions.
-  * Flag suboptimal instructions before executing.
-* **Identify Risks:**
-  * Proactively highlight potential logical flaws, scalability bottlenecks, concurrency issues, or security vulnerabilities.
-* **Constructive Feedback Loop:**
-  * If a proposed solution is suboptimal or an anti-pattern, propose superior, industry-standard alternatives before proceeding.
+* Critique all designs before executing. Flag risks (security, scalability, concurrency).
+* Propose industry-standard alternatives for anti-patterns.
 
-## Timeliness & Web Search
+## Web Search
 
-* **Web Search:**
-  * Enabled and performed actively.
-  * For queries involving frequently updated libraries, technologies, or current events, use web search to ensure answers reflect the latest versions and practices.
-* **Information Freshness:**
-  * Prioritize the latest official documentation over internal training data.
+* Enabled actively. Use for updated libraries, technologies, current events.
+* Prioritize latest official docs over training data.
+
+## Self-Review Checklist
+
+Before finalizing code:
+* [ ] All public functions have type hints and docstrings
+* [ ] No hardcoded secrets or magic numbers
+* [ ] Edge cases handled (empty inputs, None, concurrent access)
