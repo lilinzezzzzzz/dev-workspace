@@ -1,5 +1,4 @@
 {
-    "python.languageServer": "Pylance",
   // =============================================================================
   // 🐍 PYTHON 编程语言相关配置
   // =============================================================================
@@ -54,12 +53,19 @@
   "ruff.lint.ignore": [
     "E501" // 行过长（由 formatter 处理）
   ],
-  // -------------------- Pylance 类型检查 --------------------
-  "python.analysis.typeCheckingMode": "basic", // 类型检查模式（基础）
+  // -------------------- Pylance 语言服务器 --------------------
+  "python.languageServer": "Pylance", // 使用 Pylance（包含 Pyright 类型检查 + IntelliSense）
+  // 类型检查
+  "python.analysis.typeCheckingMode": "basic", // 类型检查模式: off, basic, standard, strict
   "python.analysis.autoImportCompletions": true, // 启用自动导入补全
-  "python.analysis.inlayHints.functionReturnTypes": true, // 显示函数返回类型提示
-  "python.analysis.inlayHints.variableTypes": true, // 不显示变量类型提示（避免干扰）
-  "python.analysis.inlayHints.callArgumentNames": "partial", // 显示调用参数名提示（提高可读性）
+  "python.analysis.useLibraryCodeForTypes": true, // 使用库代码进行类型推断
+  "python.analysis.completeFunctionParens": true, // 自动补全函数括号
+  // Inlay Hints（内联提示）
+  "python.analysis.inlayHints.functionReturnTypes": true, // 显示函数返回类型
+  "python.analysis.inlayHints.variableTypes": true, // 显示变量类型
+  "python.analysis.inlayHints.callArgumentNames": "partial", // 显示调用参数名: off, partial, all
+  "python.analysis.inlayHints.parametrizeTypes": true, // 显示参数类型提示
+  // 诊断严重性覆盖
   "python.analysis.diagnosticSeverityOverrides": {
     // 降为警告
     "reportUnusedImport": "warning",
