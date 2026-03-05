@@ -18,6 +18,7 @@
 ### Python
 
 * **Style:** Pythonic, PEP 8, Pydantic v2. Compatible with ruff + pylance (basic mode). No implicit `Any`.
+* **Function Signature:** Prefer keyword-only arguments (use `*` separator) for clarity and safety.
 * **Database:** SQLAlchemy 2.0+ ORM with type annotations (no raw SQL).
 * **Async:** Use anyio (not asyncio). Use httpx for HTTP, anyio.create_task_group for concurrency. Isolate I/O blocking via anyio.to_thread.run_sync, CPU-bound via anyio.to_process.run_sync.
 * **Error Handling:** Custom exceptions with error codes. Never bare `except:`. Log with context before re-raising.
