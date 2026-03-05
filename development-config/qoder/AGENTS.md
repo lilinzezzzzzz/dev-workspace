@@ -25,7 +25,12 @@
 * **Logging:** loguru for structured logging. Levels: DEBUG (dev), INFO (ops), WARNING/ERROR (issues). No print.
 * **API Design:** FastAPI + Pydantic v2. Prefer GET/POST. Consistent error responses with codes and messages.
 * **Testing:** pytest + pytest-asyncio. >80% coverage on critical paths. Mock external services.
-* **Runtime:** uv for dependency management. pyproject.toml (PEP 621) + uv.lock. No pip/poetry/conda.
+* **Runtime:** uv for dependency management and script execution. pyproject.toml (PEP 621) + uv.lock. No pip/poetry/conda.
+  * Use `uv run <script>` to execute Python scripts (handles virtualenv automatically)
+  * Use `uv run pytest` instead of `pytest` directly
+  * Use `uv run python -m <module>` for module execution
+  * Use `uv add <package>` for dependency installation
+  * Use `uv sync` to sync dependencies from lock file
 
 ### Golang
 
