@@ -2,7 +2,6 @@
   // =============================================================================
   // 🐍 VS Code Python 开发最佳实践配置（面向 2026 年当前版本）
   // =============================================================================
-
   // -------------------- Python 环境与终端 --------------------
   // 不再硬编码某个平台的解释器路径，交给最新 Python Environments 自动发现 `.venv/venv`
   "python-envs.workspaceSearchPaths": [
@@ -16,14 +15,15 @@
   "python.terminal.shellIntegration.enabled": true, // 启用 Python 终端 shell integration
   "python.terminal.useEnvFile": true, // 让终端也读取 `.env`
   "python.envFile": "${workspaceFolder}/.env",
-
   // -------------------- Python 编辑体验 --------------------
   "python.analysis.autoSearchPaths": true,
   "python.analysis.extraPaths": [],
   "python.analysis.exclude": [
+    "**/node_modules",
+    "**/__pycache__",
     "**/.venv",
     "**/venv",
-    "**/__pycache__",
+    "**/.*",
     "**/.pytest_cache",
     "**/.ruff_cache",
     "**/.mypy_cache",
@@ -47,7 +47,6 @@
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.wordBasedSuggestions": "off" // Python 更适合依赖语言服务器补全
   },
-
   // -------------------- Ruff：Lint + Format --------------------
   "ruff.enable": true,
   "ruff.nativeServer": "auto", // 最新推荐：优先使用 Rust 原生服务器
@@ -66,7 +65,6 @@
   "ruff.lint.ignore": [
     "E501"
   ],
-
   // -------------------- Pylance / 类型检查 --------------------
   "python.languageServer": "Pylance",
   "python.analysis.typeCheckingMode": "standard", // 比 basic 更实用，噪音又明显少于 strict
@@ -84,7 +82,6 @@
     "reportUnusedVariable": "none",
     "reportMissingTypeStubs": "none"
   },
-
   // -------------------- 测试配置 --------------------
   "python.testing.pytestEnabled": true,
   "python.testing.unittestEnabled": false,
@@ -97,7 +94,6 @@
     "-v",
     "--tb=short"
   ],
-
   // -------------------- Notebook / Jupyter --------------------
   // Ruff 官方当前已支持 notebook 的 lint / format / organize imports
   "notebook.formatOnSave.enabled": true,
@@ -105,7 +101,6 @@
     "notebook.source.fixAll": "explicit",
     "notebook.source.organizeImports": "explicit"
   },
-
   // -------------------- 文件关联 --------------------
   "files.associations": {
     "*.j2": "jinja",

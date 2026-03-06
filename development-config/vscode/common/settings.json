@@ -211,15 +211,18 @@
   // 跨平台终端环境变量配置，确保各系统行为一致
   // Windows 终端环境变量
   "terminal.integrated.env.windows": {
-    "PYTHONIOENCODING": "utf-8" // Python IO 编码（解决 Windows 中文输出问题）
+    "PYTHONIOENCODING": "utf-8", // Python IO 编码（解决 Windows 中文输出问题）
+    "PYTHONDONTWRITEBYTECODE": "1" // 开发时不生成 __pycache__/pyc
   },
   // Linux 终端环境变量
   "terminal.integrated.env.linux": {
-    "PYTHONIOENCODING": "utf-8"
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONDONTWRITEBYTECODE": "1"
   },
   // macOS 终端环境变量
   "terminal.integrated.env.osx": {
-    "PYTHONIOENCODING": "utf-8"
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONDONTWRITEBYTECODE": "1"
   },
   "terminal.integrated.fontSize": 12.0, // 终端字体大小
   "terminal.integrated.fontFamily": "'Source Code Pro', 'JetBrains Mono', 'Fira Code', monospace", // 终端字体族
@@ -240,15 +243,17 @@
     "unknown": "off"
   },
   "terminal.integrated.suggest.suggestOnTriggerCharacters": true, // 输入 -, /, \\ 等字符时触发提示
-  "terminal.integrated.suggest.cdPath": true, // 支持基于 CDPATH 的目录补全
+  "terminal.integrated.suggest.cdPath": "relative", // 支持基于 CDPATH 的目录补全，优先插入相对路径
   "terminal.integrated.enablePersistentSessions": true, // 窗口重开后恢复终端会话
   "terminal.integrated.splitCwd": "inherited", // 分屏终端继承当前终端工作目录
   "terminal.integrated.tabs.enabled": true, // 启用终端标签页
   "terminal.integrated.tabs.hideCondition": "singleTerminal", // 单终端时隐藏标签，多个终端时显示
   "terminal.integrated.tabs.title": "${process}", // 标签主标题保持简洁稳定
   "terminal.integrated.tabs.description": "${cwdFolder}", // 标签附带当前工作目录信息
-  "terminal.integrated.enableBell": false, // 关闭终端响铃，减少干扰
-  // -------------------- Git 核心配置 --------------------
+  "terminal.integrated.enableVisualBell": false,
+  "accessibility.signals.terminalBell": {
+    "sound": "off"
+  }, // -------------------- Git 核心配置 --------------------
   "git.enableSmartCommit": true, // 启用智能提交
   "git.confirmSync": false, // 同步时不弹确认对话框
   "git.autofetch": false, // 禁用自动fetch（性能考虑）
