@@ -1,73 +1,125 @@
 # Agent Instructions
 
-> **Scope:** Technical tasks involve code, debugging, architecture, APIs, or system design. For other topics (creative writing, general Q&A, casual chat), respond naturally without applying coding standards.
+> Scope: Apply these rules to technical work only, including code, debugging, architecture, APIs, infrastructure, migrations, and system design. For non-technical chat, respond naturally without forcing engineering standards, but still follow the sections `Communication Preferences` and `Web Research` when relevant.
 
-## Role & Context
+## Role and Context
 
-* **User Role:** Senior Full-Stack Engineer (Backend-focused, Python & Golang).
-* **Tech Stack:** AI (LLMs, GenAI, RAG, Fine-tuning, MLOps) + Backend (Distributed Systems).
+* User profile: Senior full-stack engineer, backend-focused, strong in Python and Go.
+* Primary domain: AI platforms, LLM applications, RAG, fine-tuning, MLOps, distributed systems, backend infrastructure.
+* Collaboration mode: Prefer direct execution over long theory. Be concise, technical, and decision-oriented.
 
-## Coding Standards
+## Working Principles
+
+* Production-first: Output must be production-ready, secure, testable, and maintainable.
+* Minimal-diff: Prefer the smallest correct change that solves the problem without unnecessary refactors.
+* Respect-local-conventions: Follow existing repository structure, naming, and framework patterns before introducing new abstractions.
+* No hidden assumptions: State critical assumptions explicitly when they affect correctness, performance, or API behavior.
+* No silent degradation: If something cannot be verified, run, or completed, say so clearly and explain the gap.
+* Sync related artifacts: If code behavior changes, update tests, config, schema, docs, examples, and migrations when relevant.
+
+## Execution Workflow
+
+1. Understand the task, constraints, and repo context before editing.
+2. Critique the design briefly before implementation if there are risks or better alternatives.
+3. Implement with minimal scope and clear boundaries.
+4. Validate with the strongest practical checks available.
+5. Report outcome, verification, and residual risk succinctly.
+
+## Code Quality Standards
 
 ### General
 
-* **Quality:** Production-ready, secure, no undefined behavior. Linter compliance assumed at generation time.
-* **Architecture:** Modular, scalable, clean code for AI enterprise applications.
-* **Type Safety:** Public APIs fully type-annotated. Explicit types over permissive typing.
+* Correctness: No undefined behavior, race-prone logic, silent failure, or swallowed exceptions.
+* Readability: Favor straightforward code over clever code. Keep modules cohesive and interfaces explicit.
+* Type safety: Public APIs must be fully typed. Prefer precise types over `Any`, `dict`, or unstructured payloads.
+* Error design: Use explicit error types or stable error codes for user-facing and API-facing failures.
+* Observability: Log meaningful context for failures, retries, external calls, and state transitions.
+* Security: Validate inputs, sanitize outputs, avoid secret leakage, and apply least-privilege defaults.
+* Performance: Avoid premature optimization, but do not introduce obviously wasteful queries, copies, or blocking behavior.
 
 ### Python
 
-* **Style:** Pythonic, PEP 8, Pydantic v2. Compatible with ruff + pylance (basic mode). No implicit `Any`.
-* **Function Signature:** Prefer keyword-only arguments (use `*` separator) for clarity and safety.
-* **Database:** SQLAlchemy 2.0+ ORM with type annotations (no raw SQL).
-* **Async:** Use anyio (not asyncio). Use httpx for HTTP, anyio.create_task_group for concurrency. Isolate I/O blocking via anyio.to_thread.run_sync, CPU-bound via anyio.to_process.run_sync.
-* **Error Handling:** Custom exceptions with error codes. Never bare `except:`. Log with context before re-raising.
-* **Logging:** loguru for structured logging. Levels: DEBUG (dev), INFO (ops), WARNING/ERROR (issues). No print.
-* **API Design:** FastAPI + Pydantic v2. Prefer GET/POST. Consistent error responses with codes and messages.
-* **Testing:** pytest + pytest-asyncio. >80% coverage on critical paths. Mock external services.
-* **Runtime:** uv for dependency management and script execution. pyproject.toml (PEP 621) + uv.lock. No pip/poetry/conda.
-  * Use `uv run <script>` to execute Python scripts (handles virtualenv automatically)
-  * Use `uv run pytest` instead of `pytest` directly
-  * Use `uv run python -m <module>` for module execution
-  * Use `uv add <package>` for dependency installation
-  * Use `uv sync` to sync dependencies from lock file
+* Runtime and packaging: Use `uv`, `pyproject.toml` (PEP 621), and `uv.lock`. Do not introduce `pip`, `poetry`, or `conda` workflows unless the repository already requires them.
+* Style: Pythonic, PEP 8, Pydantic v2, Ruff-compatible, Pylance-compatible. No implicit `Any` in new code.
+* Typing: Prefer `TypedDict`, `Protocol`, `Literal`, `Enum`, and Pydantic models over loose dictionaries.
+* Function signatures: Prefer keyword-only arguments for non-trivial public functions.
+* Async model: Prefer `anyio` patterns for concurrency orchestration. Use `httpx` for HTTP. Isolate blocking I/O with `anyio.to_thread.run_sync`.
+* API stack: FastAPI + Pydantic v2. Prefer explicit request/response models and consistent error envelopes.
+* Database: Prefer SQLAlchemy 2.x typed ORM/query patterns. Raw SQL is allowed only when ORM is clearly insufficient, and must be parameterized and justified.
+* Migrations: Use Alembic for schema changes. Schema changes must consider rollback, backfill, and compatibility for existing data.
+* Logging: Prefer structured logging. No `print` in application code except intentional CLI output.
+* Configuration: Read config from environment or settings objects, not scattered module globals.
+* Testing: Use `pytest` and `pytest-asyncio` when async tests are needed. Mock external services and cover failure paths, not only happy paths.
+* Quality gate: New Python code should pass Ruff and align with Pylance `standard` type-checking expectations.
+* Command policy:
+  * Use `uv run <script>` for Python scripts
+  * Use `uv run pytest` for tests
+  * Use `uv run python -m <module>` for modules
+  * Use `uv add <package>` for dependencies
+  * Use `uv sync` to install from lock file
 
-### Golang
+### Go
 
-* **Style:** Effective Go + Go Code Review Comments. Pass go vet, staticcheck, golangci-lint. Use gofmt/goimports.
-* **Runtime:** Go Modules (go.mod/go.sum). Prefer stdlib, minimize dependencies.
-* **Conventions:**
-  * Errors: Handle explicitly, no `_` for error returns.
-  * Concurrency: Idiomatic goroutines/channels; sync primitives for shared state.
-  * Naming: MixedCaps (exported), mixedCaps (unexported), no underscores.
-  * Context: First parameter, propagate cancellation/deadlines.
+* Style: Follow Effective Go and Go Code Review Comments.
+* Tooling: Code should pass `gofmt` or `goimports`, `go vet`, and preferably `staticcheck` or `golangci-lint` when configured.
+* Dependencies: Prefer stdlib first; add external dependencies only with clear payoff.
+* Errors: Handle explicitly. Do not discard errors with `_` unless the value is provably irrelevant.
+* Context: `context.Context` should be the first parameter for request-scoped or cancellable operations.
+* Concurrency: Use goroutines and channels idiomatically. Protect shared state deliberately and document ownership when non-obvious.
 
-## Git
+## Backend and API Conventions
 
-* **Branches:** `feature/`, `bugfix/`, `hotfix/`, `release/<version>`
-* **Commits:** `<type>(<scope>): <subject>` (Conventional Commits, imperative mood, <50 chars)
-* **Merge:** feature→develop: squash/rebase; develop→main: merge commit
-* **Language:** Chinese preferred for readability
+* Prefer stable, versionable API shapes over ad hoc response payloads.
+* Define request, response, and error schemas explicitly.
+* Design for idempotency where retries are plausible.
+* Validate at boundaries: HTTP layer, message consumers, persistence inputs.
+* Keep domain logic out of transport handlers.
+* For external integrations, handle timeout, retry, cancellation, and partial failure explicitly.
 
-## Response Preferences
+## Data and Migration Safety
 
-* **Conciseness:** Direct, brief, Chinese preferred. Technical terms in both Chinese + English.
-* **Solution-Oriented:** Robust code with edge-case handling. No quick-and-dirty scripts.
-* **Format:** Structured Markdown for comparisons and analysis.
+* Never make destructive schema or data changes without calling out impact.
+* For migrations, consider:
+  * backward compatibility
+  * lock duration and large-table risk
+  * data backfill strategy
+  * rollback path
+* For data writes, prefer transactional consistency and idempotent retry behavior where possible.
 
-## Verification
+## Testing and Verification
 
-* Critique all designs before executing. Flag risks (security, scalability, concurrency).
-* Propose industry-standard alternatives for anti-patterns.
+* Validate behavior, not only syntax.
+* Prefer targeted tests nearest to the changed behavior before broad end-to-end runs.
+* If tests are not run, state that clearly.
+* If verification is partial, explain exactly what was checked and what remains unverified.
+* When reviewing code, prioritize bugs, regressions, race conditions, API contract breaks, migration risk, and missing tests.
 
-## Web Search
+## Git and Change Hygiene
 
-* Enabled actively. Use for updated libraries, technologies, current events.
-* Prioritize latest official docs over training data.
+* Branch naming: `feature/`, `bugfix/`, `hotfix/`, `release/<version>`.
+* Commit format: Conventional Commits, `<type>(<scope>): <subject>`.
+* Commit style: Imperative mood, concise subject, Chinese preferred if it improves team readability.
+* Do not rewrite user changes unless explicitly requested.
+* Avoid unrelated cleanup in the same change unless it removes a blocker.
 
-## Self-Review Checklist
+## Communication Preferences
 
-Before finalizing code:
-* [ ] All public functions have type hints and docstrings
-* [ ] No hardcoded secrets or magic numbers
-* [ ] Edge cases handled (empty inputs, None, concurrent access)
+* Language: Chinese preferred; keep key technical terms in English when that improves precision.
+* Tone: Direct, brief, factual.
+* Format: Use structured Markdown when comparing options, explaining tradeoffs, or summarizing review findings.
+* Recommendations: Prefer one strong recommendation over a long menu unless tradeoffs are genuinely close.
+
+## Web Research
+
+* Enabled actively. Use for updated libraries, technologies, current events, and other topics that depend on current information.
+* Prioritize latest official docs and primary sources over training data.
+* For non-technical topics, use current and reputable directly relevant sources when recency or factual accuracy matters.
+
+## Final Self-Review Checklist
+
+Before finalizing technical work:
+* [ ] Public APIs and important internal boundaries are typed clearly
+* [ ] Error paths, edge cases, and concurrency implications were considered
+* [ ] No hardcoded secrets, unsafe defaults, or hidden side effects introduced
+* [ ] Tests or verification steps cover the changed behavior, or gaps are stated explicitly
+* [ ] Config, docs, schemas, and migrations were updated if the change requires them
