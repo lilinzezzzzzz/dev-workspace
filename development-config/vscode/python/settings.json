@@ -1,153 +1,118 @@
 {
   // =============================================================================
-  // 🐍 PYTHON 编程语言相关配置
+  // 🐍 VS Code Python 开发最佳实践配置（面向 2026 年当前版本）
   // =============================================================================
-  // -------------------- Python 解释器配置 --------------------
-  // 跨平台说明:
-  // - Linux/macOS: ${workspaceFolder}/.venv/bin/python
-  // - Windows: ${workspaceFolder}/.venv/Scripts/python.exe
-  // VS Code 会自动检测，也可通过命令面板 Ctrl+Shift+P -> Python: Select Interpreter 选择
-  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-  "python.terminal.activateEnvironment": true, // 终端启动时激活虚拟环境
-  "python.terminal.activateEnvInCurrentTerminal": true, // 在当前终端中激活环境
-  "python.envFile": "${workspaceFolder}/.env", // Python环境变量文件路径
-  "python.analysis.extraPaths": [], // 额外的导入分析路径（如自定义模块路径，根据项目添加）
-  "python.analysis.autoSearchPaths": true, // 自动搜索 Python 源码路径（用于导入分析）
-  // -------------------- Python 语言特定设置 --------------------
+
+  // -------------------- Python 环境与终端 --------------------
+  // 不再硬编码某个平台的解释器路径，交给最新 Python Environments 自动发现 `.venv/venv`
+  "python-envs.workspaceSearchPaths": [
+    "./.venv",
+    "./**/.venv",
+    "./venv",
+    "./**/venv"
+  ],
+  "python.terminal.activateEnvironment": true, // 工作区终端自动激活环境（兼容当前工作区级配置）
+  "python.terminal.activateEnvInCurrentTerminal": true, // 已打开终端也允许激活当前环境
+  "python.terminal.shellIntegration.enabled": true, // 启用 Python 终端 shell integration
+  "python.terminal.useEnvFile": true, // 让终端也读取 `.env`
+  "python.envFile": "${workspaceFolder}/.env",
+
+  // -------------------- Python 编辑体验 --------------------
+  "python.analysis.autoSearchPaths": true,
+  "python.analysis.extraPaths": [],
+  "python.analysis.exclude": [
+    "**/.venv",
+    "**/venv",
+    "**/__pycache__",
+    "**/.pytest_cache",
+    "**/.ruff_cache",
+    "**/.mypy_cache",
+    "**/.tox",
+    "**/.nox",
+    "**/build",
+    "**/dist"
+  ],
   "[python]": {
-    "editor.formatOnSave": false, // 保存时不自动格式化（由Ruff codeActionsOnSave处理）
+    "editor.formatOnSave": true, // 当前 Ruff 官方推荐用法之一
     "editor.codeActionsOnSave": {
-      "source.fixAll": "explicit", // 自动修复所有问题
-      "source.organizeImports": "explicit" // 自动整理导入语句
+      "source.fixAll.ruff": "explicit", // 仅触发 Ruff，避免和其他扩展冲突
+      "source.organizeImports.ruff": "explicit"
     },
     "editor.rulers": [
-      88, // Black 默认行长
-      120 // 最大行长限制
+      88,
+      120
     ],
-    "editor.tabSize": 4, // Tab宽度为4个空格
-    "editor.insertSpaces": true, // 使用空格而非Tab字符
-    "editor.defaultFormatter": "charliermarsh.ruff", // 默认使用 Ruff 格式化（比 Black 更快）
-    "editor.suggest.insertMode": "replace", // 补全时替换而非插入（避免重复代码）
-    "editor.quickSuggestions": {
-      "other": true, // 普通代码中启用智能提示
-      "comments": false, // 注释中禁用智能提示
-      "strings": true // 字符串中也启用补全（对于 f-string 有用）
-    }
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.wordBasedSuggestions": "off" // Python 更适合依赖语言服务器补全
   },
-  // -------------------- Ruff Linting & Formatting --------------------
-  "ruff.enable": true, // 启用Ruff语言服务器
-  "ruff.nativeServer": true, // 使用Ruff原生服务器
-  "ruff.fixAll": true, // 启用自动修复功能
-  "ruff.configurationPreference": "filesystemFirst", // 优先使用文件系统配置（pyproject.toml/ruff.toml）
-  "ruff.lineLength": 88, // 默认行长（与 Black 一致，PEP 8 建议为 79）
-  // Ruff lint 规则配置（仅在没有 pyproject.toml/ruff.toml 时生效）
+
+  // -------------------- Ruff：Lint + Format --------------------
+  "ruff.enable": true,
+  "ruff.nativeServer": "auto", // 最新推荐：优先使用 Rust 原生服务器
+  "ruff.configurationPreference": "filesystemFirst", // 优先读取 pyproject.toml / ruff.toml
+  "ruff.lineLength": 88,
+  "ruff.showNotifications": "onError",
+  // 仅在项目未提供 Ruff 配置文件时作为兜底
   "ruff.lint.select": [
-    "E", // pycodestyle errors（代码风格错误）
-    "F", // pyflakes（逻辑错误，如未定义变量）
-    "I", // isort（导入排序）
-    "UP", // pyupgrade（自动升级语法到新版本）
-    "B", // flake8-bugbear（常见 bug 检测）
-    "C4", // flake8-comprehensions（优化列表推导式）
-    "SIM" // flake8-simplify（简化代码建议）
+    "E",
+    "F",
+    "I",
+    "UP",
+    "B",
+    "C4",
+    "SIM"
   ],
   "ruff.lint.ignore": [
-    "E501" // 行过长（由 formatter 处理）
+    "E501"
   ],
-  // -------------------- Pylance 语言服务器 --------------------
-  "python.languageServer": "Pylance", // 使用 Pylance（包含 Pyright 类型检查 + IntelliSense）
-  // 类型检查
-  "python.analysis.typeCheckingMode": "basic", // 类型检查模式: off, basic, standard, strict
-  "python.analysis.autoImportCompletions": true, // 启用自动导入补全
-  "python.analysis.useLibraryCodeForTypes": true, // 使用库代码进行类型推断
-  "python.analysis.completeFunctionParens": true, // 自动补全函数括号
-  // Inlay Hints（内联提示）
-  "python.analysis.inlayHints.functionReturnTypes": true, // 显示函数返回类型
-  "python.analysis.inlayHints.variableTypes": true, // 显示变量类型
-  "python.analysis.inlayHints.callArgumentNames": "partial", // 显示调用参数名: off, partial, all
-  "python.analysis.inlayHints.parametrizeTypes": true, // 显示参数类型提示
-  // 诊断严重性覆盖
+
+  // -------------------- Pylance / 类型检查 --------------------
+  "python.languageServer": "Pylance",
+  "python.analysis.typeCheckingMode": "standard", // 比 basic 更实用，噪音又明显少于 strict
+  "python.analysis.diagnosticMode": "workspace",
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.useLibraryCodeForTypes": true,
+  "python.analysis.completeFunctionParens": true,
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.variableTypes": false, // 开太多会影响可读性
+  "python.analysis.inlayHints.callArgumentNames": "partial",
+  "python.analysis.inlayHints.parametrizeTypes": true,
+  // 只关闭和 Ruff 重复、或团队里最常见的低价值噪音
   "python.analysis.diagnosticSeverityOverrides": {
-    // 降为警告
-    "reportUnusedImport": "warning",
-    "reportUnusedVariable": "warning",
-    "reportUnusedFunction": "warning",
-    "reportUnusedClass": "warning",
-    "reportPrivateUsage": "warning",
-    "reportAssignmentType": "warning",
-    // 禁用第三方库误报
-    "reportArgumentType": "none",
-    "reportGeneralTypeIssues": "none",
-    "reportMissingTypeStubs": "none",
-    "reportUnknownMemberType": "none",
-    "reportUnknownArgumentType": "none",
-    "reportUnknownVariableType": "none",
-    "reportCallInDefaultInitializer": "none",
-    "reportUnnecessaryIsInstance": "none",
-    // 降级为信息
-    "reportOptionalMemberAccess": "information",
-    "reportUnnecessaryComparison": "information",
-    "reportAttributeAccessIssue": "information"
+    "reportUnusedImport": "none",
+    "reportUnusedVariable": "none",
+    "reportMissingTypeStubs": "none"
   },
+
   // -------------------- 测试配置 --------------------
-  "python.testing.pytestEnabled": true, // 启用pytest测试框架
-  "python.testing.unittestEnabled": false, // 禁用unittest框架
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.cwd": "${workspaceFolder}",
+  "python.testing.autoTestDiscoverOnSaveEnabled": true,
+  "python.testing.autoTestDiscoverOnSavePattern": "tests/**/*.py",
   "python.testing.pytestArgs": [
-    "tests", // 测试目录
-    "-s", // 显示print输出
-    "-v", // 详细输出模式
-    "--tb=short" // 简短traceback格式
+    "tests",
+    "-s",
+    "-v",
+    "--tb=short"
   ],
+
+  // -------------------- Notebook / Jupyter --------------------
+  // Ruff 官方当前已支持 notebook 的 lint / format / organize imports
+  "notebook.formatOnSave.enabled": true,
+  "notebook.codeActionsOnSave": {
+    "notebook.source.fixAll": "explicit",
+    "notebook.source.organizeImports": "explicit"
+  },
+
   // -------------------- 文件关联 --------------------
-  // 扩展名与语言的映射关系
   "files.associations": {
-    "*.yaml": "yaml",
-    "*.yml": "yaml",
-    "*.j2": "jinja", // Jinja2 模板文件
+    "*.j2": "jinja",
     "*.jinja2": "jinja",
-    "*.pyi": "python", // Python stub 文件（类型提示）
-    "pyproject.toml": "toml" // Python 项目配置文件
+    "*.pyi": "python",
+    "pyproject.toml": "toml"
   },
-  // -------------------- 文件排除 --------------------
-  // 这些目录/文件不会显示在资源管理器中（减少视觉干扰）
-  "files.exclude": {
-    "**/__pycache__": true, // Python 缓存目录
-    "**/*.pyc": true, // 编译后的 Python 文件
-    "**/*.pyo": true, // 优化后的 Python 文件
-    "**/.pytest_cache": true, // pytest 缓存
-    "**/.ruff_cache": true, // Ruff 缓存
-    "**/*.egg-info": true, // 包信息目录
-    "**/.mypy_cache": true, // MyPy 缓存
-    "**/.pylance": true // Pylance 缓存
-  },
-  // -------------------- 搜索排除 --------------------
-  // 搜索时跳过这些目录/文件（提高搜索性能）
-  "search.exclude": {
-    "**/__pycache__": true,
-    "**/node_modules": true,
-    "**/.venv": true, // 虚拟环境目录（包含大量第三方库）
-    "**/venv": true,
-    "**/uv.lock": true, // uv 锁文件（大文件）
-    "**/*.lock": true
-  },
-  // -------------------- YAML 语言配置 --------------------
-  "[yaml]": {
-    "editor.tabSize": 2, // YAML 使用 2 空格缩进
-    "editor.insertSpaces": true,
-    "editor.autoIndent": "advanced"
-  },
-  // -------------------- JSON 语言配置 --------------------
-  "[json]": {
-    "editor.tabSize": 2,
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "vscode.json-language-features"
-  },
-  "[jsonc]": {
-    "editor.tabSize": 2,
-    "editor.formatOnSave": true
-  },
-  // -------------------- TOML 语言配置 --------------------
-  "[toml]": {
-    "editor.tabSize": 2,
-    "editor.insertSpaces": true
-  }
+  // 通用文件排除、JSON/YAML/TOML 编辑器行为统一收敛到 common/settings.json
 }

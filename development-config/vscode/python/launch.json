@@ -1,39 +1,88 @@
 {
-    // 使用 IntelliSense 了解相关属性。
-    // 悬停以查看现有属性的描述。
-    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "🚀 FastAPI: Run Server",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "uvicorn",
-            // 显式指定虚拟环境中的 Python 解释器
-            "python": "${workspaceFolder}/.venv/bin/python",
-            // 核心参数配置
-            "args": [
-                "main:app",
-                "--host",
-                "0.0.0.0",
-                "--port",
-                "8000"
-            ],
-            // 开启 Jinja2 模板调试支持
-            "jinja": true,
-            // 只调试我的代码,跳过库文件
-            "justMyCode": true,
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}"
-            }
-        },
-        {
-            "name": "🐍 Python: Current File",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "justMyCode": true
-        }
-    ]
+  // =============================================================================
+  // 🐍 VS Code Python 调试最佳实践配置（与当前 settings.json 配套）
+  // =============================================================================
+  // 说明：
+  // 1. 不显式指定 `python`，调试器会自动使用工作区当前选中的解释器
+  // 2. 默认读取 `${workspaceFolder}/.env`
+  // 3. Web 场景默认关闭热重载，避免调试时生成子进程影响断点稳定性
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "🐍 Python: Current File",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "justMyCode": true
+    },
+    {
+      "name": "🧪 Pytest: Current File",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "args": [
+        "${file}",
+        "-s",
+        "-v",
+        "--tb=short"
+      ],
+      "justMyCode": true
+    },
+    {
+      "name": "🧪 Pytest: Workspace",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "args": [
+        "tests",
+        "-s",
+        "-v",
+        "--tb=short"
+      ],
+      "justMyCode": true
+    },
+    {
+      "name": "🚀 FastAPI: Uvicorn (main:app)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "args": [
+        "main:app",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8000"
+      ],
+      "jinja": true,
+      "justMyCode": true,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "Uvicorn running on (http://\\S+)"
+      }
+    }
+  ]
 }

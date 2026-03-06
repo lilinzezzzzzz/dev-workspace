@@ -6,6 +6,12 @@
   "editor.bracketPairColorization.enabled": true, // 启用括号对彩色高亮
   "editor.guides.bracketPairs": "active", // 仅高亮活跃的括号对
   "editor.stickyScroll.enabled": true, // 启用粘性滚动(显示嵌套作用域)
+  "breadcrumbs.enabled": true, // 显示面包屑导航（官方推荐的快速导航方式）
+  "editor.linkedEditing": true, // 成对标签/符号联动编辑
+  "editor.matchBrackets": "always", // 始终高亮匹配括号
+  "editor.unicodeHighlight.ambiguousCharacters": true, // 高亮易混淆 Unicode 字符
+  "editor.unicodeHighlight.invisibleCharacters": true, // 高亮不可见字符
+  "editor.unicodeHighlight.includeComments": true, // 注释中也检查 Unicode 混淆字符
   // -------------------- 自动补全与智能提示 --------------------
   "editor.autoClosingBrackets": "always", // 总是自动闭合括号
   "editor.autoClosingQuotes": "always", // 总是自动闭合引号
@@ -13,6 +19,7 @@
   "editor.inlineSuggest.enabled": true, // 启用内联建议（如 Copilot 补全）
   "editor.suggestSelection": "first", // 补全时默认选中第一项（提高效率）
   "editor.acceptSuggestionOnEnter": "on", // Enter 键接受建议（除了 Enter 外的其他情况）
+  "editor.suggest.showStatusBar": true, // 在建议面板中显示状态栏（便于切换补全来源）
   "editor.quickSuggestions": {
     "other": true, // 普通代码中启用智能提示
     "comments": false, // 注释中禁用智能提示
@@ -22,6 +29,8 @@
   "editor.cursorBlinking": "smooth", // 光标平滑闪烁
   "editor.cursorSmoothCaretAnimation": "on", // 启用光标平滑动画
   "editor.smoothScrolling": true, // 启用平滑滚动
+  "editor.cursorSurroundingLines": 3, // 上下保留少量上下文，跳转时更稳
+  "editor.scrollBeyondLastLine": false, // 避免文件尾部出现大量空白
   // -------------------- 显示与视觉效果 --------------------
   "editor.renderWhitespace": "boundary", // 仅在边界显示空白字符
   "editor.renderLineHighlight": "all", // 高亮整行
@@ -46,10 +55,25 @@
     "**/.git/objects/**": true, // Git 对象目录
     "**/.git/subtree-cache/**": true, // Git 子树缓存
     "**/node_modules/**": true, // Node.js 依赖
+    "**/.pnpm-store/**": true, // pnpm 全局缓存
+    "**/.yarn/**": true, // Yarn 缓存和离线镜像
     "**/.venv/**": true, // Python 虚拟环境
     "**/venv/**": true, // Python 虚拟环境
     "**/__pycache__/**": true, // Python 缓存
     "**/.pytest_cache/**": true, // Pytest 缓存
+    "**/.ruff_cache/**": true, // Ruff 缓存
+    "**/.mypy_cache/**": true, // MyPy 缓存
+    "**/.hypothesis/**": true, // Hypothesis 缓存
+    "**/.tox/**": true, // tox 环境
+    "**/.nox/**": true, // nox 环境
+    "**/.next/**": true, // Next.js 构建缓存
+    "**/.nuxt/**": true, // Nuxt 构建缓存
+    "**/.turbo/**": true, // Turborepo 缓存
+    "**/.cache/**": true, // 通用缓存目录
+    "**/dist/**": true, // 构建产物
+    "**/build/**": true, // 构建产物
+    "**/coverage/**": true, // 覆盖率产物
+    "**/target/**": true, // Rust/Java 等构建产物
     "**/.idea/**": true // IDE 配置目录
   },
   // -------------------- 通用文件排除 --------------------
@@ -62,24 +86,66 @@
     "**/.DS_Store": true, // macOS 系统文件
     "**/Thumbs.db": true, // Windows 缩略图缓存
     "**/node_modules": true, // Node.js 依赖目录
+    "**/.pnpm-store": true, // pnpm 缓存
+    "**/.yarn": true, // Yarn 缓存
+    "**/*.pyc": true, // Python 字节码文件
+    "**/*.pyo": true, // Python 优化字节码文件
     "**/__pycache__": true, // Python 缓存目录
     "**/.pytest_cache": true, // Pytest 缓存目录
+    "**/.ruff_cache": true, // Ruff 缓存目录
+    "**/.mypy_cache": true, // MyPy 缓存目录
+    "**/.hypothesis": true, // Hypothesis 缓存
+    "**/.tox": true, // tox 环境
+    "**/.nox": true, // nox 环境
+    "**/.pylance": true, // Pylance 缓存
+    "**/*.egg-info": true, // Python 包元数据目录
+    "**/htmlcov": true, // Python 覆盖率 HTML 输出
+    "**/.turbo": true, // Turborepo 缓存
+    "**/.next": true, // Next.js 缓存
+    "**/.nuxt": true, // Nuxt 缓存
+    "**/coverage": true, // 覆盖率输出
     "**/.idea": true // IDE 配置目录
   },
   // -------------------- 搜索排除 --------------------
   // 搜索时跳过这些目录/文件（提高搜索性能）
   "search.exclude": {
     "**/node_modules": true, // Node.js 依赖
+    "**/.pnpm-store": true, // pnpm 缓存
+    "**/.yarn": true, // Yarn 缓存
     "**/bower_components": true, // Bower 依赖
+    "**/.venv": true, // Python 虚拟环境
+    "**/venv": true, // Python 虚拟环境
+    "**/__pycache__": true, // Python 缓存
+    "**/.pytest_cache": true, // Pytest 缓存
+    "**/.ruff_cache": true, // Ruff 缓存
+    "**/.mypy_cache": true, // MyPy 缓存
+    "**/.hypothesis": true, // Hypothesis 缓存
+    "**/.tox": true, // tox 环境
+    "**/.nox": true, // nox 环境
+    "**/.pylance": true, // Pylance 缓存
+    "**/*.egg-info": true, // Python 包元数据目录
+    "**/htmlcov": true, // Python 覆盖率 HTML 输出
+    "**/.next": true, // Next.js 构建目录
+    "**/.nuxt": true, // Nuxt 构建目录
+    "**/.turbo": true, // Turborepo 缓存
+    "**/dist": true, // 构建产物
+    "**/build": true, // 构建产物
+    "**/coverage": true, // 覆盖率产物
+    "**/target": true, // Rust/Java 构建产物
     "**/*.code-search": true, // VS Code 搜索结果
     "**/.git": true // Git 目录
   },
   "search.followSymlinks": false, // 搜索时不跟随符号链接（提高搜索性能）
+  "search.useIgnoreFiles": true, // 尊重 .gitignore / .ignore
+  "search.useGlobalIgnoreFiles": true, // 尊重全局忽略规则
+  "search.smartCase": true, // 含大写时自动切换为大小写敏感搜索
   // -------------------- 缩进与格式化 --------------------
   "editor.detectIndentation": true, // 自动检测缩进设置
   "editor.autoIndent": "full", // 完全自动缩进
   "editor.wordWrap": "off", // 关闭自动换行
   "editor.wordWrapColumn": 120, // 换行列宽(120字符)
+  "editor.suggest.insertMode": "replace", // 补全默认使用替换模式，减少重复插入
+  "editor.formatOnSaveMode": "file", // 保存时格式化整个文件，避免局部格式化不一致
   // -------------------- 字体配置（跨平台）--------------------
   // 字体优先级: Source Code Pro > JetBrains Mono > Fira Code > 系统等宽字体
   "editor.fontFamily": "'Source Code Pro', 'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace",
@@ -97,14 +163,27 @@
   "workbench.editor.tabActionLocation": "right", // 标签页操作按钮位置
   "workbench.editor.showTabs": "multiple", // 显示多标签页（非单标签模式）
   "workbench.startupEditor": "none", // 启动时不显示欢迎页（直接显示编辑器）
+  "workbench.list.smoothScrolling": true, // 工作台列表平滑滚动
+  "workbench.commandPalette.preserveInput": true, // 命令面板保留上次输入，提高重复操作效率
   // 活动栏配置
   "workbench.activityBar.location": "default", // 显示活动栏（默认位置）
   "workbench.sideBar.location": "left", // 侧边栏位置
   // -------------------- 资源管理器配置 --------------------
   "explorer.confirmDelete": true, // 删除文件需要确认（防止误删）
   "explorer.confirmDragAndDrop": true, // 拖拽文件需要确认（防止误操作）
+  "explorer.autoOpenDroppedFile": false, // 拖入资源管理器时不自动打开文件
   "explorer.compactFolders": false, // 不压缩文件夹显示（展开空文件夹）
   "explorer.sortOrder": "type", // 按类型排序（文件夹优先于文件）
+  "explorer.fileNesting.enabled": true, // 启用文件嵌套，减少工程噪音
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lock, bun.lockb, .npmrc",
+    "tsconfig.json": "tsconfig.*.json",
+    "vite.config.*": "vitest.config.*, playwright.config.*, cypress.config.*",
+    "docker-compose.yml": "docker-compose.*.yml",
+    "docker-compose.yaml": "docker-compose.*.yaml",
+    ".env": ".env.*, .envrc"
+  },
   // -------------------- 主题配置 --------------------
   "workbench.colorTheme": "Material Dark Theme", // 颜色主题
   "workbench.iconTheme": "material-icon-theme", // 文件图标主题
@@ -150,6 +229,25 @@
   "terminal.integrated.scrollback": 10000, // 终端滚动缓冲区行数（支持更长的历史记录）
   "terminal.integrated.cursorBlinking": true, // 终端光标闪烁（更容易定位光标）
   "terminal.integrated.cursorStyle": "line", // 终端光标样式（竖线，比块状更清晰）
+  "terminal.integrated.shellIntegration.enabled": true, // 启用 shell integration（命令检测、cwd 感知、导航）
+  "terminal.integrated.shellIntegration.decorationsEnabled": "overviewRuler", // 保留命令状态标记，但减少正文区域干扰
+  "terminal.integrated.stickyScroll.enabled": true, // 终端顶部显示当前命令，长输出时更容易定位上下文
+  "terminal.integrated.suggest.enabled": true, // 启用终端 IntelliSense
+  "terminal.integrated.suggest.showStatusBar": true, // 在终端补全面板显示状态栏
+  "terminal.integrated.suggest.quickSuggestions": {
+    "commands": "on",
+    "arguments": "on",
+    "unknown": "off"
+  },
+  "terminal.integrated.suggest.suggestOnTriggerCharacters": true, // 输入 -, /, \\ 等字符时触发提示
+  "terminal.integrated.suggest.cdPath": true, // 支持基于 CDPATH 的目录补全
+  "terminal.integrated.enablePersistentSessions": true, // 窗口重开后恢复终端会话
+  "terminal.integrated.splitCwd": "inherited", // 分屏终端继承当前终端工作目录
+  "terminal.integrated.tabs.enabled": true, // 启用终端标签页
+  "terminal.integrated.tabs.hideCondition": "singleTerminal", // 单终端时隐藏标签，多个终端时显示
+  "terminal.integrated.tabs.title": "${process}", // 标签主标题保持简洁稳定
+  "terminal.integrated.tabs.description": "${cwdFolder}", // 标签附带当前工作目录信息
+  "terminal.integrated.enableBell": false, // 关闭终端响铃，减少干扰
   // -------------------- Git 核心配置 --------------------
   "git.enableSmartCommit": true, // 启用智能提交
   "git.confirmSync": false, // 同步时不弹确认对话框
@@ -173,6 +271,8 @@
   "scm.alwaysShowRepositories": true, // 总是显示仓库列表
   "scm.repositories.visible": 10, // 最多显示10个仓库
   // -------------------- 遥测配置 --------------------
+  "telemetry.telemetryLevel": "off", // 禁用 VS Code 和遵循该设置的扩展遥测
+  "telemetry.feedback.enabled": false, // 关闭内置反馈入口
   "redhat.telemetry.enabled": false, // 禁用 RedHat 扩展遥测（如 YAML 扩展）
   // =============================================================================
   // 🔌 插件扩展配置
@@ -235,8 +335,29 @@
   ],
   "statsBar.memoUsage.format": "$$(database) ${used}/${total} ${unit}, ${percent}%",
   "statsBar.cpuLoad.format": "$(chip) ${percent}%",
-  // -------------------- YAML 配置 --------------------
+  // -------------------- 通用数据文件配置 --------------------
+  "[json]": {
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[jsonc]": {
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
   "yaml.schemaStore.enable": true, // 启用schema store
+  "yaml.validate": true, // 启用 YAML 校验
+  "yaml.format.enable": true, // 启用 YAML 格式化
+  "[yaml]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.autoIndent": "advanced"
+  },
+  "[toml]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
   "yaml.schemas": {
     "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "docker-compose.y*ml"
   },
