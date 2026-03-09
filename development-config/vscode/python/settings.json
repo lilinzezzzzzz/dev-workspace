@@ -34,7 +34,7 @@
     "**/dist"
   ],
   "[python]": {
-    "editor.formatOnSave": true, // 当前 Ruff 官方推荐用法之一
+    "editor.formatOnSave": false, // 关闭保存时自动格式化
     "editor.codeActionsOnSave": {
       "source.fixAll.ruff": "explicit", // 仅触发 Ruff，避免和其他扩展冲突
       "source.organizeImports.ruff": "explicit"
@@ -97,7 +97,7 @@
   ],
   // -------------------- Notebook / Jupyter --------------------
   // Ruff 官方当前已支持 notebook 的 lint / format / organize imports
-  "notebook.formatOnSave.enabled": true,
+  "notebook.formatOnSave.enabled": false,
   "notebook.codeActionsOnSave": {
     "notebook.source.fixAll": "explicit",
     "notebook.source.organizeImports": "explicit"
