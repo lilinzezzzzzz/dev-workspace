@@ -46,7 +46,7 @@
   "files.autoSave": "onFocusChange", // 焦点切换时自动保存
   "files.insertFinalNewline": true, // 文件末尾插入新行
   "files.trimFinalNewlines": true, // 删除末尾多余空行
-  "files.trimTrailingWhitespace": true, // 删除行尾空格
+  "files.trimTrailingWhitespace": false, // 删除行尾空格
   "files.encoding": "utf8", // 文件编码UTF-8
   "files.eol": "\n", // 行结束符使用LF（跨平台统一，避免 Git diff 问题）
   "files.simpleDialog.enable": true, // 使用简单对话框（替代模态对话框，减少干扰）
