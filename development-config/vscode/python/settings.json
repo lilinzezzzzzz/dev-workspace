@@ -36,8 +36,8 @@
   "[python]": {
     "editor.formatOnSave": false, // 关闭保存时自动格式化
     "editor.codeActionsOnSave": {
-      "source.fixAll.ruff": "explicit", // 仅触发 Ruff，避免和其他扩展冲突
-      "source.organizeImports.ruff": "explicit"
+      "source.fixAll.ruff": "never", // 仅触发 Ruff，避免和其他扩展冲突
+      "source.organizeImports.ruff": "never"
     },
     "editor.rulers": [
       88,
