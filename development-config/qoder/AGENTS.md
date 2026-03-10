@@ -118,6 +118,7 @@
 ## Final Self-Review Checklist
 
 Before finalizing technical work:
+
 * [ ] Public APIs and important internal boundaries are typed clearly
 * [ ] Error paths, edge cases, and concurrency implications were considered
 * [ ] No hardcoded secrets, unsafe defaults, or hidden side effects introduced
