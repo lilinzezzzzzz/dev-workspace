@@ -282,6 +282,16 @@
   // =============================================================================
   // 🔌 插件扩展配置
   // =============================================================================
+  // -------------------- Remote / Dev Containers 最佳实践 --------------------
+  // 1. Dev Containers 是主入口：日常开发优先使用 "Reopen in Container" 打开项目。
+  // 2. Attach to Running Container 仅适合临时排障/查看环境，不适合作为长期开发工作流。
+  // 3. 远端 Docker 主机优先使用 "Remote - SSH -> Reopen in Container" 组合，稳定性通常优于直接切 Docker context。
+  // 4. 多服务项目优先使用 docker compose + devcontainer.json，不要把应用、数据库、缓存强行塞进单个容器。
+  // 5. 将 extensions / forwardPorts / postCreateCommand / features / remoteUser 固化在 .devcontainer/devcontainer.json 中，保证团队环境可复现。
+  // 6. Docker DX 主要负责 Dockerfile / Compose / Bake 的编辑体验增强，不替代 Dev Containers 的容器内开发能力。
+  // 7. 容器内尽量使用非 root 用户；如果宿主机支持，优先 rootless Docker，避免形成依赖 sudo 的开发流程。
+  // 8. Windows/macOS 如果遇到 bind mount 性能差，优先考虑 WSL、远端 Linux 主机或 volume，而不是继续堆本地挂载。
+  // 9. 基础镜像优先 Debian/Ubuntu 系；除非已验证兼容性，否则不要默认用 Alpine 作为开发容器。
   // -------------------- GitLens 配置 --------------------
   // 设计原则：最小干扰 + 按需获取 + 性能优化
   "gitlens.currentLine.enabled": true, // 启用当前行责任注释

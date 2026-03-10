@@ -5,10 +5,14 @@
     // ==================================================
     // Remote / Dev Containers（远程容器开发）
     // ==================================================
-    // Dev Containers：容器内开发（windows 需要）
+    // Dev Containers：容器内开发
     "ms-vscode-remote.remote-containers",
+    // Remote - SSH：远端主机上的容器开发
+    "ms-vscode-remote.remote-ssh",
     // Container Tools：容器与镜像管理（Docker 的继任者）
     "ms-azuretools.vscode-containers",
+    // Docker DX：Dockerfile / Compose / Bake 编辑增强（可选）
+    "docker.docker",
     // ==================================================
     // Python 核心工具链（ruff + pylance）
     // ==================================================
