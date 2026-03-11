@@ -9,7 +9,7 @@
 
 可直接在本目录新增对应文件并持续迭代。
 
-```text
+```markdown
 code review
 # 模板（变量版）
 请根据 ${SOURCE_BRANCH} 审查 ${TARGET_BRANCH} 上的更改，并重点做 ${ANALYSIS_FOCUS} 的对比分析。
