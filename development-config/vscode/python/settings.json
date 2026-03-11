@@ -29,7 +29,9 @@
     "**/.tox",
     "**/.nox",
     "**/build",
-    "**/dist"
+    "**/dist",
+    "**/site-packages",
+    "**/build"
   ],
   "[python]": {
     "editor.formatOnSave": false, // 关闭保存时自动格式化
@@ -66,13 +68,13 @@
   ],
   // -------------------- Pylance / 类型检查 --------------------
   "python.languageServer": "Pylance",
-  "python.analysis.typeCheckingMode": "standard", // 比 basic 更实用，噪音又明显少于 strict
-  "python.analysis.diagnosticMode": "workspace",
+  "python.analysis.typeCheckingMode": "off", // 已使用 Ruff，关闭 Pylance 类型检查
+  "python.analysis.diagnosticMode": "openFilesOnly",
   "python.analysis.autoImportCompletions": true,
-  "python.analysis.useLibraryCodeForTypes": true,
+  "python.analysis.useLibraryCodeForTypes": false,
   "python.analysis.completeFunctionParens": true,
   "python.analysis.inlayHints.functionReturnTypes": true,
-  "python.analysis.inlayHints.variableTypes": false, // 开太多会影响可读性
+  "python.analysis.inlayHints.variableTypes": false,
   "python.analysis.inlayHints.callArgumentNames": "partial",
   "python.analysis.inlayHints.parametrizeTypes": true,
   // 只关闭和 Ruff 重复、或团队里最常见的低价值噪音
@@ -106,6 +108,6 @@
     "*.jinja2": "jinja",
     "*.pyi": "python",
     "pyproject.toml": "toml"
-  },
+  }
   // 通用文件排除、JSON/YAML/TOML 编辑器行为统一收敛到 common/settings.json
 }
