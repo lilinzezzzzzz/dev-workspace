@@ -19,12 +19,10 @@
   "python.analysis.autoSearchPaths": true,
   "python.analysis.extraPaths": [],
   "python.analysis.exclude": [
-    "tests",
     "**/node_modules",
     "**/__pycache__",
     "**/.venv",
     "**/venv",
-    "**/.*",
     "**/.pytest_cache",
     "**/.ruff_cache",
     "**/.mypy_cache",
