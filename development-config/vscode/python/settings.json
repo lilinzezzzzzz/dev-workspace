@@ -3,13 +3,6 @@
   // 🐍 VS Code Python 开发最佳实践配置（面向 2026 年当前版本）
   // =============================================================================
   // -------------------- Python 环境与终端 --------------------
-  // 不再硬编码某个平台的解释器路径，交给最新 Python Environments 自动发现 `.venv/venv`
-  "python-envs.workspaceSearchPaths": [
-    "./.venv",
-    "./**/.venv",
-    "./venv",
-    "./**/venv"
-  ],
   "python.terminal.activateEnvironment": true, // 工作区终端自动激活环境（兼容当前工作区级配置）
   "python.terminal.activateEnvInCurrentTerminal": true, // 已打开终端也允许激活当前环境
   "python.terminal.shellIntegration.enabled": true, // 启用 Python 终端 shell integration
@@ -76,7 +69,6 @@
   "python.analysis.inlayHints.functionReturnTypes": true,
   "python.analysis.inlayHints.variableTypes": false,
   "python.analysis.inlayHints.callArgumentNames": "partial",
-  "python.analysis.inlayHints.parametrizeTypes": true,
   // 只关闭和 Ruff 重复、或团队里最常见的低价值噪音
   "python.analysis.diagnosticSeverityOverrides": {
     "reportUnusedImport": "none",
