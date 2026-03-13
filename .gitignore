@@ -21,6 +21,11 @@ infras/mongodb/logs/*
 infras/clickhouse/data/*
 infras/clickhouse/logs/*
 
+# Milvus
+infras/milvus/etcd/*
+infras/milvus/minio/*
+infras/milvus/standalone/*
+
 # Docker specific
 *.sdi
 *.log

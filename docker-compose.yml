@@ -51,6 +51,68 @@ services:
     networks:
       - common-network
 
+  milvus-etcd:
+    image: "quay.io/coreos/etcd:v3.5.18"
+    container_name: milvus-etcd
+    environment:
+      TZ: "UTC"
+    command: >
+      etcd
+      --advertise-client-urls=http://milvus-etcd:2379
+      --listen-client-urls=http://0.0.0.0:2379
+      --data-dir=/etcd
+    volumes:
+      - "./infras/milvus/etcd:/etcd"
+    networks:
+      - common-network
+
+  milvus-minio:
+    image: "minio/minio:RELEASE.2025-02-18T16-25-55Z"
+    container_name: milvus-minio
+    environment:
+      TZ: "UTC"
+      MINIO_ROOT_USER: "minioadmin"
+      MINIO_ROOT_PASSWORD: "minioadmin"
+    command: minio server /minio_data --console-address ":9001"
+    volumes:
+      - "./infras/milvus/minio:/minio_data"
+    networks:
+      - common-network
+
+  milvus-standalone:
+    image: "milvusdb/milvus:v2.6.7"
+    container_name: milvus-standalone
+    command: ["milvus", "run", "standalone"]
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      TZ: "UTC"
+      ETCD_ENDPOINTS: "milvus-etcd:2379"
+      MINIO_ADDRESS: "milvus-minio:9000"
+    volumes:
+      - "./infras/milvus/standalone:/var/lib/milvus"
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    depends_on:
+      - milvus-etcd
+      - milvus-minio
+    networks:
+      - common-network
+
+  attu:
+    image: "zilliz/attu:v2.6.3"
+    container_name: attu
+    environment:
+      TZ: "UTC"
+      MILVUS_URL: "milvus-standalone:19530"
+    ports:
+      - "18000:3000" # 避免与 workspace profile 的 8000-8099 端口段冲突
+    depends_on:
+      - milvus-standalone
+    networks:
+      - common-network
+
 # 定义共享网络
 networks:
   common-network:
