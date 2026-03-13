@@ -167,6 +167,9 @@ cython_debug/
 # IDEs & Editors
 ################################################################################
 
+# macOS Finder
+.DS_Store
+
 # JetBrains (PyCharm, IntelliJ IDEA, etc.)
 .idea/
 *.iml
