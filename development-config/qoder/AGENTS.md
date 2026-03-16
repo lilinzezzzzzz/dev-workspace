@@ -42,7 +42,7 @@
 * Runtime and packaging: Use `uv`, `pyproject.toml` (PEP 621), and `uv.lock`. Do not introduce `pip`, `poetry`, or `conda` workflows unless the repository already requires them.
 * Style: Pythonic, PEP 8, Pydantic v2, Ruff-compatible, Pylance-compatible. No implicit `Any` in new code.
 * Typing: Prefer `TypedDict`, `Protocol`, `Literal`, `Enum`, and Pydantic models over loose dictionaries.
-* Function signatures: Prefer keyword-only arguments for non-trivial public functions.
+* Function signatures: Use keyword-only arguments (via `*` separator) for public functions with multiple parameters to improve API clarity and forward compatibility. Example: `def query(table: str, *, limit: int = 100, offset: int = 0)`.
 * Async model: Prefer `anyio` patterns for concurrency orchestration. Use `httpx` for HTTP. Isolate blocking I/O with `anyio.to_thread.run_sync`.
 * API stack: FastAPI + Pydantic v2. Prefer explicit request/response models and consistent error envelopes.
 * Database: Prefer SQLAlchemy 2.x typed ORM/query patterns. Raw SQL is allowed only when ORM is clearly insufficient, and must be parameterized and justified.
