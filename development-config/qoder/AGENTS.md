@@ -31,6 +31,7 @@
 
 * Correctness: No undefined behavior, race-prone logic, silent failure, or swallowed exceptions.
 * Readability: Favor straightforward code over clever code. Keep modules cohesive and interfaces explicit.
+* Comments: Add comments for non-obvious logic, public APIs, and complex algorithms. Explain "why" rather than "what". Use docstrings for modules, classes, and public functions.
 * Type safety: Public APIs must be fully typed. Prefer precise types over `Any`, `dict`, or unstructured payloads.
 * Error design: Use explicit error types or stable error codes for user-facing and API-facing failures.
 * Observability: Log meaningful context for failures, retries, external calls, and state transitions.
