@@ -1,259 +1,272 @@
-# Docker Python 开发环境
+# dev-workspace
 
-基于 Docker 的 Python 多版本开发环境，使用 `uv` 管理 Python 版本和虚拟环境。
+基于 Docker 的本地开发工作区，包含一个可通过 SSH 进入的 Python 开发容器，以及常用的本地基础设施服务。
 
-## 特性
+当前仓库重点覆盖三类内容：
 
-- **多版本 Python**: 预装 Python 3.11.10 和 3.12.9，支持随时安装其他版本
-- **uv 包管理**: 使用 uv 替代 pip，速度提升 10-100 倍
-- **SSH 免密登录**: 支持从宿主机免密登录容器
-- **Git SSH 支持**: 容器内可直接拉取/推送代码到远程仓库
-- **共享网络**: 容器间使用 `common-network`，支持 `127.0.0.1` 互访
-- **一键部署**: 提供跨平台自动化部署脚本
+- `dev-workspace` 开发容器：Debian Bookworm + `uv` + 多版本 Python
+- 本地基础设施：Redis、MySQL、Milvus、Attu
+- 开发工具配置：VS Code、Qoder、提示词与 SSH 密钥说明
+
+## 当前服务
+
+`docker-compose.yml` 当前定义了以下服务：
+
+| 服务 | 容器名 | 默认端口 | 说明 |
+| --- | --- | --- | --- |
+| `dev-workspace` | `dev-workspace` | `10022`、`8000-8099` | Python 开发容器，按 `workspace` profile 启动 |
+| `redis` | `redis` | `6379` | Redis 6，密码 `123456` |
+| `mysql` | `mysql` | `3306` | MySQL 8，root 密码 `123456` |
+| `milvus-etcd` | `milvus-etcd` | - | Milvus 依赖组件 |
+| `milvus-minio` | `milvus-minio` | - | Milvus 对象存储 |
+| `milvus-standalone` | `milvus-standalone` | `19530`、`9091` | Milvus 单机版 |
+| `attu` | `attu` | `18000` | Milvus 可视化管理界面 |
+
+## 开发容器能力
+
+`Dockerfile` 当前提供：
+
+- 基础镜像：`buildpack-deps:bookworm`
+- Python 管理：`uv`
+- 预装 Python：`3.11.10`、`3.12.9`
+- 默认 pinned Python：`3.11.10`
+- SSH 服务：容器内启用 `sshd`
+- APT / PyPI 镜像：阿里云镜像
+
+容器内关键环境变量：
+
+| 变量 | 值 |
+| --- | --- |
+| `TZ` | `Etc/UTC` |
+| `UV_PYTHON_INSTALL_DIR` | `/opt/python` |
+| `UV_PYTHON_PREFERENCE` | `only-managed` |
+| `UV_INDEX_URL` | `https://mirrors.aliyun.com/pypi/simple` |
 
 ## 快速开始
 
 ### 前置条件
 
-1. 安装 [Docker Desktop](https://www.docker.com/products/docker-desktop)
-2. 确保本机已生成 SSH 密钥：
-   ```bash
-   # 如果没有，先生成
-   ssh-keygen -t ed25519
-   ```
+1. 安装 Docker / Docker Desktop
+2. 本机已有 SSH 密钥：`~/.ssh/id_rsa` 或 `~/.ssh/id_ed25519`
 
-### 一键部署
+如果没有密钥，可先执行：
 
-**Windows:**
+```bash
+ssh-keygen -t rsa -b 4096
+```
+
+### 一键脚本
+
+Windows：
+
 ```powershell
 .\setup.ps1
 ```
 
-**Linux/Mac:**
+Linux / macOS：
+
 ```bash
 chmod +x setup.sh
 ./setup.sh
 ```
 
-脚本会自动完成：
-1. 检查 Docker 环境
-2. 检查并复制 SSH 密钥
-3. 设置私钥权限
-4. 构建 Docker 镜像
-5. 启动服务
+### 启动说明
 
-## 服务列表
+需要注意，当前仓库里 `dev-workspace` 服务被放在 `workspace` profile 下：
 
-| 服务 | 容器名 | 端口映射 | 说明 |
-|-----|-------|---------|------|
-| dev-workspace | dev-workspace | 10022→22, 8000-8099 | Python 开发环境 |
-| redis | redis | 6379→6379 | Redis 缓存服务 |
-| mysql | mysql | 3306→3306 | MySQL 数据库服务 |
+- `setup.ps1` 会用 `--profile workspace` 启动开发容器和基础设施
+- `setup.sh` 当前只执行 `docker compose up -d`，因此默认只会启动非 profile 服务，不会启动 `dev-workspace`
 
-### 基础设施配置
-
-`infras/` 目录包含以下服务的配置文件：
-
-| 服务 | 目录 | 说明 |
-|-----|------|------|
-| ClickHouse | infras/clickhouse/ | 列式数据库配置 |
-| MongoDB | infras/mongodb/ | 文档数据库配置 |
-| MySQL | infras/mysql/ | 关系型数据库配置 |
-| Kafka + Zookeeper | infras/mq/ | 消息队列配置 |
-| Redis | infras/redis/ | 缓存服务配置 |
-
-## 连接方式
-
-### SSH 连接容器
+如果你在 Linux / macOS 上需要启动开发容器，请额外执行：
 
 ```bash
-# 免密登录（推荐）
-ssh -i ./ssh-keys/id_ed25519 root@localhost -p 10022
-
-# 密码登录（密码: 123456）
-ssh root@localhost -p 10022
+docker compose --profile workspace up -d
 ```
 
-### 进入容器
+如果只想启动基础设施：
+
+```bash
+docker compose up -d
+```
+
+如果需要连同开发容器一起启动：
+
+```bash
+docker compose --profile workspace up -d
+```
+
+## 常用连接方式
+
+### 进入开发容器
 
 ```bash
 docker exec -it dev-workspace bash
 ```
 
-### Redis 连接
+### SSH 连接开发容器
+
+```bash
+ssh root@localhost -p 10022
+```
+
+默认密码：
+
+```text
+123456
+```
+
+说明：
+
+- 当前 `docker-compose.yml` 只挂载 `ssh-keys/id_rsa` 和 `ssh-keys/id_rsa.pub`
+- `scripts/entrypoint.sh` 也只会用 `id_rsa.pub` 生成容器内的 `authorized_keys`
+- 因此按当前仓库状态，免密登录路径以 `RSA` 密钥为准
+
+如果本地已有对应私钥，可用：
+
+```bash
+ssh -i ./ssh-keys/id_rsa root@localhost -p 10022
+```
+
+### Redis
 
 ```bash
 redis-cli -h localhost -p 6379 -a 123456
 ```
 
-### MySQL 连接
+### MySQL
 
 ```bash
 mysql -h localhost -P 3306 -u root -p123456
 ```
 
-## Python 版本管理
+### Attu
 
-容器内使用 `uv` 管理 Python 版本：
+浏览器打开：
+
+```text
+http://localhost:18000
+```
+
+### Milvus
+
+常用连接地址：
+
+```text
+localhost:19530
+```
+
+## Python 开发
+
+进入容器后可直接使用 `uv`：
 
 ```bash
-# 查看已安装的 Python 版本
 uv python list
-
-# 安装新版本
-uv python install 3.13
-
-# 切换默认版本（当前默认为 3.11.10）
-uv python pin 3.11.10
-```
-
-## 项目开发
-
-### 创建虚拟环境
-
-```bash
-# 使用默认 Python 版本
 uv venv
-
-# 指定 Python 版本
 uv venv --python 3.12.9
-```
-
-### 安装依赖
-
-```bash
-# 安装单个包
-uv pip install requests
-
-# 从 requirements.txt 安装
 uv pip install -r requirements.txt
-
-# 使用 uv sync（推荐）
-uv sync
+uv run python main.py
 ```
 
-### 运行脚本
+安装新的 Python 版本：
 
 ```bash
-# 无需激活虚拟环境
-uv run python script.py
+uv python install 3.13
+```
 
-# 指定 Python 版本运行
-uv run --python 3.11.10 python script.py
+切换 pinned 版本：
+
+```bash
+uv python pin 3.12.9
+```
+
+## 常用 Docker 命令
+
+构建镜像：
+
+```bash
+docker compose build
+```
+
+构建并包含开发容器：
+
+```bash
+docker compose --profile workspace build
+```
+
+查看状态：
+
+```bash
+docker compose ps
+docker compose --profile workspace ps
+```
+
+停止服务：
+
+```bash
+docker compose down
+```
+
+查看开发容器日志：
+
+```bash
+docker logs dev-workspace
 ```
 
 ## 目录结构
 
-```
-dev-workspace/
-├── Dockerfile              # Docker 镜像构建文件
-├── docker-compose.yml      # 服务编排配置
-├── setup.ps1               # Windows 一键部署脚本
-├── setup.sh                # Linux/Mac 一键部署脚本
-├── scripts/                # 脚本目录
-│   └── entrypoint.sh       # 容器入口脚本
-├── ssh-keys/               # SSH 密钥目录
-│   ├── copy-ssh-keys.ps1   # Windows 密钥复制脚本
-│   ├── copy-ssh-keys.sh    # Linux/Mac 密钥复制脚本
-│   └── README.md           # SSH 使用说明
-├── docs/                   # 文档目录
-│   └── UV_USAGE.md         # uv 使用指南
-├── development-config/   # VSCode 配置模板
-│   ├── golang/             # Go 开发配置
-│   ├── python/             # Python 开发配置
-│   ├── qoder/              # AI Agent 配置
-│   └── common/             # 通用配置
-└── infras/                 # 基础设施配置
-    ├── clickhouse/         # ClickHouse 配置
-    ├── mongodb/            # MongoDB 配置
-    ├── mq/                 # Kafka + Zookeeper 配置
-    ├── mysql/              # MySQL 配置
-    └── redis/              # Redis 配置
+```text
+.
+├── Dockerfile
+├── docker-compose.yml
+├── setup.sh
+├── setup.ps1
+├── scripts/
+│   └── entrypoint.sh
+├── ssh-keys/
+│   └── README.md
+├── development-config/
+│   ├── prompts/
+│   ├── qoder/
+│   └── vscode/
+├── docs/
+└── infras/
+    ├── clickhouse/
+    ├── mongodb/
+    ├── mq/
+    ├── mysql/
+    └── redis/
 ```
 
-## 常用命令
+补充说明：
 
-### Docker 操作
+- `infras/milvus/` 目录会在首次启动相关容器后自动生成数据目录，但当前未纳入仓库
+- `infras/mq/docker-compose.yml` 提供 Kafka 相关独立编排
+- `development-config/vscode/README.md`、`development-config/qoder/README.md`、`ssh-keys/README.md` 分别说明对应配置的使用方式
 
-```bash
-# 构建镜像
-docker-compose build
+## 已知现状
 
-# 启动服务（仅基础设施：Redis、MySQL）
-docker-compose up -d
-
-# 启动服务（包含开发环境容器）
-docker-compose --profile workspace up -d
-
-# 停止服务
-docker-compose down
-
-# 查看服务状态
-docker-compose ps
-
-# 查看日志
-docker logs dev-env
-```
-
-### 容器内操作
-
-```bash
-# 查看 Python 版本
-uv python list
-
-# 初始化新项目
-uv init my-project
-
-# 添加依赖
-uv add requests pandas
-
-# 运行项目
-uv run python main.py
-```
-
-## 网络配置
-
-所有服务使用 `common-network` 桥接网络：
-
-- 容器间可使用服务名互访：`redis:6379`
-- 宿主机通过映射端口访问：`localhost:6379`
-
-## 环境变量
-
-| 变量 | 值 | 说明 |
-|-----|---|------|
-| TZ | UTC | 时区 |
-| UV_PYTHON_INSTALL_DIR | /opt/python | Python 安装目录 |
-| UV_INDEX_URL | mirrors.aliyun.com | PyPI 镜像源 |
+- Linux / macOS 的 `setup.sh` 当前不会自动启动 `workspace` profile
+- README 之外的部分辅助文档仍有旧容器名或旧目录描述，使用时应以根目录 `docker-compose.yml`、`Dockerfile` 和脚本为准
+- `dev-workspace` 容器的 SSH 免密登录当前按 `RSA` 挂载路径实现，`ED25519` 复制到了 `ssh-keys/`，但没有被 compose 挂载到容器
 
 ## 故障排查
 
-### SSH 连接失败
+开发容器未启动：
 
 ```bash
-# 检查容器日志
+docker compose --profile workspace ps
+docker compose --profile workspace up -d
+```
+
+检查 SSH 服务：
+
+```bash
 docker logs dev-workspace
-
-# 确认 SSH 服务状态
-docker exec dev-workspace ss -lnt | grep 22
+docker exec dev-workspace ss -lnt
 ```
 
-### 私钥权限问题 (Windows)
-
-```powershell
-# 重新设置权限
-icacls .\ssh-keys\id_ed25519 /inheritance:r /grant:r "$($env:USERNAME):(R)"
-```
-
-### 镜像构建失败
+检查基础设施状态：
 
 ```bash
-# 清理缓存重新构建
-docker-compose build --no-cache
+docker compose ps
 ```
-
-## 参考资源
-
-- [uv 官方文档](https://docs.astral.sh/uv/)
-- [Docker 文档](https://docs.docker.com/)
-- [Docker Compose 文档](https://docs.docker.com/compose/)
