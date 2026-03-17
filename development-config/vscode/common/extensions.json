@@ -50,6 +50,8 @@
     // ==================================================
     // Better Comments：注释关键字高亮
     "aaron-bond.better-comments",
+    // Comment Translate：代码注释翻译
+    "intellsmi.comment-translate",
     // Path Intellisense：路径补全
     "christian-kohler.path-intellisense",
     // Indent Rainbow：缩进着色
