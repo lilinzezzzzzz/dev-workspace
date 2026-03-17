@@ -52,6 +52,14 @@ development-config/qoder/
 
 将 `AGENTS.md` 内容配置到 Qoder 的用户设置中，让 AI 助手适应您的个人开发习惯。
 
+如果同时需要同步到本机的 `~/.codex/AGENTS.md` 和 `~/.qoder/AGENTS.md`，可在仓库根目录执行：
+
+```bash
+./development-config/qoder/sync-agents.sh
+```
+
+该脚本与 `AGENTS.md` 同目录放置，直接读取同层级的源文件，并在复制后对目标文件执行 `sha256` 校验。
+
 ### 2. 配置个人命令
 
 ```bash

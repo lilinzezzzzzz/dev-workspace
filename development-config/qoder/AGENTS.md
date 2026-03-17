@@ -90,7 +90,13 @@
 ## Testing and Verification
 
 * Validate behavior, not only syntax.
+* Prefer a practical test pyramid over flat coverage targets. Use the following distribution as a default planning guide, not a hard quota:
+  * Unit tests: 60-80%. Cover domain logic, validation, branching, edge cases, and failure paths. Keep them fast, deterministic, and isolated.
+  * Integration tests: 15-30%. Cover boundaries between modules and real infrastructure contracts such as database, cache, queue, filesystem, and external APIs. Prefer realistic wiring with limited mocking.
+  * E2E tests: 5-10%. Focus on critical user journeys and release-blocking paths only. They are recommended for high-risk cross-boundary changes, but do not need to be exhaustive.
+* Do not optimize for raw coverage numbers alone. Prioritize regression-prone areas, business-critical invariants, API contracts, and error handling.
 * Prefer targeted tests nearest to the changed behavior before broad end-to-end runs.
+* For changes spanning multiple layers, compose tests intentionally: use unit tests to lock local logic, integration tests to verify contracts, and only add E2E coverage where the full-path signal is worth the cost.
 * If tests are not run, state that clearly.
 * If verification is partial, explain exactly what was checked and what remains unverified.
 * When reviewing code, prioritize bugs, regressions, race conditions, API contract breaks, migration risk, and missing tests.
