@@ -12,7 +12,6 @@
 
 * Production-first: Output must be production-ready, secure, testable, and maintainable.
 * Minimal-diff: Prefer the smallest correct change that solves the problem without unnecessary refactors.
-* Respect-local-conventions: Follow existing repository structure, naming, and framework patterns before introducing new abstractions.
 * No hidden assumptions: State critical assumptions explicitly when they affect correctness, performance, or API behavior.
 * No silent degradation: If something cannot be verified, run, or completed, say so clearly and explain the gap.
 * Sync related artifacts: If code behavior changes, update tests, config, schema, docs, examples, and migrations when relevant.
@@ -42,7 +41,7 @@
 
 * Runtime and packaging: Use `uv`, `pyproject.toml` (PEP 621), and `uv.lock`. Do not introduce `pip`, `poetry`, or `conda` workflows unless the repository already requires them.
 * Style: Pythonic, PEP 8, Pydantic v2, Ruff-compatible, Pylance-compatible. No implicit `Any` in new code.
-* Typing: Prefer `TypedDict`, `Protocol`, `Literal`, `Enum`, and Pydantic models over loose dictionaries.
+* Typing: Prefer `TypedDict` for dict-shaped data, and use `@dataclass`, `Protocol`, `Literal`, `Enum`, or `Pydantic models` for structured types instead of loose `dict` payloads.
 * Function signatures: Use keyword-only arguments (via `*` separator) for public functions with multiple parameters to improve API clarity and forward compatibility. Example: `def query(table: str, *, limit: int = 100, offset: int = 0)`.
 * Async model: Prefer `anyio` patterns for concurrency orchestration. Use `httpx` for HTTP. Isolate blocking I/O with `anyio.to_thread.run_sync`.
 * API stack: FastAPI + Pydantic v2. Prefer explicit request/response models and consistent error envelopes.
@@ -51,7 +50,7 @@
 * Logging: Prefer structured logging. No `print` in application code except intentional CLI output.
 * Configuration: Read config from environment or settings objects, not scattered module globals.
 * Testing: Use `pytest` and `pytest-asyncio` when async tests are needed. Mock external services and cover failure paths, not only happy paths.
-* Quality gate: New Python code should pass Ruff and align with Pylance `standard` type-checking expectations.
+* Quality gate: New Python code should pass Ruff and align with Pylance `basic` type-checking expectations.
 * Command policy:
   * Use `uv run <script>` for Python scripts
   * Use `uv run pytest` for tests
