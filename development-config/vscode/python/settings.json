@@ -46,6 +46,7 @@
   "ruff.nativeServer": "auto", // 最新推荐：优先使用 Rust 原生服务器
   "ruff.configurationPreference": "filesystemFirst", // 优先读取 pyproject.toml / ruff.toml
   "ruff.lineLength": 88,
+  "ruff.lint.preview": true,
   // 仅在项目未提供 Ruff 配置文件时作为兜底
   "ruff.lint.select": [
     "E",
@@ -54,7 +55,11 @@
     "UP",
     "B",
     "C4",
-    "SIM"
+    "SIM",
+    "PLR6301",
+    "PLR1711",
+    "PLR1733",
+    "PLR1714"
   ],
   "ruff.lint.ignore": [
     "E501"

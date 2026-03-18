@@ -42,6 +42,7 @@
 * Runtime and packaging: Use `uv`, `pyproject.toml` (PEP 621), and `uv.lock`. Do not introduce `pip`, `poetry`, or `conda` workflows unless the repository already requires them.
 * Style: Pythonic, PEP 8, Pydantic v2, Ruff-compatible, Pylance-compatible. No implicit `Any` in new code.
 * Typing: Prefer `TypedDict` for dict-shaped data, and use `@dataclass`, `Protocol`, `Literal`, `Enum`, or `Pydantic models` for structured types instead of loose `dict` payloads.
+* Method semantics: Do not default to instance methods. Use instance methods for instance state, `@classmethod` for alternate constructors or class-level polymorphic behavior, `@staticmethod` for utilities that need neither `self` nor `cls`, and `@property` for cheap, side-effect-free derived attributes.
 * Function signatures: Use keyword-only arguments (via `*` separator) for public functions with multiple parameters to improve API clarity and forward compatibility. Example: `def query(table: str, *, limit: int = 100, offset: int = 0)`.
 * Async model: Prefer `anyio` patterns for concurrency orchestration. Use `httpx` for HTTP. Isolate blocking I/O with `anyio.to_thread.run_sync`.
 * API stack: FastAPI + Pydantic v2. Prefer explicit request/response models and consistent error envelopes.
