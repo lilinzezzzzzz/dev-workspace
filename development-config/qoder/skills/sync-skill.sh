@@ -121,7 +121,11 @@ copy_skill() {
 }
 
 main() {
-    mapfile -t skills < <(discover_skills)
+    local -a skills=()
+    local skill=""
+    while IFS= read -r skill; do
+        skills+=("$skill")
+    done < <(discover_skills)
 
     local selected_skill=""
     local selected_target=""
