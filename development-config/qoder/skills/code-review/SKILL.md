@@ -1,9 +1,9 @@
 ---
 name: code-review
 description: Conduct thorough, constructive code reviews for quality and security. Use when reviewing pull requests, checking code quality, identifying bugs, or auditing security. Handles best practices, SOLID principles, security vulnerabilities, performance analysis, and testing coverage.
-allowed-tools: [Read, Grep, Glob]
-tags: [code-review, code-quality, security, best-practices, PR-review, MR-review]
-platforms: [Claude, ChatGPT, Gemini]
+metadata:
+  allowed_tools: [Read, Grep, Glob]
+  tags: [code-review, code-quality, security, best-practices, PR-review, MR-review]
 ---
 
 # Code Review
@@ -19,7 +19,25 @@ platforms: [Claude, ChatGPT, Gemini]
 
 ## Instructions
 
-### Step 1: Understand the context
+### Step 1: Select the base branch
+
+Before starting the review, choose and confirm the base branch that the current changes should be compared against.
+
+- Prefer the PR/MR target branch if it is available
+- Otherwise ask the user to choose the base branch
+- If you need candidates, check common branches such as `main`, `master`, `develop`, or the current release branch
+
+Use the selected base branch to define the review scope:
+
+```bash
+git merge-base <base-branch> HEAD
+git diff --stat <base-branch>...HEAD
+git diff <base-branch>...HEAD
+```
+
+All review findings should be based on the diff against the selected base branch, not on unrelated historical changes.
+
+### Step 2: Understand the context
 
 **Read the PR Or MR description**:
 - What is the goal of this change?
@@ -31,7 +49,7 @@ platforms: [Claude, ChatGPT, Gemini]
 - What type of changes? (feature, bugfix, refactor)
 - Are tests included?
 
-### Step 2: High-level review
+### Step 3: High-level review
 
 **Architecture and design**:
 - Does the approach make sense?
@@ -44,7 +62,7 @@ platforms: [Claude, ChatGPT, Gemini]
 - Appropriate abstraction levels?
 - Logical file/folder structure?
 
-### Step 3: Detailed code review
+### Step 4: Detailed code review
 
 **Naming**:
 - [ ] Variables: descriptive, meaningful names
@@ -81,7 +99,7 @@ platforms: [Claude, ChatGPT, Gemini]
 - [ ] No magic numbers
 - [ ] Consistent formatting
 
-### Step 4: Security review
+### Step 5: Security review
 
 **Input validation**:
 - [ ] All user inputs validated
@@ -107,7 +125,7 @@ platforms: [Claude, ChatGPT, Gemini]
 - [ ] Dependencies up-to-date
 - [ ] Minimal dependency usage
 
-### Step 5: Performance review
+### Step 6: Performance review
 
 **Algorithms**:
 - [ ] Appropriate algorithm choice
@@ -131,7 +149,7 @@ platforms: [Claude, ChatGPT, Gemini]
 - [ ] Connections released
 - [ ] Memory leaks prevented
 
-### Step 6: Testing review
+### Step 7: Testing review
 
 **Test coverage**:
 - [ ] Unit tests for new code
@@ -157,7 +175,7 @@ def test1():
     pass
 ```
 
-### Step 7: Documentation review
+### Step 8: Documentation review
 
 **Code comments**:
 - [ ] Complex logic explained
@@ -189,7 +207,7 @@ def calculate_total(items: List[Item], tax_rate: float) -> Decimal:
 - [ ] API docs updated
 - [ ] Migration guide if breaking changes
 
-### Step 8: Provide feedback
+### Step 9: Provide feedback
 
 **Be constructive**:
 ```
@@ -388,4 +406,3 @@ API_KEY = os.environ.get("API_KEY")
 
 ### Example 2: Advanced usage
 <!-- Add advanced example content here -->
-
