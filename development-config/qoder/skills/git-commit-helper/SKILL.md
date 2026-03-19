@@ -51,9 +51,8 @@ description: 生成符合 Conventional Commits 规范的提交信息。当用户
 
 ### Subject 主题
 
-- 使用**祈使语气**（imperative mood）
-- 简洁明了
-- **优先使用中文**以提高团队可读性
+- 祈使语气（如「添加」非「添加了」）
+- 使用中文，技术名词使用英文
 - 不以句号结尾
 
 ### Body 正文（可选）
