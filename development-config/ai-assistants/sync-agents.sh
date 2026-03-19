@@ -96,18 +96,22 @@ choose_content() {
     done
 }
 
-choose_target_root() {
+choose_target() {
     echo "Select target assistant:" >&2
     local target=""
 
-    select target in "codex" "qoder" "Exit"; do
+    select target in "codex" "qoder" "both" "Exit"; do
         case "$target" in
             codex)
-                printf '%s\n' "$CODEX_ROOT"
+                printf '%s\n' "$target"
                 return 0
                 ;;
             qoder)
-                printf '%s\n' "$QODER_ROOT"
+                printf '%s\n' "$target"
+                return 0
+                ;;
+            both)
+                printf '%s\n' "$target"
                 return 0
                 ;;
             "Exit")
@@ -118,6 +122,27 @@ choose_target_root() {
                 ;;
         esac
     done
+}
+
+resolve_target_roots() {
+    local target="$1"
+
+    case "$target" in
+        codex)
+            printf '%s\n' "$CODEX_ROOT"
+            ;;
+        qoder)
+            printf '%s\n' "$QODER_ROOT"
+            ;;
+        both)
+            printf '%s\n' "$CODEX_ROOT"
+            printf '%s\n' "$QODER_ROOT"
+            ;;
+        *)
+            echo "Unsupported target assistant: $target" >&2
+            exit 1
+            ;;
+    esac
 }
 
 discover_skills() {
@@ -191,8 +216,10 @@ sync_agents_dir() {
 
 sync_skill_dir() {
     local -a skills=()
+    local -a target_roots=()
     local skill=""
     local selected_skill=""
+    local selected_target=""
     local target_root=""
 
     while IFS= read -r skill; do
@@ -200,8 +227,12 @@ sync_skill_dir() {
     done < <(discover_skills)
 
     selected_skill="$(choose_skill "${skills[@]}")"
-    target_root="$(choose_target_root)"
-    sync_path "$selected_skill" "$target_root/skills/$(basename "$selected_skill")"
+    selected_target="$(choose_target)"
+    mapfile -t target_roots < <(resolve_target_roots "$selected_target")
+
+    for target_root in "${target_roots[@]}"; do
+        sync_path "$selected_skill" "$target_root/skills/$(basename "$selected_skill")"
+    done
 }
 
 sync_selected_content() {
@@ -227,7 +258,9 @@ sync_selected_content() {
 
 main() {
     local content=""
+    local selected_target=""
     local target_root=""
+    local -a target_roots=()
     local continue_sync=""
 
     if [[ $# -ne 0 ]]; then
@@ -258,15 +291,24 @@ main() {
         if [[ "$content" == "skills" ]]; then
             sync_skill_dir
         else
-            target_root="$(choose_target_root)"
-            target_root="$(trim_spaces "$target_root")"
+            selected_target="$(choose_target)"
+            mapfile -t target_roots < <(resolve_target_roots "$selected_target")
 
-            if [[ -z "$target_root" ]]; then
+            if [[ "${#target_roots[@]}" -eq 0 ]]; then
                 echo "Target root cannot be empty." >&2
                 exit 1
             fi
 
-            sync_selected_content "$content" "$target_root"
+            for target_root in "${target_roots[@]}"; do
+                target_root="$(trim_spaces "$target_root")"
+
+                if [[ -z "$target_root" ]]; then
+                    echo "Target root cannot be empty." >&2
+                    exit 1
+                fi
+
+                sync_selected_content "$content" "$target_root"
+            done
         fi
 
         read -r -p "Sync another item? [y/N]: " continue_sync

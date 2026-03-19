@@ -68,7 +68,7 @@ development-config/ai-assistants/
 
 - **内容选择**: 支持 `AGENTS.md`、`agents/`、`skills/`
 - **skills 流程**: 先选择具体 skill，再选择目标 assistant
-- **目标选择**: 支持 `codex` 或 `qoder`
+- **目标选择**: 支持 `codex`、`qoder` 或 `both`
 - **覆盖策略**: `AGENTS.md` 直接覆盖；`agents/` 和 `skills/` 仅覆盖同名项
 - **完整性校验**: 文件使用 `sha256sum`，目录使用 `diff -qr`
 - **依赖要求**: 需要系统安装 `sha256sum` 和 `diff`
@@ -78,6 +78,7 @@ development-config/ai-assistants/
 - 选择 `AGENTS.md`：同步个人规则文件到目标 assistant 根目录
 - 选择 `agents`：同步仓库中的 agent 配置目录到目标 assistant 的 `agents/`
 - 选择 `skills`：选择一个 skill 并同步到目标 assistant 的 `skills/`
+- 选择 `both`：将选中的内容同步到当前配置的所有目标目录
 
 ### 3. 个性化定制
 
