@@ -1,9 +1,9 @@
 ---
 name: gen-agents-md
-description: 生成或更新项目根目录的 Qoder AGENTS.md 配置文件。当用户需要创建 AI 代理指令文档、配置编码规范、设置 Git 提交规范、定义响应偏好时使用此 skill。
+description: 生成或更新项目根目录的通用 AGENTS.md 配置文件，适用于 Codex、Qoder 和其他 AI assistant。当用户需要创建 AI 代理指令文档、配置编码规范、设置 Git 提交规范、定义响应偏好时使用此 skill。
 metadata:
   allowed_tools: [Read, Write, Glob]
-  tags: [agents, qoder, configuration, markdown, code-standards]
+  tags: [agents, ai-assistant, configuration, markdown, code-standards]
 ---
 
 # Gen AGENTS.md

@@ -6,7 +6,7 @@
 
 - `dev-workspace` 开发容器：Debian Bookworm + `uv` + 多版本 Python
 - 本地基础设施：Redis、MySQL、Milvus、Attu
-- 开发工具配置：VS Code、Qoder、提示词与 SSH 密钥说明
+- 开发工具配置：VS Code、AI assistants、提示词与 SSH 密钥说明
 
 ## 当前服务
 
@@ -226,7 +226,7 @@ docker logs dev-workspace
 │   └── README.md
 ├── development-config/
 │   ├── prompts/
-│   ├── qoder/
+│   ├── ai-assistants/
 │   └── vscode/
 ├── docs/
 └── infras/
@@ -241,7 +241,7 @@ docker logs dev-workspace
 
 - `infras/milvus/` 目录会在首次启动相关容器后自动生成数据目录，但当前未纳入仓库
 - `infras/mq/docker-compose.yml` 提供 Kafka 相关独立编排
-- `development-config/vscode/README.md`、`development-config/qoder/README.md`、`ssh-keys/README.md` 分别说明对应配置的使用方式
+- `development-config/vscode/README.md`、`development-config/ai-assistants/README.md`、`ssh-keys/README.md` 分别说明对应配置的使用方式
 
 ## 已知现状
 
