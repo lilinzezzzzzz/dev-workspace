@@ -1,0 +1,4 @@
+interface:
+  display_name: "API Endpoint Analyzer"
+  short_description: "系统化分析 API 端点的请求、响应、流程与错误处理"
+  default_prompt: "Use $api-endpoint-analyzer to analyze this API endpoint and summarize request, response, flow, and error handling."

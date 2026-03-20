@@ -15,9 +15,8 @@ development-config/ai-assistants/
 ├── agents/                   # Agent 配置文件（预留）
 ├── events/                   # 事件处理配置（预留）
 ├── skills/
-│   ├── code-review/
-│   ├── find-skills/
-│   ├── gen-agents-md/
+│   ├── api-endpoint-analyzer/
+│   ├── code-reviewer/
 │   └── git-commit-helper/
 └── README.md
 ```
@@ -41,16 +40,34 @@ development-config/ai-assistants/
 当前目录已经包含一组可复用能力：
 
 - **sync-agents.sh**: 统一同步入口，可交互选择 `AGENTS.md`、`agents/` 或单个 `skill`
-- **git-commit-helper**: 生成符合个人规范的 Git 提交信息
-- **code-review**: 代码审查规范
-- **find-skills**: 发现并安装外部 skills
-- **gen-agents-md**: 生成或更新项目级 `AGENTS.md`
+- **api-endpoint-analyzer**: 系统化分析 API endpoint 的请求、响应、业务流程与错误处理
+- **code-reviewer**: 基于 diff 输出高信号代码审查结论，优先发现 bug、回归和风险
+- **git-commit-helper**: 基于 staged diff 生成或执行规范的 Conventional Commit
 
 ### 扩展模块（预留）
 
 - **agents/**: 个人 Agent 行为定制
 - **events/**: 个人工作流事件处理
 - **skills/**: 个人专业技能模块
+
+### Skill 目录约定
+
+当前 `skills/` 目录采用统一结构，便于同步、复用和持续演进：
+
+```text
+skills/<skill-name>/
+├── SKILL.md                  # 触发描述、核心工作流、边界规则
+├── agents/
+│   └── openai.yaml           # UI 展示名、短描述、默认 prompt
+└── references/               # 按需加载的模板、检查清单、选择规则
+```
+
+设计原则：
+
+- `SKILL.md` 保持精简，只放高价值流程和决策规则
+- 细节模板、checklist、示例下沉到 `references/`
+- `agents/openai.yaml` 负责展示层和默认触发入口
+- skill 命名与目录名保持一致，避免同步或调用时混淆
 
 ---
 
@@ -67,7 +84,7 @@ development-config/ai-assistants/
 **脚本功能说明**:
 
 - **内容选择**: 支持 `AGENTS.md`、`agents/`、`skills/`
-- **skills 流程**: 先选择具体 skill，再选择目标 assistant
+- **skills 流程**: 先选择具体 skill 或全部 skills，再选择目标 assistant
 - **目标选择**: 支持 `codex`、`qoder` 或 `both`
 - **覆盖策略**: `AGENTS.md` 直接覆盖；`agents/` 和 `skills/` 仅覆盖同名项
 - **完整性校验**: 文件使用 `sha256sum`，目录使用 `diff -qr`
@@ -77,8 +94,14 @@ development-config/ai-assistants/
 
 - 选择 `AGENTS.md`：同步个人规则文件到目标 assistant 根目录
 - 选择 `agents`：同步仓库中的 agent 配置目录到目标 assistant 的 `agents/`
-- 选择 `skills`：选择一个 skill 并同步到目标 assistant 的 `skills/`
+- 选择 `skills`：选择一个 skill 或全部 skills，并同步到目标 assistant 的 `skills/`
 - 选择 `both`：将选中的内容同步到当前配置的所有目标目录
+
+当前已维护的 skill 更适合以下场景：
+
+- `api-endpoint-analyzer`：解释接口契约、梳理调用链、核对实现与文档是否一致
+- `code-reviewer`：审查 PR、MR、commit 或 diff，输出带 severity 的具体 findings
+- `git-commit-helper`：根据 staged changes 生成 commit message，或在范围清晰时执行提交
 
 ### 3. 个性化定制
 
@@ -87,6 +110,7 @@ development-config/ai-assistants/
 - 个人偏好的 Agent 行为规则
 - 符合个人工作流的事件处理
 - 专业领域的个人技能模块
+- 遵循 `SKILL.md + agents/openai.yaml + references/` 的 skill 结构
 
 ---
 

@@ -7,6 +7,8 @@ SOURCE_AGENTS_DIR="$SCRIPT_DIR/agents"
 SOURCE_SKILLS_DIR="$SCRIPT_DIR/skills"
 CODEX_ROOT="${CODEX_ROOT:-$HOME/.codex}"
 QODER_ROOT="${QODER_ROOT:-$HOME/.qoder}"
+EXIT_SENTINEL="__SYNC_AGENTS_EXIT__"
+ALL_SKILLS_SENTINEL="__SYNC_AGENTS_ALL_SKILLS__"
 
 require_command() {
     local command_name="$1"
@@ -80,14 +82,15 @@ choose_content() {
     echo "Select content to sync:" >&2
     local content=""
 
-    select content in "AGENTS.md" "agents" "skills" "Exit"; do
+    select content in "AGENTS.md" "agents" "skills" "exit"; do
         case "$content" in
             "AGENTS.md"|"agents"|"skills")
                 printf '%s\n' "$content"
                 return 0
                 ;;
-            "Exit")
-                exit 0
+            "exit")
+                printf '%s\n' "$EXIT_SENTINEL"
+                return 0
                 ;;
             *)
                 echo "Invalid selection, try again." >&2
@@ -100,7 +103,7 @@ choose_target() {
     echo "Select target assistant:" >&2
     local target=""
 
-    select target in "codex" "qoder" "both" "Exit"; do
+    select target in "codex" "qoder" "both" "exit"; do
         case "$target" in
             codex)
                 printf '%s\n' "$target"
@@ -114,8 +117,9 @@ choose_target() {
                 printf '%s\n' "$target"
                 return 0
                 ;;
-            "Exit")
-                exit 0
+            "exit")
+                printf '%s\n' "$EXIT_SENTINEL"
+                return 0
                 ;;
             *)
                 echo "Invalid selection, try again." >&2
@@ -174,13 +178,18 @@ choose_skill() {
     done
 
     echo "Available skills:" >&2
-    select selected_name in "${skill_names[@]}" "Exit"; do
+    select selected_name in "${skill_names[@]}" "all skills" "exit"; do
         case "$selected_name" in
             "")
                 echo "Invalid selection, try again." >&2
                 ;;
-            "Exit")
-                exit 0
+            "all skills")
+                printf '%s\n' "$ALL_SKILLS_SENTINEL"
+                return 0
+                ;;
+            "exit")
+                printf '%s\n' "$EXIT_SENTINEL"
+                return 0
                 ;;
             *)
                 printf '%s\n' "${skills[REPLY-1]}"
@@ -216,6 +225,7 @@ sync_agents_dir() {
 
 sync_skill_dir() {
     local -a skills=()
+    local -a selected_skills=()
     local -a target_roots=()
     local skill=""
     local selected_skill=""
@@ -227,11 +237,27 @@ sync_skill_dir() {
     done < <(discover_skills)
 
     selected_skill="$(choose_skill "${skills[@]}")"
+    if [[ "$selected_skill" == "$EXIT_SENTINEL" ]]; then
+        exit 0
+    fi
+
+    if [[ "$selected_skill" == "$ALL_SKILLS_SENTINEL" ]]; then
+        selected_skills=("${skills[@]}")
+    else
+        selected_skills=("$selected_skill")
+    fi
+
     selected_target="$(choose_target)"
+    if [[ "$selected_target" == "$EXIT_SENTINEL" ]]; then
+        exit 0
+    fi
+
     mapfile -t target_roots < <(resolve_target_roots "$selected_target")
 
     for target_root in "${target_roots[@]}"; do
-        sync_path "$selected_skill" "$target_root/skills/$(basename "$selected_skill")"
+        for skill in "${selected_skills[@]}"; do
+            sync_path "$skill" "$target_root/skills/$(basename "$skill")"
+        done
     done
 }
 
@@ -288,10 +314,18 @@ main() {
 
     while true; do
         content="$(choose_content)"
+        if [[ "$content" == "$EXIT_SENTINEL" ]]; then
+            exit 0
+        fi
+
         if [[ "$content" == "skills" ]]; then
             sync_skill_dir
         else
             selected_target="$(choose_target)"
+            if [[ "$selected_target" == "$EXIT_SENTINEL" ]]; then
+                exit 0
+            fi
+
             mapfile -t target_roots < <(resolve_target_roots "$selected_target")
 
             if [[ "${#target_roots[@]}" -eq 0 ]]; then
