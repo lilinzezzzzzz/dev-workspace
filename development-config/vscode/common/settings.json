@@ -267,7 +267,7 @@
   // Git 性能优化
   "git.autoRepositoryDetection": true, // 自动检测 Git 仓库
   "git.enableStatusBarSync": true, // 状态栏显示同步状态
-  "git.statusSortOrder": "file", // 状态排序：按文件名排序（提高大仓库性能）
+  "scm.defaultViewSortKey": "name", // SCM 视图排序：按文件名排序
   "git.repositoryScanMaxDepth": 1, // 仓库扫描最大深度（减少扫描范围）
   // VS Code SCM 面板配置
   "scm.defaultViewMode": "tree", // 默认树形视图模式
@@ -277,7 +277,6 @@
   "scm.repositories.visible": 10, // 最多显示10个仓库
   // -------------------- 遥测配置 --------------------
   "telemetry.telemetryLevel": "off", // 禁用 VS Code 和遵循该设置的扩展遥测
-  "telemetry.feedback.enabled": false, // 关闭内置反馈入口
   "redhat.telemetry.enabled": false, // 禁用 RedHat 扩展遥测（如 YAML 扩展）
   // =============================================================================
   // 🔌 插件扩展配置
@@ -320,9 +319,6 @@
   "gitlens.graph.scrollRowPadding": 6,
   "gitlens.graph.showDetailsView": "selection", // 只在选中提交时更新详情
   "gitlens.graph.minimap.enabled": false, // 关掉小地图
-  // -------------------- Git Graph 配置 --------------------
-  "git-graph.date.format": "ISO Date & Time", // Git Graph日期格式
-  "git-graph.date.type": "Commit Date", // 使用提交日期
   // -------------------- 翻译插件配置 --------------------
   "commentTranslate.multiLineMerge": false, // 不合并多行翻译
   "commentTranslate.targetLanguage": "zh-CN", // 目标翻译语言(中文)
