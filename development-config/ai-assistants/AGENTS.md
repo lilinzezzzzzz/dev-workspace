@@ -21,7 +21,7 @@
 1. Understand the task, constraints, and repo context before editing.
 2. Critique the design briefly before implementation if there are risks or better alternatives.
 3. Implement with minimal scope and clear boundaries.
-4. Validate with the strongest practical checks available.
+4. Validate proportionally to change risk with the strongest practical checks available.
 5. Report outcome, verification, and residual risk succinctly.
 
 ## Code Quality Standards
@@ -90,6 +90,9 @@
 ## Testing and Verification
 
 * Validate behavior, not only syntax.
+* Validation should be proportional to change risk, scope, and blast radius.
+* Do not default to running tests for every edit. Small, low-risk changes such as docs, comments, prompt text, copy changes, formatting, or strictly local non-behavioral refactors may be verified by inspection, diff review, lint, or type checks only.
+* Run targeted tests when behavior, API contracts, persistence, concurrency, or external integrations may be affected. Escalate to broader integration or E2E coverage only when the risk justifies it.
 * Prefer a practical test pyramid over flat coverage targets. Use the following distribution as a default planning guide, not a hard quota:
   * Unit tests: 60-80%. Cover domain logic, validation, branching, edge cases, and failure paths. Keep them fast, deterministic, and isolated.
   * Integration tests: 15-30%. Cover boundaries between modules and real infrastructure contracts such as database, cache, queue, filesystem, and external APIs. Prefer realistic wiring with limited mocking.
