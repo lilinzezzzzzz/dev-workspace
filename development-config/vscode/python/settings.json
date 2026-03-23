@@ -9,9 +9,10 @@
   "python.terminal.useEnvFile": true, // 让终端也读取 `.env`
   "python.envFile": "${workspaceFolder}/.env",
   // -------------------- Python 编辑体验 --------------------
-  "python.analysis.autoSearchPaths": true,
+  "python.analysis.autoSearchPaths": false,
   "python.analysis.extraPaths": [],
   "python.analysis.exclude": [
+    "**/.*",
     "**/node_modules",
     "**/__pycache__",
     "**/.venv",
@@ -24,7 +25,12 @@
     "**/build",
     "**/dist",
     "**/site-packages",
-    "**/build"
+    "**/.git",
+    "**/.idea",
+    "**/logs",
+    "**/.hypothesis",
+    "**/htmlcov",
+    "**/*.egg-info"
   ],
   "[python]": {
     "editor.formatOnSave": false, // 关闭保存时自动格式化
