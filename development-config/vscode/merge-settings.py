@@ -38,7 +38,7 @@ def strip_jsonc_comments(jsonc_content: str) -> str:
         # 处理字符串状态
         if in_string:
             result.append(char)
-            if char == '\\' and i + 1 < len(jsonc_content):
+            if char == "\\" and i + 1 < len(jsonc_content):
                 # 转义字符，跳过下一个字符
                 i += 1
                 result.append(jsonc_content[i])
@@ -49,7 +49,7 @@ def strip_jsonc_comments(jsonc_content: str) -> str:
             continue
 
         # 检测字符串开始
-        if char in '"\'':
+        if char in "\"'":
             in_string = True
             string_char = char
             result.append(char)
@@ -57,18 +57,18 @@ def strip_jsonc_comments(jsonc_content: str) -> str:
             continue
 
         # 检测单行注释
-        if char == '/' and i + 1 < len(jsonc_content) and jsonc_content[i + 1] == '/':
+        if char == "/" and i + 1 < len(jsonc_content) and jsonc_content[i + 1] == "/":
             # 跳过直到行尾
-            while i < len(jsonc_content) and jsonc_content[i] != '\n':
+            while i < len(jsonc_content) and jsonc_content[i] != "\n":
                 i += 1
             continue
 
         # 检测多行注释
-        if char == '/' and i + 1 < len(jsonc_content) and jsonc_content[i + 1] == '*':
+        if char == "/" and i + 1 < len(jsonc_content) and jsonc_content[i + 1] == "*":
             i += 2
             # 跳过直到 */
             while i + 1 < len(jsonc_content):
-                if jsonc_content[i] == '*' and jsonc_content[i + 1] == '/':
+                if jsonc_content[i] == "*" and jsonc_content[i + 1] == "/":
                     i += 2
                     break
                 i += 1
@@ -77,17 +77,17 @@ def strip_jsonc_comments(jsonc_content: str) -> str:
         result.append(char)
         i += 1
 
-    result_str = ''.join(result)
+    result_str = "".join(result)
 
     # 移除尾随逗号 (在 } 或 ] 之前的逗号)
-    result_str = re.sub(r',(\s*[}\]])', r'\1', result_str)
+    result_str = re.sub(r",(\s*[}\]])", r"\1", result_str)
 
     return result_str
 
 
 def parse_jsonc(file_path: Path) -> Dict[str, Any]:
     """解析 JSONC 文件，返回字典"""
-    content = file_path.read_text(encoding='utf-8')
+    content = file_path.read_text(encoding="utf-8")
     json_content = strip_jsonc_comments(content)
     return json.loads(json_content)
 
@@ -110,7 +110,9 @@ def deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]
     return result
 
 
-def generate_jsonc_with_comments(config: Dict[str, Any], header_comment: str = "") -> str:
+def generate_jsonc_with_comments(
+    config: Dict[str, Any], header_comment: str = ""
+) -> str:
     """
     生成带有头部注释的 JSONC 内容
     由于无法保留原始注释，这里添加文件头部说明
@@ -125,11 +127,11 @@ def generate_jsonc_with_comments(config: Dict[str, Any], header_comment: str = "
     json_str = json.dumps(config, indent=2, ensure_ascii=False)
 
     # 跳过第一行的 "{" 和最后一行的 "}"
-    json_lines = json_str.split('\n')[1:-1]
+    json_lines = json_str.split("\n")[1:-1]
     lines.extend(json_lines)
     lines.append("}")
 
-    return '\n'.join(lines)
+    return "\n".join(lines)
 
 
 def merge_settings(base_dir: Path, lang: str) -> Dict[str, Any]:
@@ -165,10 +167,10 @@ def main():
     python merge-settings.py              # 生成所有配置
     python merge-settings.py --python     # 仅生成 Python 配置
     python merge-settings.py --golang     # 仅生成 Go 配置
-        """
+        """,
     )
-    parser.add_argument('--python', action='store_true', help='仅生成 Python 配置')
-    parser.add_argument('--golang', action='store_true', help='仅生成 Go 配置')
+    parser.add_argument("--python", action="store_true", help="仅生成 Python 配置")
+    parser.add_argument("--golang", action="store_true", help="仅生成 Go 配置")
 
     args = parser.parse_args()
 
@@ -188,7 +190,7 @@ def main():
 
         # 生成 JSONC 内容
         content = generate_jsonc_with_comments(merged, "Python 开发环境配置")
-        output_path.write_text(content, encoding='utf-8')
+        output_path.write_text(content, encoding="utf-8")
 
         print(f"   ✅ 已生成: {output_path}")
         generated_files.append(output_path)
@@ -200,7 +202,7 @@ def main():
 
         # 生成 JSONC 内容
         content = generate_jsonc_with_comments(merged, "Golang 开发环境配置")
-        output_path.write_text(content, encoding='utf-8')
+        output_path.write_text(content, encoding="utf-8")
 
         print(f"   ✅ 已生成: {output_path}")
         generated_files.append(output_path)
@@ -208,7 +210,9 @@ def main():
     print(f"\n🎉 完成! 共生成 {len(generated_files)} 个配置文件")
     print("\n使用方法:")
     print("  将生成的配置文件复制到项目的 .vscode/settings.json 即可使用")
-    print("  或创建符号链接: ln -s /path/to/settings-python.jsonc .vscode/settings.json")
+    print(
+        "  或创建符号链接: ln -s /path/to/settings-python.jsonc .vscode/settings.json"
+    )
 
 
 if __name__ == "__main__":
