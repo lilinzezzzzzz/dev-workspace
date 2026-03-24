@@ -12,6 +12,7 @@
 
 * Production-first: Output must be production-ready, secure, testable, and maintainable.
 * Minimal-diff: Prefer the smallest correct change that solves the problem without unnecessary refactors.
+* Flat-by-default: Prefer shallow call graphs and direct control flow. Avoid layers of thin wrappers, pass-through helpers, speculative abstractions, and "manager/service/utils" splits that do not reduce real complexity.
 * No hidden assumptions: State critical assumptions explicitly when they affect correctness, performance, or API behavior.
 * No silent degradation: If something cannot be verified, run, or completed, say so clearly and explain the gap.
 * Sync related artifacts: If code behavior changes, update tests, config, schema, docs, examples, and migrations when relevant.
@@ -30,6 +31,8 @@
 
 * Correctness: No undefined behavior, race-prone logic, silent failure, or swallowed exceptions.
 * Readability: Favor straightforward code over clever code. Keep modules cohesive and interfaces explicit.
+* Abstraction discipline: Extract helpers, classes, or layers only when they remove real duplication, isolate genuinely complex branching, define a stable boundary, or materially improve testability. Do not introduce single-use wrappers or indirection that merely renames a call.
+* Call-path simplicity: Keep request and task flows easy to trace end-to-end. Prefer keeping related logic close together instead of scattering a simple path across many files, classes, or helper functions.
 * Comments: Add comments for non-obvious logic, public APIs, and complex algorithms. Explain "why" rather than "what". Use docstrings for modules, classes, and public functions.
 * Type safety: Public APIs must be fully typed. Prefer precise types over `Any`, `dict`, or unstructured payloads.
 * Error design: Use explicit error types or stable error codes for user-facing and API-facing failures.
@@ -42,6 +45,7 @@
 * Runtime and packaging: Use `uv`, `pyproject.toml` (PEP 621), and `uv.lock`. Do not introduce `pip`, `poetry`, or `conda` workflows unless the repository already requires them.
 * Style: Pythonic, PEP 8, Pydantic v2, Ruff-compatible, Pylance-compatible. No implicit `Any` in new code.
 * Typing: Prefer `TypedDict` for dict-shaped data, and use `@dataclass`, `Protocol`, `Literal`, `Enum`, or `Pydantic models` for structured types instead of loose `dict` payloads.
+* Structure: Prefer module-level functions or small focused types for straightforward workflows. Avoid deep class hierarchies, overuse of dependency injection, and helper chains for simple business logic.
 * Method semantics: Do not default to instance methods. Use instance methods for instance state, `@classmethod` for alternate constructors or class-level polymorphic behavior, `@staticmethod` for utilities that need neither `self` nor `cls`, and `@property` for cheap, side-effect-free derived attributes.
 * Function signatures: Use keyword-only arguments (via `*` separator) for public functions with multiple parameters to improve API clarity and forward compatibility. Example: `def query(table: str, *, limit: int = 100, offset: int = 0)`.
 * Async model: Prefer `anyio` patterns for concurrency orchestration. Use `httpx` for HTTP. Isolate blocking I/O with `anyio.to_thread.run_sync`.
@@ -64,6 +68,7 @@
 * Style: Follow Effective Go and Go Code Review Comments.
 * Tooling: Code should pass `gofmt` or `goimports`, `go vet`, and preferably `staticcheck` or `golangci-lint` when configured.
 * Dependencies: Prefer stdlib first; add external dependencies only with clear payoff.
+* Structure: Prefer small packages and direct function calls. Introduce interfaces at the consumption boundary when multiple implementations or test seams are actually needed, not preemptively.
 * Errors: Handle explicitly. Do not discard errors with `_` unless the value is provably irrelevant.
 * Context: `context.Context` should be the first parameter for request-scoped or cancellable operations.
 * Concurrency: Use goroutines and channels idiomatically. Protect shared state deliberately and document ownership when non-obvious.
