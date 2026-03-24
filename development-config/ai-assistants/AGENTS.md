@@ -33,7 +33,7 @@
 * Readability: Favor straightforward code over clever code. Keep modules cohesive and interfaces explicit.
 * Abstraction discipline: Extract helpers, classes, or layers only when they remove real duplication, isolate genuinely complex branching, define a stable boundary, or materially improve testability. Do not introduce single-use wrappers or indirection that merely renames a call.
 * Call-path simplicity: Keep request and task flows easy to trace end-to-end. Prefer keeping related logic close together instead of scattering a simple path across many files, classes, or helper functions.
-* Comments: Add comments for non-obvious logic, public APIs, and complex algorithms. Explain "why" rather than "what". Use docstrings for modules, classes, and public functions.
+* Comments: Write a brief comment or docstring for public APIs, boundary functions, and non-obvious logic. Focus on intent and effect, plus inputs and outputs; add side effects, exceptions or async behavior, and concurrency expectations only when needed. Do not restate the code line by line.
 * Type safety: Public APIs must be fully typed. Prefer precise types over `Any`, `dict`, or unstructured payloads.
 * Error design: Use explicit error types or stable error codes for user-facing and API-facing failures.
 * Observability: Log meaningful context for failures, retries, external calls, and state transitions.
@@ -52,6 +52,7 @@
 * API stack: FastAPI + Pydantic v2. Prefer explicit request/response models and consistent error envelopes.
 * Database: Prefer SQLAlchemy 2.x typed ORM/query patterns. Raw SQL is allowed only when ORM is clearly insufficient, and must be parameterized and justified.
 * Migrations: Use Alembic for schema changes. Schema changes must consider rollback, backfill, and compatibility for existing data.
+* Docstrings: Use concise triple-quoted docstrings where comments are required. Prefer them for modules, classes, public functions, and public methods.
 * Logging: Prefer structured logging. No `print` in application code except intentional CLI output.
 * Configuration: Read config from environment or settings objects, not scattered module globals.
 * Testing: Use `pytest` and `pytest-asyncio` when async tests are needed. Mock external services and cover failure paths, not only happy paths.
@@ -69,6 +70,7 @@
 * Tooling: Code should pass `gofmt` or `goimports`, `go vet`, and preferably `staticcheck` or `golangci-lint` when configured.
 * Dependencies: Prefer stdlib first; add external dependencies only with clear payoff.
 * Structure: Prefer small packages and direct function calls. Introduce interfaces at the consumption boundary when multiple implementations or test seams are actually needed, not preemptively.
+* Doc comments: Use concise leading comments where comments are required. Exported comments should start with the symbol name.
 * Errors: Handle explicitly. Do not discard errors with `_` unless the value is provably irrelevant.
 * Context: `context.Context` should be the first parameter for request-scoped or cancellable operations.
 * Concurrency: Use goroutines and channels idiomatically. Protect shared state deliberately and document ownership when non-obvious.
