@@ -34,6 +34,7 @@
 * Abstraction discipline: Extract helpers, classes, or layers only when they remove real duplication, isolate genuinely complex branching, define a stable boundary, or materially improve testability. Do not introduce single-use wrappers or indirection that merely renames a call.
 * Call-path simplicity: Keep request and task flows easy to trace end-to-end. Prefer keeping related logic close together instead of scattering a simple path across many files, classes, or helper functions.
 * Comments: Write a brief comment or docstring for public APIs, boundary functions, and non-obvious logic. Focus on intent and effect, plus inputs and outputs; add side effects, exceptions or async behavior, and concurrency expectations only when needed. Do not restate the code line by line.
+* Markdown: Generated Markdown documents must follow markdownlint rules, including proper heading hierarchy, no trailing spaces, consistent list markers, and blank lines around block elements.
 * Type safety: Public APIs must be fully typed. Prefer precise types over `Any`, `dict`, or unstructured payloads.
 * Error design: Use explicit error types or stable error codes for user-facing and API-facing failures.
 * Observability: Log meaningful context for failures, retries, external calls, and state transitions.
