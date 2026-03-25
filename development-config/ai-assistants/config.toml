@@ -1,0 +1,37 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+model_verbosity = "medium"
+personality = "pragmatic"
+
+# IDE 里建议直接开 live，查最新资料更顺手
+# 如果你更想要稳定/少联网，可改成 "cached"
+web_search = "live"
+
+# 需要越权时再弹确认
+approval_policy = "on-request"
+
+# 日常开发最实用
+sandbox_mode = "workspace-write"
+
+history.persistence = "save-all"
+file_opener = "vscode"
+tool_output_token_limit = 12000
+
+[sandbox_workspace_write]
+network_access = false
+writable_roots = ["/tmp"]
+
+[features]
+multi_agent = true
+personality = true
+unified_exec = true
+shell_snapshot = true
+
+[tools]
+view_image = true
+
+[mcp_servers.openaiDeveloperDocs]
+url = "https://developers.openai.com/mcp"
+required = false
