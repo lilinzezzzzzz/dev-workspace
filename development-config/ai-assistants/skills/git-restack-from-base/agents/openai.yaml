@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Restack From Base"
+  short_description: "输入基础分支后先确认再重切分支并迁移提交"
+  default_prompt: "Use $git-restack-from-base to first ask in natural language which base branch to use, then show the base branch and current branch for confirmation before recreating the current branch."
