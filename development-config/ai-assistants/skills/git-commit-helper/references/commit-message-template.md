@@ -23,14 +23,15 @@ If `scope` is unnecessary, omit it:
 ## Draft With Body
 
 Use when the staged diff contains a small set of tightly related subchanges.
+Format the body as a bulleted list using `- ` prefixes.
 
 ```text
 建议的 commit message:
 
 <type>(<scope>): <subject>
 
-<body line 1>
-<body line 2>
+- <body bullet 1>
+- <body bullet 2>
 ```
 
 ## Draft With Breaking Change

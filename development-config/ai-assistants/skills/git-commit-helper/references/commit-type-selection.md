@@ -40,8 +40,9 @@ Add a body only when one line is not enough. Good reasons include:
 
 Body guidance:
 
-- explain what changed and any critical context
-- keep lines concise
+- format the body as a bulleted list using `- ` prefixes
+- each bullet should capture one subchange or one piece of critical context
+- keep bullets concise
 - do not restate the subject verbatim
 
 ## Footer Rules
