@@ -110,9 +110,9 @@ def ensure_branch_absent(branch_name: str) -> None:
 
 
 def create_branch(*, new_branch: str, base_ref: str) -> None:
-    """Create and check out the new branch from the base ref."""
+    """Create and check out the new branch from the base ref without inheriting upstream."""
     try:
-        run_git("switch", "-c", new_branch, base_ref)
+        run_git("switch", "--no-track", "-c", new_branch, base_ref)
     except subprocess.CalledProcessError as exc:
         message = exc.stderr.strip() or exc.stdout.strip() or "Failed to create branch."
         raise SystemExit(message) from exc
@@ -178,7 +178,7 @@ def print_plan(plan: RestackPlan) -> None:
     for commit in plan.commits:
         print(f"  - {commit.sha} {commit.subject}")
     print("commands:")
-    print(f"  git switch -c {plan.new_branch} {plan.base_ref}")
+    print(f"  git switch --no-track -c {plan.new_branch} {plan.base_ref}")
     for commit in plan.commits:
         print(f"  git cherry-pick {commit.sha}")
     print("status: awaiting_confirmation")

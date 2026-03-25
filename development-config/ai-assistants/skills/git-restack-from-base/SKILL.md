@@ -67,7 +67,7 @@ Useful flags:
 - Abort if the working tree is dirty unless the user explicitly asks to proceed.
 - Abort if there are no branch-only commits to cherry-pick.
 - Use `git log --reverse <base_ref>..<source_branch>` semantics so cherry-pick order matches the original history.
-- Prefer `git switch -c <new_branch> <base_ref>` to create the fresh branch.
+- Prefer `git switch --no-track -c <new_branch> <base_ref>` to create the fresh branch without tracking the base branch.
 - If a cherry-pick conflicts, stop immediately, report the conflicting commit, and tell the user to resolve and continue with `git cherry-pick --continue` or abort with `git cherry-pick --abort`.
 - Do not delete the source branch automatically.
 
