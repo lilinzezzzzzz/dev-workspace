@@ -1,4 +1,4 @@
-FROM buildpack-deps:bookworm
+FROM debian:bookworm-slim
 
 ENV TZ=Etc/UTC \
     LANG=C.UTF-8 \
@@ -20,15 +20,30 @@ RUN echo "set mouse=" >> /root/.vimrc && \
     echo 'alias grep="grep --color=auto"' >> /root/.bashrc && \
     echo 'export TERM=xterm-256color' >> /root/.bashrc
 # 替换为阿里云镜像源（Debian Bookworm）
-RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources && \
-    sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources
+RUN if [ -f /etc/apt/sources.list.d/debian.sources ]; then \
+        sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources && \
+        sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources; \
+    fi && \
+    if [ -f /etc/apt/sources.list ]; then \
+        sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list && \
+        sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list; \
+    fi
 
 # 基础工具 + sshd
-# buildpack-deps 已包含: curl, wget, git, build-essential
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+    build-essential \
+    ca-certificates \
+    curl \
+    git \
+    iproute2 \
+    iputils-ping \
+    lsof \
+    net-tools \
     openssh-server \
-    vim unzip \
-    iproute2 net-tools iputils-ping lsof \
+    procps \
+    unzip \
+    vim \
+    wget \
     bubblewrap \
     && rm -rf /var/lib/apt/lists/*
 
@@ -63,8 +78,7 @@ RUN sed -ri 's/^#?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config 
     mkdir -p /root/.ssh && chmod 700 /root/.ssh
 
 # 复制入口脚本：处理 SSH 密钥并启动 sshd
-COPY scripts/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY --chmod=755 scripts/entrypoint.sh /entrypoint.sh
 
 # 轻量健康检查：确认 22 已监听
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \

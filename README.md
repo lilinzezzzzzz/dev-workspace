@@ -4,7 +4,7 @@
 
 当前仓库重点覆盖三类内容：
 
-- `dev-workspace` 开发容器：Debian Bookworm + `uv` + 多版本 Python
+- `python-workspace` 开发容器：Debian Bookworm + `uv` + 多版本 Python
 - 本地基础设施：Redis、MySQL、Milvus、Attu
 - 开发工具配置：VS Code、AI assistants、提示词与 SSH 密钥说明
 
@@ -14,7 +14,7 @@
 
 | 服务 | 容器名 | 默认端口 | 说明 |
 | --- | --- | --- | --- |
-| `dev-workspace` | `dev-workspace` | `10022`、`8000-8099` | Python 开发容器，按 `workspace` profile 启动 |
+| `python-workspace` | `python-workspace` | `10022`、`8000-8099` | Python 开发容器，按 `python-workspace` profile 启动 |
 | `redis` | `redis` | `6379` | Redis 6，密码 `123456` |
 | `mysql` | `mysql` | `3306` | MySQL 8，root 密码 `123456` |
 | `milvus-etcd` | `milvus-etcd` | - | Milvus 依赖组件 |
@@ -26,12 +26,13 @@
 
 `Dockerfile` 当前提供：
 
-- 基础镜像：`buildpack-deps:bookworm`
+- 基础镜像：`debian:bookworm-slim`
 - Python 管理：`uv`
 - 预装 Python：`3.11.10`、`3.12.9`
 - 默认 pinned Python：`3.11.10`
 - SSH 服务：容器内启用 `sshd`
 - APT / PyPI 镜像：阿里云镜像
+- 系统包策略：构建时执行安全更新，并仅安装开发容器实际需要的工具
 
 容器内关键环境变量：
 
@@ -72,15 +73,15 @@ chmod +x setup.sh
 
 ### 启动说明
 
-需要注意，当前仓库里 `dev-workspace` 服务被放在 `workspace` profile 下：
+需要注意，当前仓库里 `python-workspace` 服务被放在 `python-workspace` profile 下：
 
-- `setup.ps1` 会用 `--profile workspace` 启动开发容器和基础设施
-- `setup.sh` 当前只执行 `docker compose up -d`，因此默认只会启动非 profile 服务，不会启动 `dev-workspace`
+- `setup.ps1` 会用 `--profile python-workspace` 启动开发容器和基础设施
+- `setup.sh` 当前只执行 `docker compose up -d`，因此默认只会启动非 profile 服务，不会启动 `python-workspace`
 
 如果你在 Linux / macOS 上需要启动开发容器，请额外执行：
 
 ```bash
-docker compose --profile workspace up -d
+docker compose --profile python-workspace up -d
 ```
 
 如果只想启动基础设施：
@@ -92,7 +93,7 @@ docker compose up -d
 如果需要连同开发容器一起启动：
 
 ```bash
-docker compose --profile workspace up -d
+docker compose --profile python-workspace up -d
 ```
 
 ## 常用连接方式
@@ -100,7 +101,7 @@ docker compose --profile workspace up -d
 ### 进入开发容器
 
 ```bash
-docker exec -it dev-workspace bash
+docker exec -it python-workspace bash
 ```
 
 ### SSH 连接开发容器
@@ -190,14 +191,14 @@ docker compose build
 构建并包含开发容器：
 
 ```bash
-docker compose --profile workspace build
+docker compose --profile python-workspace build
 ```
 
 查看状态：
 
 ```bash
 docker compose ps
-docker compose --profile workspace ps
+docker compose --profile python-workspace ps
 ```
 
 停止服务：
@@ -209,7 +210,7 @@ docker compose down
 查看开发容器日志：
 
 ```bash
-docker logs dev-workspace
+docker logs python-workspace
 ```
 
 ## 目录结构
@@ -245,24 +246,24 @@ docker logs dev-workspace
 
 ## 已知现状
 
-- Linux / macOS 的 `setup.sh` 当前不会自动启动 `workspace` profile
+- Linux / macOS 的 `setup.sh` 当前不会自动启动 `python-workspace` profile
 - README 之外的部分辅助文档仍有旧容器名或旧目录描述，使用时应以根目录 `docker-compose.yml`、`Dockerfile` 和脚本为准
-- `dev-workspace` 容器的 SSH 免密登录当前按 `RSA` 挂载路径实现，`ED25519` 复制到了 `ssh-keys/`，但没有被 compose 挂载到容器
+- `python-workspace` 容器的 SSH 免密登录当前按 `RSA` 挂载路径实现，`ED25519` 复制到了 `ssh-keys/`，但没有被 compose 挂载到容器
 
 ## 故障排查
 
 开发容器未启动：
 
 ```bash
-docker compose --profile workspace ps
-docker compose --profile workspace up -d
+docker compose --profile python-workspace ps
+docker compose --profile python-workspace up -d
 ```
 
 检查 SSH 服务：
 
 ```bash
-docker logs dev-workspace
-docker exec dev-workspace ss -lnt
+docker logs python-workspace
+docker exec python-workspace ss -lnt
 ```
 
 检查基础设施状态：

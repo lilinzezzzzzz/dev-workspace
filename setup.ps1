@@ -137,7 +137,7 @@ Write-Step "构建 Docker 镜像 (可能需要几分钟)..."
 
 # 临时允许 stderr 输出，因为 Docker 的进度信息会输出到 stderr
 $ErrorActionPreference = "Continue"
-& docker-compose --profile workspace build --no-cache
+& docker-compose --profile python-workspace build --no-cache
 $buildExitCode = $LASTEXITCODE
 $ErrorActionPreference = "Stop"
 
@@ -154,7 +154,7 @@ Write-Success "Docker 镜像构建完成"
 Write-Step "启动服务..."
 
 $ErrorActionPreference = "Continue"
-& docker-compose --profile workspace up -d
+& docker-compose --profile python-workspace up -d
 $upExitCode = $LASTEXITCODE
 $ErrorActionPreference = "Stop"
 
@@ -172,7 +172,7 @@ Write-Step "等待服务就绪..."
 
 Start-Sleep -Seconds 5
 
-$status = docker-compose --profile workspace ps --format json 2>&1 | ConvertFrom-Json
+$status = docker-compose --profile python-workspace ps --format json 2>&1 | ConvertFrom-Json
 $allHealthy = $true
 
 foreach ($service in $status) {
@@ -195,7 +195,7 @@ Write-Host ""
 Write-Host "连接方式:" -ForegroundColor Cyan
 Write-Host "  SSH 免密登录:  ssh -i ./ssh-keys/id_ed25519 root@localhost -p 10022" -ForegroundColor White
 Write-Host "  SSH 密码登录:  ssh root@localhost -p 10022  (密码: 123456)" -ForegroundColor White
-Write-Host "  进入容器:      docker exec -it dev-workspace bash" -ForegroundColor White
+Write-Host "  进入容器:      docker exec -it python-workspace bash" -ForegroundColor White
 Write-Host ""
 Write-Host "Redis 连接:" -ForegroundColor Cyan
 Write-Host "  redis-cli -h localhost -p 6379 -a 123456" -ForegroundColor White

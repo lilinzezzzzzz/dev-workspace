@@ -1,8 +1,8 @@
 services:
-  dev-workspace:
-    profiles: ["workspace"]  # 仅 Windows 环境需要启动，通过 --profile workspace 激活
-    image: dev-workspace:latest
-    container_name: dev-workspace
+  python-workspace:
+    profiles: ["python-workspace"]  # 仅 Windows 环境需要启动，通过 --profile python-workspace 激活
+    image: python-workspace:latest
+    container_name: python-workspace
     build:
       context: . # 上下文路径为当前目录, 如果使用dockerfile构建，则image是构建的镜像名
       dockerfile: Dockerfile # 指定 Dockerfile 的相对路径
@@ -107,7 +107,7 @@ services:
       TZ: "UTC"
       MILVUS_URL: "milvus-standalone:19530"
     ports:
-      - "18000:3000" # 避免与 workspace profile 的 8000-8099 端口段冲突
+      - "18000:3000" # 避免与 python-workspace profile 的 8000-8099 端口段冲突
     depends_on:
       - milvus-standalone
     networks:
