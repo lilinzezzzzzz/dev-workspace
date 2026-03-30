@@ -18,6 +18,16 @@ Example:
    Impact: The handler now accepts invalid requests and pushes failure deeper into the service layer.
    Recommendation: Restore boundary validation and keep the failure at the API edge.
 
+## Review Basis
+
+Use this section when the review scope depends on a base ref rather than an explicit PR or patch artifact.
+
+Example:
+
+- Review scope: `origin/main...HEAD`
+- Base ref type: `remote-tracking`
+- Fetch: `executed`
+
 ## Open Questions / Assumptions
 
 Use this section for concerns that are plausible but not fully verified.
@@ -39,5 +49,6 @@ Keep this short. Mention one of:
 - Findings must be specific enough that the author can act without re-reading the whole diff.
 - Explain why the issue matters, not just what changed.
 - Prefer file and line references over vague location hints.
+- When review scope depends on an inferred or resolved base ref, state the exact ref used and whether it was remote-tracking or local. Also say whether fetch was executed or skipped when freshness matters.
 - Do not bury the main issue inside long prose.
 - If there are no findings, say so explicitly instead of padding with praise.

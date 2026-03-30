@@ -1,11 +1,13 @@
 ---
 name: git-restack-from-base
-description: Recreate the current git branch from an explicitly provided base branch and cherry-pick the branch-only commits onto a new versioned branch. Use when a feature branch must be retargeted onto the newest `dev` or another base branch, especially for workflows like `A` 到 `A-v2`, `A-v2` 到 `A-v3`, or any request to cut a fresh branch from updated base history and migrate the current branch's commits with cherry-pick. In IDE workflows, first ask the user in natural language which base branch to use, then show the base branch and current branch for confirmation before execution.
+description: Recreate the current git branch from an explicitly provided base branch and cherry-pick the branch-only commits onto a new versioned branch. Use when a feature branch must be retargeted onto the newest integration branch or another base branch, especially for workflows like `A` 到 `A-v2`, `A-v2` 到 `A-v3`, or any request to cut a fresh branch from updated base history and migrate the current branch's commits with cherry-pick. Treat an unqualified base branch name such as `dev`, `main`, or `master` as the corresponding remote-tracking branch by default, not a local branch. In IDE workflows, first ask the user in natural language which base branch to use, then show the resolved base ref and current branch for confirmation before execution.
 ---
 
 # Git Restack From Base
 
 Use this skill to rebuild the current branch on top of an explicitly specified base branch while preserving the branch's own commits.
+
+By default, resolve an unqualified base branch name such as `dev`, `main`, or `master` to the corresponding remote-tracking ref `<remote>/<branch>`. Only use a local base ref when the user explicitly asks for local branch state or provides a full local ref.
 
 ## Workflow
 
@@ -17,6 +19,13 @@ Use this skill to rebuild the current branch on top of an explicitly specified b
 6. Validate the resulting branch and report any unresolved conflicts or gaps.
 
 Prefer using `scripts/restack_from_base.py` for branch naming, commit discovery, and command generation. The script defaults to plan mode and prints `status: awaiting_confirmation`. Only run with `--apply --confirm` after the user has reviewed the printed branches and explicitly approved continuation.
+
+## Base Ref Resolution
+
+1. If the user provides a full remote ref such as `origin/main`, use it directly.
+2. If the user provides an unqualified branch name such as `dev`, `main`, or `master`, resolve it to the corresponding remote-tracking ref `<remote>/<branch>` by default.
+3. If the user explicitly asks for local branch state, or provides a full local ref such as `refs/heads/main`, use that exact local ref.
+4. When using the default remote-tracking behavior, fetch the remote branch first unless the environment is offline, the user explicitly wants to skip fetch, or an explicit `--base-ref` was already provided.
 
 ## IDE Interaction Rule
 
@@ -51,6 +60,8 @@ python3 scripts/restack_from_base.py --base dev --remote origin
 python3 scripts/restack_from_base.py --base dev --remote origin --apply --confirm
 ```
 
+With the default resolution rules, `--base master --remote upstream` means the effective base ref is `upstream/master`, not the local `master` branch.
+
 Useful flags:
 
 - `--source-branch <name>`: restack a branch other than `HEAD`
@@ -63,7 +74,8 @@ Useful flags:
 
 - Require the base branch as an explicit input from the user before running the script.
 - In IDE conversations, obtain that input by asking a natural-language question first, not by telling the user to execute a command.
-- Before any execution, show the base branch and current branch back to the user and wait for approval.
+- Resolve an unqualified base branch name to `<remote>/<base>` by default. Do not silently fall back to a local branch.
+- Before any execution, show the user both the base branch they provided and the resolved base ref, then wait for approval.
 - Abort if the working tree is dirty unless the user explicitly asks to proceed.
 - Abort if there are no branch-only commits to cherry-pick.
 - Use `git log --reverse <base_ref>..<source_branch>` semantics so cherry-pick order matches the original history.
@@ -94,7 +106,12 @@ Report:
 - the base branch provided by the user
 - the source branch
 - the base ref used
+- whether the base ref was resolved as a remote-tracking ref or an explicit local ref
 - the new branch name
 - the commits selected for cherry-pick
 - whether fetch was executed or skipped
 - whether the run is awaiting confirmation, completed, or stopped on conflict
+
+## References
+
+- Read [references/base-ref-resolution.md](./references/base-ref-resolution.md) for the default base-ref resolution, freshness, and reporting rules.

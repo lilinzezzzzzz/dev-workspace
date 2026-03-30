@@ -189,13 +189,17 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Recreate a branch from the latest base branch and cherry-pick source-only commits.",
     )
-    parser.add_argument("--base", required=True, help="Base branch name, such as dev")
+    parser.add_argument(
+        "--base",
+        required=True,
+        help="Base branch name, such as dev, main, or master",
+    )
     parser.add_argument("--remote", default="origin", help="Remote name. Default: origin")
     parser.add_argument("--source-branch", help="Source branch to restack. Default: current branch")
     parser.add_argument("--new-branch", help="Override the generated versioned branch name")
     parser.add_argument(
         "--base-ref",
-        help="Explicit git ref to use as base, such as origin/dev or dev",
+        help="Explicit git ref to use as base, such as origin/main, upstream/master, or refs/heads/main",
     )
     parser.add_argument(
         "--skip-fetch",

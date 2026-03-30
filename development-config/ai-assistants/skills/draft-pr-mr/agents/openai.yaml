@@ -1,0 +1,4 @@
+interface:
+  display_name: "Draft PR/MR"
+  short_description: "基于明确基础分支生成 PR/MR 标题与描述，未限定分支名默认按对应远程分支处理"
+  default_prompt: "Use $draft-pr-mr to draft a PR or MR title and description against an explicit base branch, resolving an unqualified branch name to the corresponding remote-tracking ref by default and fetching it first when freshness matters."

@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: 审查 PR、MR、commit、diff 或工作区改动，识别 bug、回归、API 契约破坏、数据与迁移风险、并发问题、安全漏洞、性能退化和测试缺口。当用户要求 review、CR、PR review、MR review、代码审查、找风险、审核实现或判断改动是否可合入时使用此 skill。
+description: 审查 PR、MR、commit、diff 或工作区改动，识别 bug、回归、API 契约破坏、数据与迁移风险、并发问题、安全漏洞、性能退化和测试缺口。当用户要求 review、CR、PR review、MR review、代码审查、找风险、审核实现或判断改动是否可合入时使用此 skill。若 review 需要基于基础分支推导范围，未限定的分支名默认解析为对应的 remote-tracking ref，而不是本地分支。
 ---
 
 # Code Review
@@ -21,9 +21,10 @@ Use this skill to turn a change set into a small number of high-signal review fi
 1. Define review scope.
    - If the user provides a PR, MR, commit range, or diff, use that as the scope.
    - Otherwise infer a reasonable base branch and review the diff from that base to `HEAD`.
-   - Prefer a remote-tracking base ref such as `origin/dev` or `origin/main` over a local branch ref such as `dev` or `main` when reviewing branch work before opening a PR.
-   - If the user wants review against the latest base branch, sync the remote-tracking ref first, for example `git fetch origin dev`, then review against `origin/dev`. Do not assume a local branch ref is current.
-   - If the base is ambiguous and correctness depends on it, state the assumption or ask. Also state the exact ref used for review when it matters, for example `origin/dev` vs `dev`.
+   - Resolve an unqualified base branch name such as `dev`, `main`, or `master` to the corresponding remote-tracking ref `<remote>/<branch>` by default.
+   - Use a local base ref only when the user explicitly asks for local branch state or provides a full local ref such as `refs/heads/main`.
+   - If the user wants review against the latest base branch, sync the remote-tracking ref first, for example `git fetch origin main`, then review against `origin/main`. Do not assume a local branch ref is current.
+   - If the base is ambiguous and correctness depends on it, state the assumption or ask. Also state the exact ref used for review when it matters, whether it was a remote-tracking or local ref, and whether fetch was executed or skipped.
 
 2. Understand the change before judging it.
    - Read the diff summary first.
@@ -57,7 +58,7 @@ Use severity for user impact, not for stylistic preference.
 ## Scope Guidance
 
 - Treat generated files, snapshots, vendored code, and lockfiles as secondary evidence unless the change specifically targets them.
-- Distinguish local branch refs from remote-tracking refs. `dev` and `origin/dev` may point to different commits; if review correctness depends on the latest integration branch, prefer the fetched remote-tracking ref and say which ref was used.
+- Distinguish local branch refs from remote-tracking refs. `main` and `origin/main` may point to different commits; if review correctness depends on the latest integration branch, prefer the fetched remote-tracking ref and say which ref was used.
 - Follow unchanged code when a claim depends on shared helpers, framework hooks, middleware, serializers, migrations, or config.
 - For dependency bumps, check compatibility, transitive risk, runtime defaults, and required follow-up changes.
 - For migrations and infra changes, check rollout safety, backward compatibility, lock duration, defaults, and rollback path.

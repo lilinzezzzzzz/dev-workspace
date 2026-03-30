@@ -2,6 +2,13 @@
 
 Use only the sections relevant to the change. This is a thinking aid, not a template to dump verbatim.
 
+## 0. Review Basis and Freshness
+
+- What exact review scope am I using, for example `origin/main...HEAD` or a PR patch?
+- If a base branch name was unqualified, was it resolved to the corresponding remote-tracking ref `<remote>/<branch>` by default?
+- Did I intentionally review against local branch state, and if so, is that called out explicitly?
+- If latest remote state matters, was fetch executed, skipped, or not needed?
+
 ## 1. Correctness and Control Flow
 
 - Does the new behavior actually match the intended behavior?
