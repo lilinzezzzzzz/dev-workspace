@@ -17,7 +17,9 @@ development-config/ai-assistants/
 ├── skills/
 │   ├── api-endpoint-analyzer/
 │   ├── code-reviewer/
-│   └── git-commit-helper/
+│   ├── git-commit-helper/
+│   ├── git-draft-pr-or-mr/
+│   └── git-restack-from-base/
 └── README.md
 ```
 
@@ -43,6 +45,8 @@ development-config/ai-assistants/
 - **api-endpoint-analyzer**: 系统化分析 API endpoint 的请求、响应、业务流程与错误处理
 - **code-reviewer**: 基于 diff 输出高信号代码审查结论，优先发现 bug、回归和风险
 - **git-commit-helper**: 基于 staged diff 生成或执行规范的 Conventional Commit
+- **git-draft-pr-or-mr**: 基于明确 base ref 和真实 git diff 生成精简的 PR/MR 标题与描述
+- **git-restack-from-base**: 基于显式基础分支重新切出版本化分支，并按原顺序 cherry-pick 当前分支独有提交
 
 ### 扩展模块（预留）
 
@@ -59,7 +63,8 @@ skills/<skill-name>/
 ├── SKILL.md                  # 触发描述、核心工作流、边界规则
 ├── agents/
 │   └── openai.yaml           # UI 展示名、短描述、默认 prompt
-└── references/               # 按需加载的模板、检查清单、选择规则
+├── references/               # 按需加载的模板、检查清单、选择规则
+└── scripts/                  # 可选，本地辅助脚本或命令封装
 ```
 
 设计原则：
@@ -67,7 +72,9 @@ skills/<skill-name>/
 - `SKILL.md` 保持精简，只放高价值流程和决策规则
 - 细节模板、checklist、示例下沉到 `references/`
 - `agents/openai.yaml` 负责展示层和默认触发入口
+- `scripts/` 只放 skill 专属、值得复用的执行逻辑，避免把复杂 shell 直接塞进说明文档
 - skill 命名与目录名保持一致，避免同步或调用时混淆
+- `sync-agents.sh` 会自动发现包含 `SKILL.md` 的一级 skill 目录，无需手动维护 skill 列表
 
 ---
 
@@ -102,6 +109,8 @@ skills/<skill-name>/
 - `api-endpoint-analyzer`：解释接口契约、梳理调用链、核对实现与文档是否一致
 - `code-reviewer`：审查 PR、MR、commit 或 diff，输出带 severity 的具体 findings
 - `git-commit-helper`：根据 staged changes 生成 commit message，或在范围清晰时执行提交
+- `git-draft-pr-or-mr`：基于显式 base branch 或 base ref，生成可直接粘贴到 GitHub/GitLab 的 PR/MR 文案
+- `git-restack-from-base`：把当前功能分支基于新 base 重建为 `-v2`、`-v3` 等版本化分支，并在确认后执行 cherry-pick
 
 ### 3. 个性化定制
 
@@ -110,7 +119,7 @@ skills/<skill-name>/
 - 个人偏好的 Agent 行为规则
 - 符合个人工作流的事件处理
 - 专业领域的个人技能模块
-- 遵循 `SKILL.md + agents/openai.yaml + references/` 的 skill 结构
+- 遵循 `SKILL.md + agents/openai.yaml + optional references/ + optional scripts/` 的 skill 结构
 
 ---
 
