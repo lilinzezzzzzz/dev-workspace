@@ -1,5 +1,5 @@
 ---
-name: code-reviewer
+name: git-code-reviewer
 description: 审查 PR、MR、commit、diff 或工作区改动，识别 bug、回归、API 契约破坏、数据与迁移风险、并发问题、安全漏洞、性能退化和测试缺口。当用户要求 review、CR、PR review、MR review、代码审查、找风险、审核实现或判断改动是否可合入时使用此 skill。若 review 需要基于基础分支推导范围，未限定的分支名默认解析为对应的 remote-tracking ref，而不是本地分支。
 ---
 

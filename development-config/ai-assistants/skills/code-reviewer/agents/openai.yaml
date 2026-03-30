@@ -1,4 +1,0 @@
-interface:
-  display_name: "Code Reviewer"
-  short_description: "基于 diff 输出高信号审查结论，默认按对应远程基线审查分支改动"
-  default_prompt: "Use $code-reviewer to review these changes and report concrete findings with severity, file references, and residual risks. If the review scope depends on a base branch, resolve an unqualified branch name to the corresponding remote-tracking ref by default and say clearly whether fetch was executed or skipped."
