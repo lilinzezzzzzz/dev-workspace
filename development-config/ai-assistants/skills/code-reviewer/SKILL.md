@@ -21,7 +21,9 @@ Use this skill to turn a change set into a small number of high-signal review fi
 1. Define review scope.
    - If the user provides a PR, MR, commit range, or diff, use that as the scope.
    - Otherwise infer a reasonable base branch and review the diff from that base to `HEAD`.
-   - If the base is ambiguous and correctness depends on it, state the assumption or ask.
+   - Prefer a remote-tracking base ref such as `origin/dev` or `origin/main` over a local branch ref such as `dev` or `main` when reviewing branch work before opening a PR.
+   - If the user wants review against the latest base branch, sync the remote-tracking ref first, for example `git fetch origin dev`, then review against `origin/dev`. Do not assume a local branch ref is current.
+   - If the base is ambiguous and correctness depends on it, state the assumption or ask. Also state the exact ref used for review when it matters, for example `origin/dev` vs `dev`.
 
 2. Understand the change before judging it.
    - Read the diff summary first.
@@ -55,6 +57,7 @@ Use severity for user impact, not for stylistic preference.
 ## Scope Guidance
 
 - Treat generated files, snapshots, vendored code, and lockfiles as secondary evidence unless the change specifically targets them.
+- Distinguish local branch refs from remote-tracking refs. `dev` and `origin/dev` may point to different commits; if review correctness depends on the latest integration branch, prefer the fetched remote-tracking ref and say which ref was used.
 - Follow unchanged code when a claim depends on shared helpers, framework hooks, middleware, serializers, migrations, or config.
 - For dependency bumps, check compatibility, transitive risk, runtime defaults, and required follow-up changes.
 - For migrations and infra changes, check rollout safety, backward compatibility, lock duration, defaults, and rollback path.
