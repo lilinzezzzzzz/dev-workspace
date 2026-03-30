@@ -94,8 +94,8 @@ skills/<skill-name>/
 - **skills 流程**: 先选择具体 skill 或全部 skills，再选择目标 assistant
 - **目标选择**: 支持 `codex`、`qoder` 或 `both`
 - **覆盖策略**: `AGENTS.md` 直接覆盖；`agents/` 和 `skills/` 仅覆盖同名项
-- **完整性校验**: 文件使用 `sha256sum`，目录使用 `diff -qr`
-- **依赖要求**: 需要系统安装 `sha256sum` 和 `diff`
+- **完整性校验**: 文件使用 SHA-256 校验，目录使用 `diff -qr`
+- **依赖要求**: 需要系统安装 `diff`，文件校验会优先使用 `sha256sum`，并兼容 `shasum` 或 `openssl`
 
 ### 2. 典型用法
 

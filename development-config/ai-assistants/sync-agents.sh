@@ -19,6 +19,34 @@ require_command() {
     fi
 }
 
+command_exists() {
+    local command_name="$1"
+
+    command -v "$command_name" >/dev/null 2>&1
+}
+
+sha256_file() {
+    local file_path="$1"
+
+    if command_exists sha256sum; then
+        sha256sum "$file_path" | awk '{print $1}'
+        return 0
+    fi
+
+    if command_exists shasum; then
+        shasum -a 256 "$file_path" | awk '{print $1}'
+        return 0
+    fi
+
+    if command_exists openssl; then
+        openssl dgst -sha256 -r "$file_path" | awk '{print $1}'
+        return 0
+    fi
+
+    echo "A SHA-256 tool is required but not installed (tried: sha256sum, shasum, openssl)" >&2
+    exit 1
+}
+
 trim_spaces() {
     local value="$1"
 
@@ -33,8 +61,8 @@ verify_file_copy() {
     local source_hash=""
     local dest_hash=""
 
-    source_hash="$(sha256sum "$source_path" | awk '{print $1}')"
-    dest_hash="$(sha256sum "$dest_path" | awk '{print $1}')"
+    source_hash="$(sha256_file "$source_path")"
+    dest_hash="$(sha256_file "$dest_path")"
 
     if [[ "$source_hash" != "$dest_hash" ]]; then
         echo "sha256 verification failed for $dest_path" >&2
@@ -66,7 +94,7 @@ sync_path() {
 
     base_name="$(basename "$dest_path")"
     staging_path="$(mktemp -d "$dest_parent/.${base_name}.XXXXXX")"
-    cp -a "$source_path"/. "$staging_path"/
+    cp -R "$source_path"/. "$staging_path"/
     rm -rf "$dest_path"
     mv "$staging_path" "$dest_path"
 
@@ -252,7 +280,10 @@ sync_skill_dir() {
         exit 0
     fi
 
-    mapfile -t target_roots < <(resolve_target_roots "$selected_target")
+    target_roots=()
+    while IFS= read -r target_root; do
+        [[ -n "$target_root" ]] && target_roots+=("$target_root")
+    done < <(resolve_target_roots "$selected_target")
 
     for target_root in "${target_roots[@]}"; do
         for skill in "${selected_skills[@]}"; do
@@ -309,7 +340,6 @@ main() {
         exit 1
     fi
 
-    require_command sha256sum
     require_command diff
 
     while true; do
@@ -326,7 +356,10 @@ main() {
                 exit 0
             fi
 
-            mapfile -t target_roots < <(resolve_target_roots "$selected_target")
+            target_roots=()
+            while IFS= read -r target_root; do
+                [[ -n "$target_root" ]] && target_roots+=("$target_root")
+            done < <(resolve_target_roots "$selected_target")
 
             if [[ "${#target_roots[@]}" -eq 0 ]]; then
                 echo "Target root cannot be empty." >&2
