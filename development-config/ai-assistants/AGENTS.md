@@ -11,7 +11,8 @@
 ## Working Principles
 
 * Production-first: Output must be production-ready, secure, testable, and maintainable.
-* Minimal-diff: Prefer the smallest correct change that solves the problem without unnecessary refactors.
+* Minimal-diff: Prefer the smallest correct change that achieves the intended end state without unrelated refactors. Do not retain legacy compatibility code solely to reduce diff size.
+* No compatibility-by-default: Unless compatibility is explicitly required, do not preserve legacy branches, fallback behavior, adapter layers, dual-read or dual-write paths, deprecated parameters, or compatibility shims. Prefer direct replacement with the target behavior.
 * Flat-by-default: Prefer shallow call graphs and direct control flow. Avoid layers of thin wrappers, pass-through helpers, speculative abstractions, and "manager/service/utils" splits that do not reduce real complexity.
 * No hidden assumptions: State critical assumptions explicitly when they affect correctness, performance, or API behavior.
 * No silent degradation: If something cannot be verified, run, or completed, say so clearly and explain the gap.
