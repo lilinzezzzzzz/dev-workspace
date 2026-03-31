@@ -55,8 +55,6 @@
 4. Validate in proportion to risk, starting with the nearest useful
    check.
 5. Report outcome, verification, and residual risk clearly.
-6. Ask before proceeding only when the missing answer would materially
-   change correctness, data safety, or compatibility.
 
 ## Engineering Non-negotiables
 
@@ -100,8 +98,8 @@
 
 ### Python
 
-- Use `uv`, `pyproject.toml` (PEP 621), and `uv.lock` unless the
-  repository already requires something else.
+- Use `uv`-based tooling with `pyproject.toml` (PEP 621) and `uv.lock`
+  unless the repository already requires something else.
 - Write Pythonic, Ruff-compatible, and Pylance-compatible code. No
   implicit `Any` in new code.
 - Prefer `TypedDict`, `dataclass`, `Protocol`, `Literal`, `Enum`, or
@@ -124,8 +122,6 @@
   output.
 - Use `pytest` and `pytest-asyncio` as applicable. Cover failure paths,
   not only happy paths.
-- Command policy: use `uv run <script>`, `uv run pytest`,
-  `uv run python -m <module>`, `uv add <package>`, and `uv sync`.
 
 ### Go
 
