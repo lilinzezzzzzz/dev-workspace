@@ -1,0 +1,62 @@
+# Shell defaults
+export ZSH="${ZSH:-$HOME/.oh-my-zsh}"
+
+# Keep PATH stable and deduplicated across hosts.
+typeset -U path PATH
+for dir in \
+  /opt/homebrew/bin \
+  /usr/local/bin \
+  "$HOME/go/bin" \
+  "$HOME/.cargo/bin" \
+  "$HOME/bin" \
+  "$HOME/.local/bin"
+do
+  [[ -d "$dir" ]] && path=("$dir" $path)
+done
+export PATH
+
+if command -v nvim >/dev/null 2>&1; then
+  export EDITOR="${EDITOR:-nvim}"
+elif command -v vim >/dev/null 2>&1; then
+  export EDITOR="${EDITOR:-vim}"
+else
+  export EDITOR="${EDITOR:-vi}"
+fi
+export VISUAL="${VISUAL:-$EDITOR}"
+export PAGER="${PAGER:-less}"
+
+export HISTSIZE=10000
+export SAVEHIST=20000
+setopt APPEND_HISTORY
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_REDUCE_BLANKS
+setopt SHARE_HISTORY
+setopt EXTENDED_HISTORY
+setopt INTERACTIVE_COMMENTS
+setopt NO_HUP
+
+ZSH_THEME=""
+DISABLE_AUTO_TITLE="true"
+
+plugins=(
+  git
+  docker
+  extract
+  sudo
+  copypath
+  fzf
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+)
+
+if [[ -r "$ZSH/oh-my-zsh.sh" ]]; then
+  source "$ZSH/oh-my-zsh.sh"
+fi
+
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+fi
+
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+fi
