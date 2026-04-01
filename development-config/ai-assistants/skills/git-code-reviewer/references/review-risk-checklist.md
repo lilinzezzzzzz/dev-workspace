@@ -14,12 +14,13 @@ Use only the sections relevant to the change. This is a thinking aid, not a temp
 - Does the new behavior actually match the intended behavior?
 - Are all important branches covered, including failure paths and partial-success paths?
 - Did the change alter defaults, fallbacks, or state transitions in a way that breaks existing callers?
-- Are `nil` / `None` / zero-value / empty-value cases handled explicitly where needed?
+- Are `None`, empty, falsy, sentinel, and omitted-value cases handled explicitly where needed?
 
 ## 2. API and Contract Compatibility
 
 - Did request or response shape change?
 - Did serialized fields, enum values, headers, status codes, or event payloads change?
+- For service code, did request models, response models, exception mapping, middleware effects, or dependency wiring semantics change?
 - Does the change break backward compatibility for existing clients, workers, or stored data?
 - If a contract changed intentionally, were dependent tests, docs, examples, and generated specs updated?
 
@@ -47,7 +48,7 @@ Use only the sections relevant to the change. This is a thinking aid, not a temp
 ## 6. Performance and Resource Lifecycle
 
 - Does the change introduce obvious `O(n^2)` work, N+1 queries, unbounded loops, or large unnecessary copies?
-- Are connections, files, streams, and goroutines/tasks released correctly?
+- Are connections, files, streams, tasks, threads, or worker processes released correctly?
 - Is blocking work accidentally executed on an async or latency-sensitive path?
 - Does retry logic multiply load under failure?
 

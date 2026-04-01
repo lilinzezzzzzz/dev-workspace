@@ -18,6 +18,13 @@ Example:
    Impact: The handler now accepts invalid requests and pushes failure deeper into the service layer.
    Recommendation: Restore boundary validation and keep the failure at the API edge.
 
+Preferred per-finding structure:
+
+- `Evidence`: Confirmed facts from code, config, tests, schema, or command output you actually inspected.
+- `Impact`: The direct consequence that follows from the evidence.
+- `Recommendation`: The smallest reasonable correction or follow-up.
+- `Unverified assumption`: Optional. Include only when part of the impact depends on behavior you did not verify.
+
 ## Review Basis
 
 Use this section when the review scope depends on a base ref rather than an explicit PR or patch artifact.
@@ -47,6 +54,7 @@ Keep this short. Mention one of:
 ## Output Rules
 
 - Findings must be specific enough that the author can act without re-reading the whole diff.
+- Keep confirmed facts separate from unverified assumptions. Do not present a hypothesis as a confirmed defect.
 - Explain why the issue matters, not just what changed.
 - Prefer file and line references over vague location hints.
 - When review scope depends on an inferred or resolved base ref, state the exact ref used and whether it was remote-tracking or local. Also say whether fetch was executed or skipped when freshness matters.
