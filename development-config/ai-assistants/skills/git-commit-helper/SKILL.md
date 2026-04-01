@@ -12,9 +12,23 @@ Use this skill to derive a commit message from the actual change set. Prefer one
 1. Inspect the real change set before proposing or creating a commit.
 2. Base the message on staged content first. Do not infer from unstaged changes unless the user explicitly asks.
 3. Keep one commit to one concern. If the staged diff mixes unrelated changes, call it out before committing.
-4. Prefer a short, imperative subject. Use Chinese by default; keep technical terms in English when clearer.
+4. Prefer a short, imperative subject.
 5. Do not auto-push.
 6. If the user asked for a message only, draft the message only. If the user asked to commit, commit only after the staged scope is clear enough to justify a single message.
+
+## Language Policy (IMPORTANT)
+
+**Commit message 的 subject 和 body 默认使用中文。** 仅在以下情况保留英文：
+
+- Conventional Commits 的 `type` 和 `scope` 必须使用英文（如 `feat`, `fix`, `auth`, `api`）
+- 专有技术术语保持英文形式更清晰时（如 `JWT`, `API`, `WebSocket`, `CI/CD`, `Milvus`）
+- 代码标识符、函数名、变量名等直接引用代码的内容
+
+**示例：**
+
+- `feat(auth): 添加 JWT 刷新令牌接口` ✓
+- `fix(api): 修复分页参数为空时的 500 错误` ✓
+- `feat(auth): add JWT refresh token endpoint` ✗ 应使用中文
 
 ## Workflow
 
