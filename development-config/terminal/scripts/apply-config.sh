@@ -46,6 +46,19 @@ if [ -f "$CONFIG_DIR/ghostty.config" ]; then
     mkdir -p "$HOME/.config/ghostty"
     cp "$CONFIG_DIR/ghostty.config" "$HOME/.config/ghostty/config"
     print_status "已复制 Ghostty 配置"
+    
+    # macOS: 重启 Ghostty 使配置生效
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        if pgrep -x "ghostty" > /dev/null; then
+            read -p "是否重启 Ghostty 使配置生效? [Y/n]: " restart_ghostty
+            if [[ ! "$restart_ghostty" =~ ^[Nn]$ ]]; then
+                killall ghostty 2>/dev/null
+                sleep 0.5
+                open -a Ghostty
+                print_status "已重启 Ghostty"
+            fi
+        fi
+    fi
 else
     print_warning "未找到 $CONFIG_DIR/ghostty.config"
 fi

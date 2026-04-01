@@ -9,7 +9,8 @@ for dir in \
   "$HOME/go/bin" \
   "$HOME/.cargo/bin" \
   "$HOME/bin" \
-  "$HOME/.local/bin"
+  "$HOME/.local/bin" \
+  /Applications/Ghostty.app/Contents/MacOS
 do
   [[ -d "$dir" ]] && path=("$dir" $path)
 done
