@@ -4,7 +4,7 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONFIG_DIR="$SCRIPT_DIR/../configs"
+CONFIG_DIR="$SCRIPT_DIR/configs"
 GUI_ENV_SOURCE="$CONFIG_DIR/environment.d/input-method.conf"
 GUI_ENV_DIR="$HOME/.config/environment.d"
 GUI_ENV_TARGET="$GUI_ENV_DIR/input-method.conf"

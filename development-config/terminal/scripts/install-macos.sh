@@ -42,10 +42,18 @@ if ! command -v brew &> /dev/null; then
     echo "正在安装 Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-    # 添加 Homebrew 到 PATH (Apple Silicon)
-    if [[ -f "/opt/homebrew/bin/brew" ]]; then
+    # 安装器会根据架构放到不同路径，安装后立即注入当前 shell 的 PATH。
+    if [[ -x "/opt/homebrew/bin/brew" ]]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [[ -x "/usr/local/bin/brew" ]]; then
+        eval "$(/usr/local/bin/brew shellenv)"
     fi
+
+    if ! command -v brew &> /dev/null; then
+        print_error "Homebrew 安装后仍未找到 brew，请重新打开终端后再运行脚本"
+        exit 1
+    fi
+
     print_status "Homebrew 安装完成"
 else
     print_status "Homebrew 已安装"
@@ -188,7 +196,7 @@ echo '  eval "$(/opt/homebrew/bin/brew shellenv)"  # Apple Silicon'
 echo '  eval "$(/usr/local/bin/brew shellenv)"     # Intel Mac'
 echo ""
 echo "配置同步命令："
-echo "  从仓库复制到系统: $SCRIPT_DIR/apply-config.sh"
+echo "  从仓库复制到系统: $SCRIPT_DIR/../apply-config.sh"
 echo "  从系统同步到仓库: $SCRIPT_DIR/sync-config.sh"
 echo ""
 echo "配置文件目录: $CONFIG_DIR"

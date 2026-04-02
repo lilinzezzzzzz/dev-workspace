@@ -12,10 +12,10 @@ terminal/
 │   ├── ghostty.config          # Ghostty 终端配置
 │   ├── starship.toml           # Starship 提示符配置
 │   └── zshrc                   # Zsh + Oh My Zsh 配置
-└── scripts/                    # 脚本
+├── apply-config.sh             # 仓库 → 系统
+└── scripts/                    # 其他脚本
     ├── install-ubuntu.sh       # Ubuntu 一键安装
     ├── install-macos.sh        # macOS 一键安装
-    ├── apply-config.sh         # 仓库 → 系统
     └── sync-config.sh          # 系统 → 仓库
 ```
 
@@ -37,7 +37,7 @@ terminal/
 
 **从仓库应用到系统：**
 ```bash
-./scripts/apply-config.sh
+./apply-config.sh
 ```
 
 **从系统同步到仓库：**
