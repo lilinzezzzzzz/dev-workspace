@@ -26,6 +26,23 @@ fi
 export VISUAL="${VISUAL:-$EDITOR}"
 export PAGER="${PAGER:-less}"
 
+# Enable ls colors on macOS
+export CLICOLOR=1
+export LSCOLORS="Gxfxcxdxbxegedabagacad"
+
+# Enable ls colors on Linux (GNU ls)
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  alias ls='ls --color=auto'
+  alias ll='ls -alF --color=auto'
+  alias la='ls -A --color=auto'
+  alias l='ls -CF --color=auto'
+else
+  # macOS BSD ls
+  alias ll='ls -alF'
+  alias la='ls -A'
+  alias l='ls -CF'
+fi
+
 export HISTSIZE=10000
 export SAVEHIST=20000
 setopt APPEND_HISTORY
