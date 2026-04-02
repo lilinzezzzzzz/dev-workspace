@@ -7,6 +7,8 @@ Ghostty + Zsh + Starship 终端环境配置，支持 Ubuntu 和 macOS 快速部�
 ```
 terminal/
 ├── configs/                    # 配置文件
+│   ├── environment.d/
+│   │   └── input-method.conf   # Linux GUI 会话输入法环境变量
 │   ├── ghostty.config          # Ghostty 终端配置
 │   ├── starship.toml           # Starship 提示符配置
 │   └── zshrc                   # Zsh + Oh My Zsh 配置
@@ -58,3 +60,4 @@ terminal/
 - **主题**: 修改 `configs/ghostty.config` 中的 `theme`，可用主题列表: `ghostty +list-themes`
 - **提示符**: 修改 `configs/starship.toml`
 - **插件**: 修改 `configs/zshrc` 中的 `plugins=(...)`
+- **GUI 输入法环境**: 修改 `configs/environment.d/input-method.conf`，并在 Linux 上重新登录使其生效
