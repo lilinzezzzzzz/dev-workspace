@@ -5,6 +5,9 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_DIR="$SCRIPT_DIR/../configs"
+GUI_ENV_SOURCE="$CONFIG_DIR/environment.d/input-method.conf"
+GUI_ENV_DIR="$HOME/.config/environment.d"
+GUI_ENV_TARGET="$GUI_ENV_DIR/input-method.conf"
 echo "======================================"
 echo "  Ghostty + Zsh + Starship 安装脚本"
 echo "======================================"
@@ -141,6 +144,18 @@ mkdir -p "$HOME/.config"
 cp "$CONFIG_DIR/starship.toml" "$HOME/.config/starship.toml"
 print_status "已复制 Starship 配置"
 
+if [ -f "$GUI_ENV_SOURCE" ]; then
+    mkdir -p "$GUI_ENV_DIR"
+    if [ -f "$GUI_ENV_TARGET" ]; then
+        cp "$GUI_ENV_TARGET" "$GUI_ENV_TARGET.backup.$(date +%Y%m%d%H%M%S)"
+        print_status "已备份 GUI 会话输入法环境配置"
+    fi
+    cp "$GUI_ENV_SOURCE" "$GUI_ENV_TARGET"
+    print_status "已复制 GUI 会话输入法环境配置"
+else
+    print_warning "未找到 $GUI_ENV_SOURCE"
+fi
+
 # ==================== 9. 设置默认 Shell ====================
 echo ""
 echo ">>> 设置默认 Shell..."
@@ -161,6 +176,7 @@ echo "后续步骤："
 echo "  1. 注销并重新登录，使默认 Shell 生效"
 echo "  2. 打开 Ghostty 终端"
 echo "  3. 在 Ghostty 中优先选择 'MesloLGS NF' 字体，必要时回退到 'JetBrains Mono'"
+echo "  4. GUI 应用的输入法环境也会在重新登录后生效"
 echo ""
 echo "已安装组件："
 echo "  - Ghostty 深色终端配置"
@@ -170,7 +186,7 @@ echo "  - zoxide (按需启用)"
 echo "  - fzf (模糊搜索)"
 echo ""
 echo "配置同步命令："
-echo "  从仓库复制到系统: $SCRIPT_DIR/apply-config.sh"
+echo "  从仓库复制到系统: $SCRIPT_DIR/../apply-config.sh"
 echo "  从系统同步到仓库: $SCRIPT_DIR/sync-config.sh"
 echo ""
 echo "配置文件目录: $CONFIG_DIR"

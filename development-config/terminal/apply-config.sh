@@ -4,7 +4,10 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONFIG_DIR="$SCRIPT_DIR/../configs"
+CONFIG_DIR="$SCRIPT_DIR/configs"
+GUI_ENV_SOURCE="$CONFIG_DIR/environment.d/input-method.conf"
+GUI_ENV_DIR="$HOME/.config/environment.d"
+GUI_ENV_TARGET="$GUI_ENV_DIR/input-method.conf"
 
 # 颜色定义
 GREEN='\033[0;32m'
@@ -27,6 +30,9 @@ echo "将以下配置从仓库复制到系统:"
 echo "  $CONFIG_DIR/zshrc           -> ~/.zshrc"
 echo "  $CONFIG_DIR/ghostty.config  -> ~/.config/ghostty/config"
 echo "  $CONFIG_DIR/starship.toml   -> ~/.config/starship.toml"
+if [[ "$OSTYPE" != "darwin"* ]]; then
+    echo "  $GUI_ENV_SOURCE  -> $GUI_ENV_TARGET"
+fi
 echo ""
 
 # 备份并复制 zshrc
@@ -72,6 +78,22 @@ else
     print_warning "未找到 $CONFIG_DIR/starship.toml"
 fi
 
+# 复制 GUI 会话输入法环境配置
+if [[ "$OSTYPE" != "darwin"* ]]; then
+    if [ -f "$GUI_ENV_SOURCE" ]; then
+        mkdir -p "$GUI_ENV_DIR"
+        if [ -f "$GUI_ENV_TARGET" ]; then
+            cp "$GUI_ENV_TARGET" "$GUI_ENV_TARGET.backup.$(date +%Y%m%d%H%M%S)"
+            print_status "已备份 GUI 会话输入法环境配置"
+        fi
+        cp "$GUI_ENV_SOURCE" "$GUI_ENV_TARGET"
+        print_status "已复制 GUI 会话输入法环境配置"
+        print_warning "GUI 会话环境变更需要注销并重新登录后生效"
+    else
+        print_warning "未找到 $GUI_ENV_SOURCE"
+    fi
+fi
+
 echo ""
 echo "======================================"
 echo -e "${GREEN}  配置已应用！${NC}"
@@ -87,5 +109,8 @@ if [[ ! "$reload_choice" =~ ^[Nn]$ ]]; then
 else
     echo "请手动运行以下命令使配置生效:"
     echo "  source ~/.zshrc"
+    if [[ "$OSTYPE" != "darwin"* ]]; then
+        echo "  # GUI 会话环境变更还需要注销并重新登录"
+    fi
     echo ""
 fi

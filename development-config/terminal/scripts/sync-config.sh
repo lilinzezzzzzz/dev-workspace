@@ -5,6 +5,9 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_DIR="$SCRIPT_DIR/../configs"
+GUI_ENV_SOURCE="$HOME/.config/environment.d/input-method.conf"
+GUI_ENV_DIR="$CONFIG_DIR/environment.d"
+GUI_ENV_TARGET="$GUI_ENV_DIR/input-method.conf"
 
 # 颜色定义
 GREEN='\033[0;32m'
@@ -27,6 +30,7 @@ echo "将以下配置同步到: $CONFIG_DIR"
 echo "  - ~/.zshrc"
 echo "  - ~/.config/ghostty/config"
 echo "  - ~/.config/starship.toml"
+echo "  - ~/.config/environment.d/input-method.conf"
 echo ""
 
 # 同步 zshrc
@@ -51,6 +55,15 @@ if [ -f "$HOME/.config/starship.toml" ]; then
     print_status "已同步 Starship 配置"
 else
     print_warning "未找到 ~/.config/starship.toml"
+fi
+
+# 同步 GUI 会话输入法环境配置
+if [ -f "$GUI_ENV_SOURCE" ]; then
+    mkdir -p "$GUI_ENV_DIR"
+    cp "$GUI_ENV_SOURCE" "$GUI_ENV_TARGET"
+    print_status "已同步 GUI 会话输入法环境配置"
+else
+    print_warning "未找到 $GUI_ENV_SOURCE"
 fi
 
 echo ""

@@ -11,7 +11,7 @@
 ```text
 development-config/ai-assistants/
 ├── AGENTS.md                 # 通用 AGENTS 指令和开发规范
-├── sync-agents.sh            # 统一同步入口：AGENTS.md / agents / skills
+├── apply_agengts.sh          # 统一同步入口：AGENTS.md / agents / skills
 ├── agents/                   # Agent 配置文件（预留）
 ├── events/                   # 事件处理配置（预留）
 ├── skills/
@@ -41,7 +41,7 @@ development-config/ai-assistants/
 
 当前目录已经包含一组可复用能力：
 
-- **sync-agents.sh**: 统一同步入口，可交互选择 `AGENTS.md`、`agents/` 或单个 `skill`
+- **apply_agengts.sh**: 统一同步入口，可交互选择 `AGENTS.md`、`agents/` 或单个 `skill`
 - **api-endpoint-analyzer**: 系统化分析 API endpoint 的请求、响应、业务流程与错误处理
 - **git-code-reviewer**: 基于 diff 输出高信号代码审查结论，优先发现 bug、回归和风险
 - **git-commit-helper**: 基于 staged diff 生成或执行规范的 Conventional Commit
@@ -74,7 +74,7 @@ skills/<skill-name>/
 - `agents/openai.yaml` 负责展示层和默认触发入口
 - `scripts/` 只放 skill 专属、值得复用的执行逻辑，避免把复杂 shell 直接塞进说明文档
 - skill 命名与目录名保持一致，避免同步或调用时混淆
-- `sync-agents.sh` 会自动发现包含 `SKILL.md` 的一级 skill 目录，无需手动维护 skill 列表
+- `apply_agengts.sh` 会自动发现包含 `SKILL.md` 的一级 skill 目录，无需手动维护 skill 列表
 
 ---
 
@@ -85,7 +85,7 @@ skills/<skill-name>/
 执行统一同步脚本后，按提示选择要同步的内容类型，再选择目标 assistant：
 
 ```bash
-./development-config/ai-assistants/sync-agents.sh
+./development-config/ai-assistants/apply_agengts.sh
 ```
 
 **脚本功能说明**:
