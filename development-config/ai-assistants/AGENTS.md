@@ -107,6 +107,21 @@
 - Prefer module-level functions or small focused types for
   straightforward workflows. Avoid deep class hierarchies and
   unnecessary dependency injection.
+- Choose the narrowest callable form that matches the required state:
+  prefer a module-level function when logic does not need class or
+  instance state.
+- Use an instance method only when behavior depends on `self` state,
+  object lifecycle, or instance invariants. Do not make a method an
+  instance method only for namespacing or organization.
+- Use `@classmethod` for alternate constructors, type-directed factory
+  or parsing logic, and behavior that must respect subclass dispatch via
+  `cls`.
+- Use `@staticmethod` when logic is semantically owned by the type but
+  does not read or mutate `self` or `cls`. If class ownership is weak,
+  prefer a module-level function instead.
+- Treat methods that do not use `self` or `cls` as a design smell unless
+  required by an external interface, framework hook, or compatibility
+  boundary.
 - Use keyword-only parameters for public functions when the parameter
   list is easy to misuse, has multiple optional arguments, or will
   likely grow.
@@ -157,6 +172,8 @@
 Before finalizing technical work, confirm:
 
 - [ ] Typed boundaries are clear where they matter.
+- [ ] Function and method forms match actual state usage; no instance
+  methods that ignore `self` unless required by an interface.
 - [ ] Error paths, edge cases, and concurrency implications were
   considered.
 - [ ] No unsafe defaults, hidden side effects, or secret leakage were
