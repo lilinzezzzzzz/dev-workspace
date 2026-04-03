@@ -131,17 +131,9 @@ choose_target() {
     echo "Select target assistant:" >&2
     local target=""
 
-    select target in "codex" "qoder" "both" "exit"; do
+    select target in "both" "codex" "qoder" "exit"; do
         case "$target" in
-            codex)
-                printf '%s\n' "$target"
-                return 0
-                ;;
-            qoder)
-                printf '%s\n' "$target"
-                return 0
-                ;;
-            both)
+            both|codex|qoder)
                 printf '%s\n' "$target"
                 return 0
                 ;;
@@ -206,7 +198,7 @@ choose_skill() {
     done
 
     echo "Available skills:" >&2
-    select selected_name in "${skill_names[@]}" "all skills" "exit"; do
+    select selected_name in "all" "${skill_names[@]}" "exit"; do
         case "$selected_name" in
             "")
                 echo "Invalid selection, try again." >&2
