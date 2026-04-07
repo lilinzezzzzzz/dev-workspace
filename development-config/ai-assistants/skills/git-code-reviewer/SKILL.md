@@ -13,7 +13,7 @@ Use this skill to turn a change set into a small number of high-signal review fi
 2. Base every finding on concrete evidence from code, config, tests, schema, or runtime wiring.
 3. Prefer changed-code review first; read surrounding context only when needed to validate behavior.
 4. Trace changed behavior across request boundary, service logic, persistence, async or background execution, external calls, and rollout or config surfaces when relevant.
-5. Focus on issues that matter: correctness, contracts, data safety, concurrency, security, performance, observability, and test adequacy.
+5. Focus on issues that matter: correctness, contracts, data safety, concurrency, security, performance, observability, and test adequacy. Also include low-severity maintainability findings when the changed code becomes harder to reason about or easier to misuse — for example dead parameters or branches, wrappers whose behavior is no longer live, or opaque positional containers replacing named structures.
 6. Use validation to confirm or narrow ambiguous concerns when a nearby check is cheap and high-signal. Do not claim verification you did not run.
 7. Do not spend review budget on style-only or speculative issues unless repository policy makes them blocking.
 8. By default, report findings instead of fixing code. Only patch code when the user explicitly asks for fixes.
@@ -37,6 +37,7 @@ Use this skill to turn a change set into a small number of high-signal review fi
 
 3. Review by risk surface, not by file order.
    - Load [references/review-risk-checklist.md](./references/review-risk-checklist.md).
+   - **Mandatory final pass**: after evaluating all risk surfaces, always scan the changed code once for low-severity maintainability hazards — dead parameters, unreachable branches, obsolete wrappers, and opaque positional internal contracts. This pass is required even when higher-severity findings already exist.
    - If the change mainly touches Python backend code such as `.py` files, FastAPI or Starlette handlers, Pydantic models, SQLAlchemy ORM, Alembic migrations, Celery or worker code, settings, or API schemas, also load [references/python-backend-review-checklist.md](./references/python-backend-review-checklist.md).
    - Use only the sections relevant to the changed behavior.
    - For large changes, prioritize the most failure-prone surfaces first.
@@ -44,7 +45,7 @@ Use this skill to turn a change set into a small number of high-signal review fi
 4. Validate findings.
    - Separate `事实`, `推断`, and `未验证`.
    - Prefer evidence order: diff, implementation, tests, schema/config/migrations, docs/comments, inference.
-   - If a nearby validation step is cheap and materially clarifies a risk, run the smallest useful check, for example a targeted `pytest`, linter, type checker, schema diff, or migration inspection. Report exactly what was run, skipped, or blocked.
+   - If a nearby validation step is cheap and would confirm or eliminate a risk, run the smallest useful check, for example a targeted `pytest`, linter, type checker, schema diff, or migration inspection. Report exactly what was run, skipped, or blocked.
    - If a concern is plausible but not verified, present it as a question or residual risk, not as a confirmed defect.
 
 5. Produce the review in a stable format.
@@ -57,7 +58,7 @@ Use this skill to turn a change set into a small number of high-signal review fi
 - `critical`: security breach, auth bypass, data loss/corruption, irreversible migration failure, or outage-class bug.
 - `high`: user-visible bug, contract break, race condition, bad rollback story, or major failure-path gap.
 - `medium`: missing validation, incomplete error handling, meaningful performance regression, observability gap, or missing regression test.
-- `low`: maintainability issue likely to cause future defects.
+- `low`: maintainability issue on the changed path that obscures semantics (e.g. opaque positional containers replacing named structures), leaves dead logic behind (e.g. unused parameters, unreachable branches), or otherwise increases future defect risk.
 
 Use severity for user impact, not for stylistic preference.
 

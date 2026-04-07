@@ -15,6 +15,8 @@ Use only the sections relevant to the change. This is a thinking aid, not a temp
 - Are all important branches covered, including failure paths and partial-success paths?
 - Did the change alter defaults, fallbacks, or state transitions in a way that breaks existing callers?
 - Are `None`, empty, falsy, sentinel, and omitted-value cases handled explicitly where needed?
+- Did the change leave a parameter, branch, fallback, or wrapper behaviorally dead, or preserve logic that no longer influences runtime behavior?
+- Does any tuple, list, dict, flag combination, or numeric priority now encode semantics so opaquely that the changed code is easy to misread or misuse?
 
 ## 2. API and Contract Compatibility
 
@@ -69,6 +71,7 @@ Use only the sections relevant to the change. This is a thinking aid, not a temp
 ## 9. What Not to Report as Findings
 
 - Pure style differences with no correctness, readability, or policy impact
+- Readability nits where the existing code is still unambiguous to a new reader, does not hide dead behavior, and does not weaken a changed internal contract
 - Broad refactor suggestions unrelated to the changed risk surface
 - Speculation without code evidence
 - Issues outside the review scope unless the current change makes them worse or depends on them

@@ -58,7 +58,9 @@ Use only the sections relevant to the change. This is a thinking aid for Python 
 ## 9. Typing and Interface Precision
 
 - Did the change make function signatures, request models, repository interfaces, or settings objects less precise in a way that hides real `None` or shape errors?
+- Did the change replace a named or typed internal structure with an opaque positional tuple or loose container at an important boundary, making the contract harder to review or easier to misuse?
 - Could the implementation now violate declared types, for example returning `None` where the annotation promises a value, widening to loose dict payloads, or breaking `TypedDict`, Pydantic, or protocol expectations?
+- Did helper parameters, fallback branches, or review-scope wrappers become behaviorally dead after the change, indicating obsolete code that should likely be removed?
 - If the repository uses `mypy`, `pyright`, or Pylance-strict conventions, would the changed code still satisfy the intended type boundary rather than merely passing at runtime?
 
 ## 10. Tests and Verification
