@@ -130,8 +130,7 @@
 - FastAPI: explicit request/response models, `Depends` for DI,
   consistent error envelopes.
 - Pydantic v2 patterns; avoid v1 compat shims.
-  SQLAlchemy 2.x typed patterns.
-- Alembic for migrations.
+- SQLAlchemy 2.x typed patterns; Alembic for migrations.
 - Docstrings: required for public API. Google style, imperative mood,
   one-line summary. `Args`/`Returns`/`Raises` only when non-obvious.
   Inline comments explain *why*; delete comments that restate code.
