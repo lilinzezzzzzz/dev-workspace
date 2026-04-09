@@ -68,24 +68,31 @@
 
 ## Python
 
-- `uv` + `pyproject.toml` (PEP 621) unless repo requires otherwise.
+- Target: Python 3.11+; `uv` + `pyproject.toml` (PEP 621).
 - Ruff/Pylance-compatible; no implicit `Any`.
-- Prefer `TypedDict`, `dataclass`, `Protocol`, Pydantic over loose
-  dicts.
-- Prefer module-level functions; use instance methods only when behavior
-  depends on `self` state. Treat unused `self`/`cls` as design smell.
-- `@classmethod` for alternate constructors, factory/parsing, subclass
-  dispatch. `@staticmethod` when logic is owned by type but needs no
-  `self`/`cls`; if ownership is weak, use module function instead.
-- Do not assign `lambda` expressions; use `def`.
-- Use keyword-only parameters when the parameter list is easy to misuse,
-  has multiple optional args, or will likely grow.
-- `anyio` for concurrency, `httpx` for HTTP; isolate blocking I/O.
-- FastAPI: explicit request/response models, consistent error envelopes.
-- SQLAlchemy 2.x typed patterns; parameterized raw SQL only when
-  justified.
-- Alembic for migrations; call out compatibility and rollback.
-- Structured logging.
+- Import order: isort-compatible (stdlib → third-party → local),
+  one import per line for top-level packages.
+- Lowercase built-in generics (`list`, `dict`, `tuple`, etc.),
+  not `typing` aliases.
+- Prefer `TypedDict`, `dataclass`, `Protocol`, Pydantic v2 over
+  loose dicts.
+- Prefer module-level functions; instance methods only when
+  behavior depends on `self`. `@classmethod` for alternate
+  constructors; `@staticmethod` only when type ownership is clear.
+- Prefer keyword-only parameters; positional-only only when
+  call-site brevity clearly wins.
+- `def` over `lambda` assignment; f-strings over `.format()`.
+- Custom exceptions: inherit from a project-specific base
+  (e.g. `AppError`); use `ValueError`/`TypeError` only for
+  programming errors, not business logic. Keep hierarchy flat.
+- `anyio` + `TaskGroup` for concurrency; `httpx` for HTTP;
+  isolate blocking I/O with `anyio.to_thread`.
+- FastAPI: explicit request/response models, `Depends` for DI,
+  consistent error envelopes.
+- Pydantic v2 patterns; avoid v1 compat shims.
+- SQLAlchemy 2.x typed patterns; parameterized raw SQL only
+  when justified. Alembic for migrations.
+- Structured logging (`structlog` or stdlib).
 - `pytest` with failure-path coverage.
 
 ## Go
