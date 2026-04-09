@@ -13,58 +13,98 @@
 
 ## Priority Rules
 
+> Priority Rules govern *what* to change and *how much*. Engineering
+> Standards govern *how* to implement. Priority Rules win on conflict.
+>
+> **Conflict resolution**: Correctness > Change Scope > Code Shape.
+> When rules conflict, correctness and data safety win; note the
+> relaxed rule as follow-up.
+
+### Correctness
+
 - **Production-first**: Secure, testable, maintainable changes.
 - **Correctness over convenience**: No undefined behavior, race-prone
   logic, swallowed exceptions, or silent failure.
-- **Minimal diff**: Smallest complete change; no unrelated refactors.
-- **No backwards-compatibility hacks**: If something is confirmed
-  unused, delete it outright. Do not keep legacy renames, re-exports,
-  or "removed" markers without an explicit compatibility requirement.
-- **No compatibility by default**: Drop legacy paths unless explicitly
-  required.
-- **No speculative abstraction**: Do not create helpers, utilities, or
-  abstractions for one-time operations. Prefer a few direct lines over
-  premature reuse.
-- **Compatibility-sensitive boundaries**: Treat public APIs, persisted
-  formats, message schemas, and cross-service contracts as
-  compatibility-sensitive.
-- **Flat, direct code**: Shallow call paths, local reasoning. Avoid
-  speculative abstractions and unnecessary layers.
-- **Requested scope only**: Do not add features, refactor surrounding
-  code, or make unrelated improvements beyond what was asked or what is
-  clearly required for correctness. Do not add comments, docstrings, or
-  type annotations to untouched code.
 - **No fabricated results**: Never claim unverified tests or outputs.
+  When uncertain about behavior, runtime effect, or compatibility,
+  state the uncertainty explicitly and what would be needed to
+  verify. Prefer "I have not verified X" over a plausible guess.
+  Do not infer test outcomes from code reading alone—run or
+  explicitly state "not executed".
+
+### Change Scope
+
+- **Scope discipline**: Change only what the task requires plus
+  anything clearly necessary for correctness. Do not add features,
+  refactor adjacent code, or attach comments/docstrings/type
+  annotations to untouched code. When a nearby issue is spotted
+  during the task, report it but fix it only if: (a) it would cause
+  incorrect behavior in the current change, or (b) it is a
+  one-line / trivial fix in the same function. Otherwise, note it
+  as a follow-up.
 - **Sync artifacts**: Update tests, config, schema, docs, migrations
   when behavior changes.
 
+### Code Shape
+
+- **No dead weight**: Drop confirmed-unused code, legacy re-exports,
+  and backwards-compatibility shims outright. Do not preserve them
+  without an explicit compatibility requirement. Treat public APIs,
+  persisted formats, message schemas, and cross-service contracts
+  as compatibility-sensitive—these require explicit confirmation
+  before removal.
+- **No speculative abstraction**: Do not create helpers, utilities, or
+  abstractions for one-time operations. Prefer a few direct lines over
+  premature reuse. Shallow call paths, local reasoning, no
+  unnecessary layers.
+
 ## Execution Protocol
 
-1. Read the relevant files first. Understand task, constraints, and repo
-   context before editing or proposing changes.
-2. Call out better design only when it materially affects correctness or
-   maintainability.
-3. Implement minimal complete change with clear boundaries.
-4. Validate in proportion to risk; report outcome and residual risk.
+> Follow sequentially. If a step does not apply, state why and continue.
+
+1. **Understand** — Read files directly involved and their immediate
+   callers/callees. Identify constraints (types, contracts, migrations)
+   and blast radius. Ask before proceeding if the gap affects
+   correctness, data safety, or API compatibility.
+2. **Plan** — List files to modify with one-line intent each. Flag
+   design concerns only when they affect correctness. State
+   compatibility impact for public APIs, persisted formats, message
+   schemas, cross-service contracts.
+3. **Implement** — One logical change per edit. Sync required artifacts
+   (tests, config, schema, docs, migrations). Note nearby issues as
+   follow-ups per Scope discipline.
+4. **Verify & Report** — Run relevant tests / linter / type-checker.
+   State concretely what was verified and what was not (with reason).
+   Summarize: what changed, why, what is left, any assumptions or
+   relaxed rules.
+
+**Fallback** — when a rule cannot be satisfied:
+
+- **Cannot verify**: State what and why; mark as required follow-up.
+- **Conflicting rules**: Apply conflict resolution order; document
+  which rule was relaxed.
+- **Insufficient context**: Ask when it affects correctness/safety;
+  for low-risk gaps, choose conservative option and note assumption.
+- **Blocked by environment**: Report blocker and propose alternatives.
 
 ## Engineering Standards
 
-- **Types**: Clear types at public and important internal boundaries. No
-  loose `Any` or ad hoc dicts.
-- **Errors**: Explicit handling; stable error codes for API failures.
-- **Validation**: Validate at transport, message, persistence
-  boundaries. Domain logic stays out of handlers.
-- **External calls**: Handle timeout, retry, cancellation, partial
-  failure explicitly.
-- **Writes**: Idempotent where practical; prefer transactional
-  consistency.
-- **Security**: Log failure context, no secret leakage, least-privilege
-  defaults.
-- **Migrations**: Call out blast radius, compatibility, lock duration,
-  backfill, rollback before schema drops or bulk changes.
-- **Dependencies**: Prefer stdlib and existing deps; justify additions.
-- **Verification**: Validate behavior, not syntax. State what was
-  checked and what remains unverified.
+> How to implement. Does not override Priority Rules on change scope.
+
+- **Types & Validation**: Clear types at public and important internal
+  boundaries. No loose `Any` or ad hoc dicts. Validate at transport,
+  message, persistence boundaries; domain logic stays out of handlers.
+- **Reliability**: Explicit error handling; stable error codes for API
+  failures. Handle timeout, retry, cancellation, partial failure on
+  external calls. Idempotent writes where practical.
+- **Security & Ops**: Log failure context, no secret leakage,
+  least-privilege. Migrations: call out blast radius, compatibility,
+  lock duration, backfill, rollback. Prefer stdlib and existing deps.
+- **Performance**: Batch/bulk by default. Flag N+1 queries, unbounded
+  `SELECT`, missing pagination. Cursor-based pagination for large
+  datasets. Stream large payloads; explicit `LIMIT` on user-facing
+  queries. Async hot paths: `asyncio.gather`/`TaskGroup` over
+  sequential awaits.
 
 ## Python
 
@@ -90,10 +130,15 @@
 - FastAPI: explicit request/response models, `Depends` for DI,
   consistent error envelopes.
 - Pydantic v2 patterns; avoid v1 compat shims.
-- SQLAlchemy 2.x typed patterns; parameterized raw SQL only
-  when justified. Alembic for migrations.
-- Structured logging (`structlog` or stdlib).
-- `pytest` with failure-path coverage.
+  SQLAlchemy 2.x typed patterns.
+- Alembic for migrations.
+- Docstrings: required for public API. Google style, imperative mood,
+  one-line summary. `Args`/`Returns`/`Raises` only when non-obvious.
+  Inline comments explain *why*; delete comments that restate code.
+- Tests (`pytest`): unit for logic/edges, integration for cross-boundary
+  flows (`@pytest.mark.integration`). Mock only external I/O. Bug fixes
+  require regression test. ≥ 80 % line coverage for new/changed modules;
+  critical paths need explicit happy + error + edge cases.
 
 ## Go
 
