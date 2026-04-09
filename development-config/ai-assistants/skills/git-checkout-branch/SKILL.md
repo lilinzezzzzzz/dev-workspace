@@ -140,6 +140,7 @@ Before execution, reply in this shape:
 ```
 
 If blocked, say exactly why:
+
 - base branch is missing or unresolved
 - working tree is clean
 - diff topic is mixed
