@@ -110,30 +110,20 @@
 
 - Target: Python 3.11+; `uv` + `pyproject.toml` (PEP 621).
 - Ruff/Pylance-compatible; no implicit `Any`.
-- Import order: isort-compatible (stdlib → third-party → local),
-  one import per line for top-level packages.
-- Lowercase built-in generics (`list`, `dict`, `tuple`, etc.),
-  not `typing` aliases.
-- Prefer `TypedDict`, `dataclass`, `Protocol`, Pydantic v2 over
-  loose dicts.
+- Import order: isort-compatible (stdlib → third-party → local), one import per line for top-level packages.
+- Lowercase built-in generics (`list`, `dict`, `tuple`, etc.), not `typing` aliases.
+- Prefer `TypedDict`, `dataclass`, `Protocol`, Pydantic v2 over loose dicts.
 - Prefer module-level functions; instance methods only when
   behavior depends on `self`. `@classmethod` for alternate
   constructors; `@staticmethod` only when type ownership is clear.
-- Prefer keyword-only parameters; positional-only only when
-  call-site brevity clearly wins.
+- Prefer keyword-only parameters; positional-only only when call-site brevity clearly wins.
 - `def` over `lambda` assignment; f-strings over `.format()`.
-- Custom exceptions: inherit from a project-specific base
-  (e.g. `AppError`); use `ValueError`/`TypeError` only for
-  programming errors, not business logic. Keep hierarchy flat.
-- `anyio` + `TaskGroup` for concurrency; `httpx` for HTTP;
-  isolate blocking I/O with `anyio.to_thread`.
-- FastAPI: explicit request/response models, `Depends` for DI,
-  consistent error envelopes.
+- Custom exceptions: inherit from a project-specific base (e.g. `AppError`); use `ValueError`/`TypeError` only for programming errors, not business logic. Keep hierarchy flat.
+- `anyio` + `TaskGroup` for concurrency; `httpx` for HTTP; isolate blocking I/O with `anyio.to_thread`.
+- FastAPI: explicit request/response models, `Depends` for DI, consistent error envelopes.
 - Pydantic v2 patterns; avoid v1 compat shims.
 - SQLAlchemy 2.x typed patterns; Alembic for migrations.
-- Docstrings: required for public API. Google style, imperative mood,
-  one-line summary. `Args`/`Returns`/`Raises` only when non-obvious.
-  Inline comments explain *why*; delete comments that restate code.
+- Docstrings: required for public API. Google style, imperative mood, one-line summary. `Args`/`Returns`/`Raises` only when non-obvious. Inline comments explain *why*; delete comments that restate code.
 - Tests (`pytest`): unit for logic/edges, integration for cross-boundary
   flows (`@pytest.mark.integration`). Mock only external I/O. Bug fixes
   require regression test. ≥ 80 % line coverage for new/changed modules;
@@ -146,6 +136,16 @@
 - Handle errors explicitly; `context.Context` first for cancellable ops.
 - Document non-obvious shared-state ownership.
 
+## Git
+
+- Common branch prefixes: `feature/*` for new features, `bugfix/*` for
+  non-urgent fixes, `hotfix/*` for urgent production fixes,
+  `release/*` for stabilization, `chore/*` for maintenance,
+  `docs/*` for documentation, `refactor/*` for code cleanup,
+  `test/*` for test-only changes, `ci/*` for CI/CD changes.
+- Keep commits small and focused; prefer Conventional Commits when
+  practical.
+
 ## Response Contract
 
 - Language: Chinese preferred; keep English terms for precision.
@@ -154,7 +154,5 @@
   findings.
 - Recommendations: Prefer one strong recommendation unless tradeoffs are
   genuinely close.
-- Research: Use web search when facts depend on current external info.
-  Prefer official docs and primary sources.
 - Reviews: Lead with findings—bugs, regressions, races, API breaks,
   migration risk, missing tests.
