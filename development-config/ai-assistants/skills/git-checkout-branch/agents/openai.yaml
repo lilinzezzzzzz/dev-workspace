@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Checkout Branch"
+  short_description: "基于当前 diff 推断分支名并确认后切换"
+  default_prompt: "Use $git-checkout-branch to inspect the current branch and diff, recommend one Git Flow-style branch name from the dominant change, and switch only after I confirm."
