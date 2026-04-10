@@ -39,6 +39,8 @@ Use only the sections relevant to the change. This is a thinking aid, not a temp
 - Are retries, cancellation, deadlines, and timeouts propagated correctly?
 - Could work be duplicated, reordered, or applied after the caller times out?
 - Does the change rely on eventual consistency without documenting or testing the gap?
+- Does the code check key or row existence and then read, delete, or clean it up in a later operation, creating a TOCTOU window on mutable shared storage such as Redis?
+- Can cleanup or eviction race with concurrent refresh or recreation of the same index entry?
 
 ## 5. Security and Trust Boundaries
 
@@ -50,6 +52,9 @@ Use only the sections relevant to the change. This is a thinking aid, not a temp
 ## 6. Performance and Resource Lifecycle
 
 - Does the change introduce obvious `O(n^2)` work, N+1 queries, unbounded loops, or large unnecessary copies?
+- Does the changed path fetch an entire Redis, cache, or key-value collection when only one member, one page, or a count is needed?
+- Does it materialize all IDs and then issue per-ID probes such as `EXISTS`, `GET`, or `LRANGE`, creating linear command fan-out and memory growth on the request path?
+- Is membership or authz implemented by fetching all members and using `in` locally instead of an exact server-side lookup such as `SISMEMBER`, `ZSCORE`, or `HEXISTS`?
 - Are connections, files, streams, tasks, threads, or worker processes released correctly?
 - Is blocking work accidentally executed on an async or latency-sensitive path?
 - Does retry logic multiply load under failure?
@@ -71,7 +76,7 @@ Use only the sections relevant to the change. This is a thinking aid, not a temp
 ## 9. What Not to Report as Findings
 
 - Pure style differences with no correctness, readability, or policy impact
-- Readability nits where the existing code is still unambiguous to a new reader, does not hide dead behavior, and does not weaken a changed internal contract
+- Readability nits that do not materially obscure semantics, hide dead behavior, or weaken a changed internal contract
 - Broad refactor suggestions unrelated to the changed risk surface
 - Speculation without code evidence
 - Issues outside the review scope unless the current change makes them worse or depends on them
