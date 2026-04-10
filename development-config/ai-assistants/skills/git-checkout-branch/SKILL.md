@@ -101,14 +101,22 @@ Do not derive the topic from an imagined future commit message.
 Prefer:
 
 ```bash
-git switch -c <branch-name> <base-ref>
+git switch --no-track -c <branch-name> <base-ref>
 ```
 
 Fallback for older Git:
 
 ```bash
-git checkout -b <branch-name> <base-ref>
+git checkout --no-track -b <branch-name> <base-ref>
 ```
+
+Then, if `origin/<branch-name>` already exists, set upstream explicitly:
+
+```bash
+git branch --set-upstream-to=origin/<branch-name> <branch-name>
+```
+
+If the same-name remote branch does not exist yet, do not set upstream during checkout.
 
 9. Verify and report.
 
@@ -116,6 +124,8 @@ git checkout -b <branch-name> <base-ref>
 git branch --show-current
 git status --short
 ```
+
+If `origin/<branch-name>` did not exist at checkout time, tell the user the first publish should be `git push -u origin <branch-name>`. This creates the remote branch and sets upstream in one step. Do not inherit the base branch as upstream.
 
 Report the original branch, the resolved base ref, the new branch, the prefix rationale, and the evidence used to infer the slug.
 
@@ -151,6 +161,7 @@ If blocked, say exactly why:
 
 - Do not auto-commit, auto-stash, or auto-reset changes.
 - Do not change the base branch implicitly.
+- Do not set upstream to the base branch. Only set upstream to `origin/<branch-name>` when that exact remote branch already exists.
 - Do not treat an out-of-date local branch as the authoritative base when a remote-tracking ref is available.
 - Do not claim the result follows "Git Flow" if the repository clearly uses another naming scheme.
 - Do not choose `docs/`, `test/`, `ci/`, or `refactor/` just because those files appear in the diff; they must be the dominant intent of the branch.
