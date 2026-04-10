@@ -111,7 +111,8 @@
 - Target: Python 3.11+; `uv` + `pyproject.toml` (PEP 621).
 - Ruff/Pylance-compatible; no implicit `Any`.
 - Import order: isort-compatible (stdlib → third-party → local), one import per line for top-level packages.
-- Lowercase built-in generics (`list`, `dict`, `tuple`, etc.), not `typing` aliases.
+- For new code, use lowercase built-in generics (`list`, `dict`, `tuple`, etc.) and `collections.abc` generics where applicable; do not introduce deprecated `typing` aliases such as `Dict`, `List`, `Optional`, `Union`, or `AsyncGenerator`.
+- Use PEP 604 union syntax in new code: `A | B` instead of `Union[A, B]`, and `T | None` instead of `Optional[T]`.
 - Prefer `TypedDict`, `dataclass`, `Protocol`, Pydantic v2 over loose dicts.
 - Prefer module-level functions; instance methods only when
   behavior depends on `self`. `@classmethod` for alternate
