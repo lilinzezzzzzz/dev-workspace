@@ -23,12 +23,16 @@ Use only the sections relevant to the change. This is a thinking aid, not a temp
 - Did request or response shape change?
 - Did serialized fields, enum values, headers, status codes, or event payloads change?
 - For service code, did request models, response models, exception mapping, middleware effects, or dependency wiring semantics change?
+- Which compatibility surface changed: public API, persisted format, message schema, cross-service contract, or mixed-version rollout behavior?
+- Can old and new readers, writers, producers, or consumers coexist safely during rollout and rollback?
 - Does the change break backward compatibility for existing clients, workers, or stored data?
 - If a contract changed intentionally, were dependent tests, docs, examples, and generated specs updated?
 
 ## 3. Data Safety and Migration Risk
 
 - Does the change introduce destructive writes, data loss risk, or state corruption risk?
+- If the change introduces or updates derived state such as caches, indexes, counters, status rows, or denormalized records, is the authoritative source explicit and are synchronization and cleanup paths complete?
+- Are create, update, delete, expire, retry, replay, and rollback paths symmetric, or can one path leave stale or contradictory secondary state behind?
 - Are migrations backward compatible during rollout?
 - Is there a safe backfill story, lock-duration consideration, and rollback path?
 - Could retries, partial failures, or duplicate delivery make writes non-idempotent?
@@ -71,12 +75,15 @@ Use only the sections relevant to the change. This is a thinking aid, not a temp
 - Do tests cover the changed behavior, not just adjacent code?
 - Are failure paths, edge cases, and regression-prone branches exercised?
 - If the change spans boundaries, is there at least one integration-style check where it matters?
+- For shared helpers or stateful changes, were the immediate callers, immediate callees, and nearest tests inspected before concluding there are no defects?
+- Was at least one concrete counterexample considered, such as retry after partial success, delete during read, mixed-version rollout, or replay of stale state?
 - If tests were not updated, is the existing suite genuinely sufficient?
 
 ## 9. What Not to Report as Findings
 
 - Pure style differences with no correctness, readability, or policy impact
 - Readability nits that do not materially obscure semantics, hide dead behavior, or weaken a changed internal contract
+- Multiple findings that are only different symptoms of the same root cause; combine them unless the remediations are meaningfully different
 - Broad refactor suggestions unrelated to the changed risk surface
 - Speculation without code evidence
 - Issues outside the review scope unless the current change makes them worse or depends on them

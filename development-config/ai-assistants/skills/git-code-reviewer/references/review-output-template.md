@@ -23,6 +23,8 @@ Preferred per-finding structure:
 - `Evidence`: Confirmed facts from code, config, tests, schema, or command output you actually inspected.
 - `Impact`: The direct consequence that follows from the evidence.
 - `Recommendation`: The smallest reasonable correction or follow-up.
+- `Confidence`: Optional. Prefer `confirmed`, `probable`, or `question`.
+- `Counterexample`: Optional. A concrete failure scenario that makes the risk obvious, especially for races, retries, rollout, or stateful consistency issues.
 - `Unverified assumption`: Optional. Include only when part of the impact depends on behavior you did not verify.
 
 ## Review Basis
@@ -55,6 +57,7 @@ Keep this short. Mention one of:
 
 - Findings must be specific enough that the author can act without re-reading the whole diff.
 - Keep confirmed facts separate from unverified assumptions. Do not present a hypothesis as a confirmed defect.
+- Prefer one finding per root cause. If multiple symptoms share one defect, combine them and explain the blast radius in `Impact`.
 - Explain why the issue matters, not just what changed.
 - Prefer file and line references over vague location hints.
 - When review scope depends on an inferred or resolved base ref, state the exact ref used and whether it was remote-tracking or local. Also say whether fetch was executed or skipped when freshness matters.
