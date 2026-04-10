@@ -203,7 +203,7 @@ choose_skill() {
             "")
                 echo "Invalid selection, try again." >&2
                 ;;
-            "all skills")
+            "all")
                 printf '%s\n' "$ALL_SKILLS_SENTINEL"
                 return 0
                 ;;
