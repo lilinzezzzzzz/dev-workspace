@@ -110,7 +110,7 @@ choose_content() {
     echo "Select content to sync:" >&2
     local content=""
 
-    select content in "AGENTS.md" "agents" "skills" "exit"; do
+    select content in "AGENTS.md" "skills" "agents" "exit"; do
         case "$content" in
             "AGENTS.md"|"agents"|"skills")
                 printf '%s\n' "$content"
