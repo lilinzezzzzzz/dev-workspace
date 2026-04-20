@@ -1,15 +1,15 @@
 {
   // =============================================================================
-  // 🐍 VS Code Python 开发最佳实践配置（面向 2026 年当前版本）
+  // 🐍 VS Code Python 开发配置
   // =============================================================================
   // -------------------- Python 环境与终端 --------------------
-  "python.terminal.activateEnvironment": true, // 工作区终端自动激活环境（兼容当前工作区级配置）
+  "python.terminal.activateEnvironment": true, // 工作区终端自动激活环境
   "python.terminal.activateEnvInCurrentTerminal": true, // 已打开终端也允许激活当前环境
   "python.terminal.shellIntegration.enabled": true, // 启用 Python 终端 shell integration
   "python.terminal.useEnvFile": true, // 让终端也读取 `.env`
   "python.envFile": "${workspaceFolder}/.env",
   // -------------------- Python 编辑体验 --------------------
-  "python.analysis.autoSearchPaths": false,
+  "python.analysis.autoSearchPaths": false, // 禁用自动搜索路径，避免引入隐式路径
   "python.analysis.extraPaths": [],
   "python.analysis.exclude": [
     "**/.*",
@@ -35,8 +35,8 @@
   "[python]": {
     "editor.formatOnSave": false, // 关闭保存时自动格式化
     "editor.codeActionsOnSave": {
-      "source.fixAll.ruff": "never", // 仅触发 Ruff，避免和其他扩展冲突
-      "source.organizeImports.ruff": "never"
+      "source.fixAll.ruff": "never", // 不在保存时自动修复
+      "source.organizeImports.ruff": "never" // 不在保存时自动整理导入
     },
     "editor.rulers": [
       88,
@@ -49,43 +49,53 @@
   },
   // -------------------- Ruff：Lint + Format --------------------
   "ruff.enable": true,
-  "ruff.nativeServer": "auto", // 最新推荐：优先使用 Rust 原生服务器
-  "ruff.configurationPreference": "filesystemFirst", // 优先读取 pyproject.toml / ruff.toml
-  "ruff.lineLength": 88,
-  "ruff.lint.preview": true,
-  // 仅在项目未提供 Ruff 配置文件时作为兜底
-  "ruff.lint.select": [
-    "E",
-    "F",
-    "I",
-    "UP",
-    "B",
-    "C4",
-    "SIM",
-    "PLR6301",
-    "PLR1711",
-    "PLR1733",
-    "PLR1714"
-  ],
-  "ruff.lint.ignore": [
-    "E501"
-  ],
-  // -------------------- Pylance / 类型检查 --------------------
+  "ruff.nativeServer": "auto", // 优先使用 Rust 原生服务器
+  "ruff.configurationPreference": "editorOnly", // 以编辑器内配置为准
+  "ruff.configuration": {
+    "line-length": 88,
+    "lint": {
+      "preview": true,
+      "select": [
+        "E",
+        "F",
+        "I",
+        "UP",
+        "B",
+        "C4",
+        "SIM",
+        "PLR6301",
+        "PLR1711",
+        "PLR1733",
+        "PLR1714"
+      ],
+      "ignore": [
+        "E501"
+      ],
+      "flake8-bugbear": {
+        "extend-immutable-calls": [
+          "fastapi.Query",
+          "fastapi.Path",
+          "fastapi.Header",
+          "fastapi.Depends",
+          "fastapi.Body",
+          "fastapi.File"
+        ]
+      }
+    }
+  },
+  // -------------------- Pylance / 分析配置 --------------------
   "python.languageServer": "Pylance",
-  "python.analysis.typeCheckingMode": "off", // 已使用 Ruff，关闭 Pylance 类型检查
-  "python.analysis.diagnosticMode": "openFilesOnly",
-  "python.analysis.autoImportCompletions": true,
-  "python.analysis.useLibraryCodeForTypes": false,
-  "python.analysis.completeFunctionParens": true,
-  "python.analysis.inlayHints.functionReturnTypes": true,
-  "python.analysis.inlayHints.variableTypes": false,
-  "python.analysis.inlayHints.callArgumentNames": "partial",
-  // 只关闭和 Ruff 重复、或团队里最常见的低价值噪音
+  "python.analysis.diagnosticMode": "openFilesOnly", // 仅分析打开的文件
+  "python.analysis.autoImportCompletions": true, // 关闭自动导入补全
+  "python.analysis.completeFunctionParens": true, // 补全函数时自动补全括号
+  "python.analysis.inlayHints.functionReturnTypes": true, // 显示函数返回值提示
+  "python.analysis.inlayHints.variableTypes": false, // 不显示变量类型提示
+  "python.analysis.inlayHints.callArgumentNames": "partial", // 部分显示参数名提示
   "python.analysis.diagnosticSeverityOverrides": {
     "reportUnusedImport": "none",
     "reportUnusedVariable": "none",
     "reportMissingTypeStubs": "none"
-  },
+  }, // 关闭与 Ruff 重复或低价值的 Pylance 诊断
   // -------------------- 测试配置 --------------------
   "python.testing.pytestEnabled": true,
   "python.testing.unittestEnabled": false,
@@ -112,5 +122,4 @@
     "*.pyi": "python",
     "pyproject.toml": "toml"
   }
-  // 通用文件排除、JSON/YAML/TOML 编辑器行为统一收敛到 common/settings.json
 }
