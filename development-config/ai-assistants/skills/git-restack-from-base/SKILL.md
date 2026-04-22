@@ -18,7 +18,7 @@ By default, resolve an unqualified base branch name such as `dev`, `main`, or `m
 5. Execute the restack only after explicit user confirmation.
 6. Validate the resulting branch and report any unresolved conflicts or gaps.
 
-Prefer using `scripts/restack_from_base.py` for branch naming, commit discovery, and command generation. The script defaults to plan mode and prints `status: awaiting_confirmation`. Only run with `--apply --confirm` after the user has reviewed the printed branches and explicitly approved continuation.
+Prefer using `scripts/restack_from_base.py` for branch naming, commit discovery, and command generation. Resolve that relative path against the directory containing this `SKILL.md`; do not assume the current working directory is the skill directory. The canonical helper path is `<skill-dir>/scripts/restack_from_base.py`. The script defaults to plan mode and prints `status: awaiting_confirmation`. Only run with `--apply --confirm` after the user has reviewed the printed branches and explicitly approved continuation.
 
 ## Base Ref Resolution
 
@@ -56,8 +56,8 @@ Do not guess a different naming scheme unless the repository already uses one an
 Use the helper script:
 
 ```bash
-python3 scripts/restack_from_base.py --base dev --remote origin
-python3 scripts/restack_from_base.py --base dev --remote origin --apply --confirm
+python3 <skill-dir>/scripts/restack_from_base.py --base dev --remote origin
+python3 <skill-dir>/scripts/restack_from_base.py --base dev --remote origin --apply --confirm
 ```
 
 With the default resolution rules, `--base master --remote upstream` means the effective base ref is `upstream/master`, not the local `master` branch.
@@ -74,6 +74,8 @@ Useful flags:
 
 - Require the base branch as an explicit input from the user before running the script.
 - In IDE conversations, obtain that input by asking a natural-language question first, not by telling the user to execute a command.
+- Resolve `scripts/restack_from_base.py` relative to this skill directory before executing it. Do not run `python3 scripts/restack_from_base.py` unless the shell is already in `<skill-dir>`.
+- If the first attempt says the script is missing, check the sibling `scripts/` directory under this skill and rerun with the resolved path. Do not fall back to a manual restack until that canonical script path has been checked.
 - Resolve an unqualified base branch name to `<remote>/<base>` by default. Do not silently fall back to a local branch.
 - Before any execution, show the user both the base branch they provided and the resolved base ref, then wait for approval.
 - Abort if the working tree is dirty unless the user explicitly asks to proceed.
