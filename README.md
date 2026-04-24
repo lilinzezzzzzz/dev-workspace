@@ -17,6 +17,8 @@
 | `python-workspace` | `python-workspace` | `10022`、`8000-8099` | Python 开发容器，按 `python-workspace` profile 启动 |
 | `redis` | `redis` | `6379` | Redis 6，密码 `123456` |
 | `mysql` | `mysql` | `3306` | MySQL 8，root 密码 `123456` |
+| `postgres` | `postgres` | `5432` | PostgreSQL 17，按 `jsontype-postgres` profile 启动，用于 `JSONType` 方言测试 |
+| `oracle` | `oracle` | `1521` | Oracle Database Free，按 `jsontype-oracle` profile 启动，用于 `JSONType` 方言测试 |
 | `milvus-etcd` | `milvus-etcd` | - | Milvus 依赖组件 |
 | `milvus-minio` | `milvus-minio` | - | Milvus 对象存储 |
 | `milvus-standalone` | `milvus-standalone` | `19530`、`9091` | Milvus 单机版 |
@@ -96,6 +98,25 @@ docker compose up -d
 docker compose --profile python-workspace up -d
 ```
 
+如果需要做 `JSONType` 的跨数据库方言验证，可按需启动额外数据库：
+
+```bash
+docker compose --profile jsontype-postgres up -d postgres
+docker compose --profile jsontype-oracle up -d oracle
+```
+
+如果需要同时拉起两个专项测试库：
+
+```bash
+docker compose --profile jsontype-postgres --profile jsontype-oracle up -d postgres oracle
+```
+
+说明：
+
+- PostgreSQL 当前定位为 `JSONType` 方言专项测试容器；`ai-service` 的配置层还不能直接切到 PostgreSQL 运行整套应用
+- Oracle Free 镜像首次启动较慢，镜像和 named volume 都比较大
+- Oracle 当前使用 Docker named volume 持久化数据，避免宿主机 bind mount 权限导致初始化失败
+
 ## 常用连接方式
 
 ### 进入开发容器
@@ -138,6 +159,18 @@ redis-cli -h localhost -p 6379 -a 123456
 
 ```bash
 mysql -h localhost -P 3306 -u root -p123456
+```
+
+### PostgreSQL
+
+```bash
+psql -h localhost -p 5432 -U postgres -d ai_chat
+```
+
+### Oracle
+
+```bash
+sqlplus system/Welcome_12345@//localhost:1521/FREE
 ```
 
 ### Attu

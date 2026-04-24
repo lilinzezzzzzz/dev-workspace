@@ -51,6 +51,42 @@ services:
     networks:
       - common-network
 
+  postgres:
+    profiles: ["jsontype-postgres"]
+    image: "postgres:17"
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      TZ: "UTC"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "123456"
+      POSTGRES_DB: "ai_chat"
+    volumes:
+      - "./infras/postgres/data:/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ai_chat"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - common-network
+
+  oracle:
+    profiles: ["jsontype-oracle"]
+    image: "container-registry.oracle.com/database/free:latest-lite"
+    container_name: oracle
+    ports:
+      - "1521:1521"
+    environment:
+      TZ: "UTC"
+      ORACLE_PWD: "Welcome_12345"
+    volumes:
+      - "oracle-oradata:/opt/oracle/oradata"
+    shm_size: "1gb"
+    networks:
+      - common-network
+
   milvus-etcd:
     image: "quay.io/coreos/etcd:v3.5.18"
     container_name: milvus-etcd
@@ -112,6 +148,10 @@ services:
       - milvus-standalone
     networks:
       - common-network
+
+volumes:
+  oracle-oradata:
+    name: oracle-oradata
 
 # 定义共享网络
 networks:
