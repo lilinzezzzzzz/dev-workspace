@@ -14,10 +14,12 @@ Use this skill to create a new branch from an explicit remote base branch while 
    - Do not run repo inspection or branch creation until the base branch is known.
 2. Inspect the real repository state first. Never invent a branch topic.
 3. Resolve the provided base branch before continuing.
-   - Prefer a remote-tracking ref that matches the provided branch name.
-   - If the user gives an unqualified name such as `dev`, `main`, or `master`, resolve it to the corresponding remote-tracking ref by default when one exists.
-   - Treat a local branch as an explicit fallback only when the user asks for local branch state or provides a full local ref.
-   - If the base branch still cannot be resolved unambiguously, stop and ask for clarification.
+   - Treat an unqualified base branch name such as `dev`, `main`, `master`, or `release/1.0` as a remote branch by default. Resolve it to the corresponding remote-tracking ref, for example `dev` -> `origin/dev`.
+   - Use `origin` as the default remote when it exists. If `origin` is absent and exactly one remote exists, use that remote. If multiple non-`origin` remotes exist, ask which remote to use.
+   - If the user provides a full remote-tracking ref such as `origin/dev` or `upstream/main`, use that exact remote-tracking ref.
+   - Fetch the specific remote base before proposing or creating the branch, for example `git fetch origin dev`, then use `origin/dev`. Skip fetch only when the user explicitly asks to avoid it or the environment blocks it; report the skip or blocker.
+   - Never silently fall back to a local branch with the same name. Use a local base only when the user explicitly asks for local branch state or provides a full local ref such as `refs/heads/dev`.
+   - If the remote base branch still cannot be resolved unambiguously, stop and ask for clarification.
 4. Prefer repository-local naming conventions when visible from existing local or remote refs.
 5. If no local convention is visible, default to Git Flow-compatible or common team prefixes:
    - `feature/` for new work, net-new capability, or no stronger signal
@@ -40,16 +42,20 @@ Use this skill to create a new branch from an explicit remote base branch while 
 2. Inspect the current branch, resolved base ref, current diff, and visible naming conventions.
 
 ```bash
-git fetch --prune
+git remote
+git branch -r --list
+git fetch <remote> <base-branch>
+git rev-parse --verify <remote>/<base-branch>
 git rev-parse --abbrev-ref HEAD
 git branch --list
-git branch -r --list
 git branch --show-current
 git status --short
 git diff --staged --stat
 git diff --stat
 git branch --all --format='%(refname:short)'
 ```
+
+For a full remote-tracking ref such as `origin/release/1.0`, parse the first path component as the remote and fetch the remaining branch name. For an unqualified branch with slashes such as `release/1.0`, do not treat `release` as a remote unless it is a configured git remote.
 
 If the summary is not enough to infer the topic, inspect `git diff --staged` and `git diff`.
 
@@ -89,7 +95,8 @@ Do not derive the topic from an imagined future commit message.
 7. Validate the proposal.
    - The branch name must describe the dominant topic, not every touched file
    - The base branch must be resolved before proposing a branch name
-   - The base branch should resolve to a remote-tracking ref unless the user explicitly asked for a local ref
+   - The base branch must resolve to a remote-tracking ref unless the user explicitly asked for a local ref
+   - Unqualified base names must not resolve to local refs; `dev` means the resolved remote-tracking ref such as `origin/dev`
    - If the working tree is clean, say there is no diff-based topic to infer unless the user provides one
    - If the diff spans unrelated modules or concerns, say the change set is too mixed for reliable auto-naming
    - If the proposed branch already exists, add a short disambiguator only after checking refs
@@ -136,6 +143,7 @@ Before execution, reply in this shape:
 ```text
 基础分支：<provided-base-branch>
 解析后的基础分支：<resolved-base-ref>
+基线说明：remote-tracking；fetch: <executed|skipped|blocked>
 当前分支：<current-branch>
 
 检测到的主要改动：
@@ -163,6 +171,7 @@ If blocked, say exactly why:
 - Do not change the base branch implicitly.
 - Do not set upstream to the base branch. Only set upstream to `origin/<branch-name>` when that exact remote branch already exists.
 - Do not treat an out-of-date local branch as the authoritative base when a remote-tracking ref is available.
+- Do not use a same-name local branch as fallback for an unresolved remote base branch.
 - Do not claim the result follows "Git Flow" if the repository clearly uses another naming scheme.
 - Do not choose `docs/`, `test/`, `ci/`, or `refactor/` just because those files appear in the diff; they must be the dominant intent of the branch.
 - If only part of the current changes should move to the new branch, say that a plain branch switch is insufficient and the user likely needs selective staging, `git stash --keep-index`, or a separate commit workflow.

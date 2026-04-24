@@ -25,8 +25,18 @@ class RestackPlan:
     source_branch: str
     new_branch: str
     base_ref: str
+    base_ref_kind: str
     commits: list[Commit]
     fetch_executed: bool
+
+
+@dataclass(frozen=True)
+class BaseResolution:
+    base_branch: str
+    base_ref: str
+    base_ref_kind: str
+    remote: str | None
+    remote_branch: str | None
 
 
 def run_git(*args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -92,6 +102,100 @@ def ensure_ref_exists(ref: str) -> None:
         raise SystemExit(f"Git ref not found: {ref}")
 
 
+def ref_exists(ref: str) -> bool:
+    """Return whether a git ref exists."""
+    return run_git("show-ref", "--verify", ref, check=False).returncode == 0
+
+
+def list_remotes() -> list[str]:
+    """Return configured git remotes."""
+    output = git_output("remote")
+    return [line for line in output.splitlines() if line]
+
+
+def select_remote(*, requested_remote: str | None, remotes: list[str]) -> str:
+    """Select the remote used for an unqualified base branch."""
+    if requested_remote:
+        if requested_remote not in remotes:
+            raise SystemExit(f"Remote not found: {requested_remote}")
+        return requested_remote
+    if "origin" in remotes:
+        return "origin"
+    if len(remotes) == 1:
+        return remotes[0]
+    if not remotes:
+        raise SystemExit(
+            "No git remote found. Provide --base-ref only when you explicitly want a local ref."
+        )
+    raise SystemExit(
+        "Multiple remotes found and no origin remote exists. Provide --remote explicitly: "
+        + ", ".join(remotes)
+    )
+
+
+def resolve_base_ref(
+    *,
+    base: str,
+    remote: str | None,
+    base_ref: str | None,
+) -> BaseResolution:
+    """Resolve user base input to the effective base ref."""
+    remotes = list_remotes()
+    if base_ref:
+        if base_ref.startswith("refs/heads/"):
+            base_ref_kind = "local"
+        elif base_ref.startswith("refs/remotes/") or ref_exists(f"refs/remotes/{base_ref}"):
+            base_ref_kind = "remote-tracking"
+        else:
+            base_ref_kind = "explicit"
+        return BaseResolution(
+            base_branch=base,
+            base_ref=base_ref,
+            base_ref_kind=base_ref_kind,
+            remote=None,
+            remote_branch=None,
+        )
+
+    if base.startswith("refs/heads/"):
+        return BaseResolution(
+            base_branch=base,
+            base_ref=base,
+            base_ref_kind="local",
+            remote=None,
+            remote_branch=None,
+        )
+
+    if base.startswith("refs/remotes/"):
+        remote_branch = base.removeprefix("refs/remotes/")
+        remote_name, _, branch_name = remote_branch.partition("/")
+        return BaseResolution(
+            base_branch=base,
+            base_ref=base,
+            base_ref_kind="remote-tracking",
+            remote=remote_name if remote_name in remotes and branch_name else None,
+            remote_branch=branch_name or None,
+        )
+
+    remote_name, separator, branch_name = base.partition("/")
+    if separator and (remote_name in remotes or ref_exists(f"refs/remotes/{base}")):
+        return BaseResolution(
+            base_branch=base,
+            base_ref=base,
+            base_ref_kind="remote-tracking",
+            remote=remote_name if remote_name in remotes else None,
+            remote_branch=branch_name if remote_name in remotes else None,
+        )
+
+    selected_remote = select_remote(requested_remote=remote, remotes=remotes)
+    return BaseResolution(
+        base_branch=base,
+        base_ref=f"{selected_remote}/{base}",
+        base_ref_kind="remote-tracking",
+        remote=selected_remote,
+        remote_branch=base,
+    )
+
+
 def collect_commits(*, base_ref: str, source_branch: str) -> list[Commit]:
     """Collect commits that exist on the source branch but not on the base ref."""
     output = git_output("log", "--reverse", "--format=%H%x09%s", f"{base_ref}..{source_branch}")
@@ -136,32 +240,38 @@ def build_plan(
     source_branch: str,
     new_branch: str | None,
     base: str,
-    remote: str,
+    remote: str | None,
     base_ref: str | None,
     skip_fetch: bool,
 ) -> RestackPlan:
     """Resolve the inputs into an executable restack plan."""
-    resolved_base_ref = base_ref or f"{remote}/{base}"
-    if not skip_fetch and base_ref is None:
-        fetch_base(remote=remote, base=base)
+    base_resolution = resolve_base_ref(base=base, remote=remote, base_ref=base_ref)
+    if (
+        not skip_fetch
+        and base_ref is None
+        and base_resolution.remote is not None
+        and base_resolution.remote_branch is not None
+    ):
+        fetch_base(remote=base_resolution.remote, base=base_resolution.remote_branch)
         fetch_executed = True
     else:
         fetch_executed = False
-    ensure_ref_exists(resolved_base_ref)
+    ensure_ref_exists(base_resolution.base_ref)
     ensure_ref_exists(source_branch)
 
     resolved_new_branch = new_branch or next_versioned_branch(source_branch)
-    commits = collect_commits(base_ref=resolved_base_ref, source_branch=source_branch)
+    commits = collect_commits(base_ref=base_resolution.base_ref, source_branch=source_branch)
     if not commits:
         raise SystemExit(
-            f"No commits found in {source_branch} that are not already in {resolved_base_ref}."
+            f"No commits found in {source_branch} that are not already in {base_resolution.base_ref}."
         )
 
     return RestackPlan(
-        base_branch=base,
+        base_branch=base_resolution.base_branch,
         source_branch=source_branch,
         new_branch=resolved_new_branch,
-        base_ref=resolved_base_ref,
+        base_ref=base_resolution.base_ref,
+        base_ref_kind=base_resolution.base_ref_kind,
         commits=commits,
         fetch_executed=fetch_executed,
     )
@@ -172,6 +282,7 @@ def print_plan(plan: RestackPlan) -> None:
     print(f"base_branch: {plan.base_branch}")
     print(f"source_branch: {plan.source_branch}")
     print(f"base_ref: {plan.base_ref}")
+    print(f"base_ref_kind: {plan.base_ref_kind}")
     print(f"new_branch: {plan.new_branch}")
     print(f"fetch_executed: {'yes' if plan.fetch_executed else 'no'}")
     print("commits:")
@@ -192,9 +303,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--base",
         required=True,
-        help="Base branch name, such as dev, main, or master",
+        help="Base branch or remote-tracking ref, such as dev, main, origin/dev, or refs/heads/main",
     )
-    parser.add_argument("--remote", default="origin", help="Remote name. Default: origin")
+    parser.add_argument(
+        "--remote",
+        help="Remote for unqualified base branches. Default: origin when present, otherwise the sole remote",
+    )
     parser.add_argument("--source-branch", help="Source branch to restack. Default: current branch")
     parser.add_argument("--new-branch", help="Override the generated versioned branch name")
     parser.add_argument(

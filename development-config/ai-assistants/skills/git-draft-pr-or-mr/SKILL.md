@@ -11,21 +11,26 @@ Use this skill to draft a PR or MR title and description from the actual git dif
 
 1. Require an explicit base branch or base ref. If the user does not specify one, ask first instead of inferring.
 2. Distinguish local refs from remote-tracking refs. `main` and `origin/main` are not equivalent.
-3. Resolve an unqualified base branch name such as `dev`, `main`, or `master` to the corresponding remote-tracking ref such as `<remote>/<branch>` by default. Do not silently fall back to the local branch.
-4. If the user explicitly asks for local branch state, or provides a full local ref such as `refs/heads/main`, use that exact local ref.
-5. If the skill is using the default remote-tracking base and latest remote state matters, sync that ref first, for example `git fetch origin main`, then draft against `origin/main`.
-6. Base the title and description on the real change set. Use commit messages only as secondary evidence.
-7. Prefer concise change framing over long business narration. Lead with the dominant change set, and include only the technical detail needed for precision, review, or release awareness.
-8. State the exact base ref used whenever it matters, especially when the user names a branch such as `dev`, `main`, or `master` without clarifying whether they mean local or remote-tracking.
-9. Produce one strong recommendation, not multiple equally vague options, unless the user explicitly asks for alternatives.
+3. Treat an unqualified base branch name such as `dev`, `main`, `master`, or `release/1.0` as a remote branch by default. Resolve it to the corresponding remote-tracking ref such as `<remote>/<branch>`, for example `dev` -> `origin/dev`.
+4. Use `origin` as the default remote when it exists. If `origin` is absent and exactly one remote exists, use that remote. If multiple non-`origin` remotes exist, ask which remote to use.
+5. Fetch the specific remote base before drafting, for example `git fetch origin dev`, then draft against `origin/dev`. Skip fetch only when the user explicitly asks to avoid it or the environment blocks it; report the skip or blocker.
+6. Do not silently fall back to a local branch with the same name. If the user explicitly asks for local branch state, or provides a full local ref such as `refs/heads/main`, use that exact local ref.
+7. If the remote base cannot be resolved after remote selection and fetch, stop and ask for clarification instead of drafting against a local branch.
+8. Base the title and description on the real change set. Use commit messages only as secondary evidence.
+9. Prefer concise change framing over long business narration. Lead with the dominant change set, and include only the technical detail needed for precision, review, or release awareness.
+10. State the exact base ref used whenever it matters, especially when the user names a branch such as `dev`, `main`, or `master` without clarifying whether they mean local or remote-tracking.
+11. Produce one strong recommendation, not multiple equally vague options, unless the user explicitly asks for alternatives.
 
 ## Workflow
 
 1. Resolve the base ref.
    - If the user gives a full ref such as `origin/main`, use it directly.
-   - If the user gives an unqualified branch name such as `dev`, `main`, or `master`, resolve it to the corresponding remote-tracking ref `<remote>/<branch>` by default.
+   - If the user gives an unqualified branch name such as `dev`, `main`, `master`, or `release/1.0`, resolve it to the corresponding remote-tracking ref `<remote>/<branch>` by default.
+   - Use `origin` as the default remote when it exists. If `origin` is absent and exactly one remote exists, use that remote. If multiple non-`origin` remotes exist, ask which remote to use.
+   - For a full remote-tracking ref such as `origin/release/1.0`, parse the first path component as the remote and fetch the remaining branch name. For an unqualified branch with slashes such as `release/1.0`, do not treat `release` as a remote unless it is a configured git remote.
    - If the user explicitly asks for local branch state, or provides a full local ref such as `refs/heads/main`, use that exact local ref.
-   - If the request says "latest" or "最新", or the skill is using the default remote-tracking behavior, fetch the remote-tracking ref first unless the environment is offline or the user asks not to fetch.
+   - Fetch the remote-tracking ref first unless the environment is offline or the user asks not to fetch. Prefer `git fetch <remote> <branch>` over broad fetches when the base is known.
+   - Verify the resolved ref before drafting. If the remote-tracking ref is missing or ambiguous, stop instead of using a same-name local branch.
    - If the base is missing, stop and ask for it.
 
 2. Inspect the real change set.
@@ -56,7 +61,7 @@ Use this skill to draft a PR or MR title and description from the actual git dif
 ## Output Rules
 
 - Include the exact base ref used near the top when returning the draft.
-- State whether the base ref was a remote-tracking ref or an explicit local ref, and whether fetch was executed or skipped when that affects freshness.
+- State whether the base ref was a remote-tracking ref or an explicit local ref, and whether fetch was executed, skipped, or blocked.
 - Mention verification only when the user asks for it or when omitting it would hide an important risk.
 - If the branch includes unrelated commits or mixed concerns, say so and draft the description around the actual combined scope rather than pretending the change is narrower.
 - If the user asks for “PR” or “MR”, treat the artifact shape as the same unless the target platform requires a specific term.

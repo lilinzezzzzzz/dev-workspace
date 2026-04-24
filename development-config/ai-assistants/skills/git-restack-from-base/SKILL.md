@@ -7,7 +7,7 @@ description: Recreate the current git branch from an explicitly provided base br
 
 Use this skill to rebuild the current branch on top of an explicitly specified base branch while preserving the branch's own commits.
 
-By default, resolve an unqualified base branch name such as `dev`, `main`, or `master` to the corresponding remote-tracking ref `<remote>/<branch>`. Only use a local base ref when the user explicitly asks for local branch state or provides a full local ref.
+By default, treat an unqualified base branch name such as `dev`, `main`, `master`, or `release/1.0` as a remote branch. Resolve it to the corresponding remote-tracking ref, for example `dev` -> `origin/dev`. Only use a local base ref when the user explicitly asks for local branch state or provides a full local ref.
 
 ## Workflow
 
@@ -22,10 +22,12 @@ Prefer using `scripts/restack_from_base.py` for branch naming, commit discovery,
 
 ## Base Ref Resolution
 
-1. If the user provides a full remote ref such as `origin/main`, use it directly.
-2. If the user provides an unqualified branch name such as `dev`, `main`, or `master`, resolve it to the corresponding remote-tracking ref `<remote>/<branch>` by default.
-3. If the user explicitly asks for local branch state, or provides a full local ref such as `refs/heads/main`, use that exact local ref.
-4. When using the default remote-tracking behavior, fetch the remote branch first unless the environment is offline, the user explicitly wants to skip fetch, or an explicit `--base-ref` was already provided.
+1. If the user provides a full remote-tracking ref such as `origin/main` or `upstream/release/1.0`, use it directly as the base ref.
+2. If the user provides an unqualified branch name such as `dev`, `main`, `master`, or `release/1.0`, resolve it to the corresponding remote-tracking ref `<remote>/<branch>` by default.
+3. Use `origin` as the default remote when it exists. If `origin` is absent and exactly one remote exists, use that remote. If multiple non-`origin` remotes exist, ask which remote to use.
+4. Fetch the specific remote base before planning or applying, for example `git fetch origin dev`, then use `origin/dev`. Skip fetch only when the user explicitly asks to avoid it, the environment blocks it, or an explicit `--base-ref` was provided as already-fetched input.
+5. Do not silently fall back to a local branch with the same name. Use a local base only when the user explicitly asks for local branch state or provides a full local ref such as `refs/heads/main`.
+6. For a full remote-tracking ref such as `origin/release/1.0`, parse the first path component as the remote and fetch the remaining branch name. For an unqualified branch with slashes such as `release/1.0`, do not treat `release` as a remote unless it is a configured git remote.
 
 ## IDE Interaction Rule
 
@@ -56,14 +58,17 @@ Do not guess a different naming scheme unless the repository already uses one an
 Use the helper script:
 
 ```bash
-python3 <skill-dir>/scripts/restack_from_base.py --base dev --remote origin
-python3 <skill-dir>/scripts/restack_from_base.py --base dev --remote origin --apply --confirm
+python3 <skill-dir>/scripts/restack_from_base.py --base dev
+python3 <skill-dir>/scripts/restack_from_base.py --base origin/dev
+python3 <skill-dir>/scripts/restack_from_base.py --base dev --remote upstream
+python3 <skill-dir>/scripts/restack_from_base.py --base dev --apply --confirm
 ```
 
 With the default resolution rules, `--base master --remote upstream` means the effective base ref is `upstream/master`, not the local `master` branch.
 
 Useful flags:
 
+- `--remote <name>`: remote for unqualified base branches. Omit it to use `origin` when present or the only configured remote.
 - `--source-branch <name>`: restack a branch other than `HEAD`
 - `--new-branch <name>`: override the generated versioned branch name
 - `--base-ref <ref>`: use an already-fetched ref instead of `<remote>/<base>`
@@ -76,7 +81,8 @@ Useful flags:
 - In IDE conversations, obtain that input by asking a natural-language question first, not by telling the user to execute a command.
 - Resolve `scripts/restack_from_base.py` relative to this skill directory before executing it. Do not run `python3 scripts/restack_from_base.py` unless the shell is already in `<skill-dir>`.
 - If the first attempt says the script is missing, check the sibling `scripts/` directory under this skill and rerun with the resolved path. Do not fall back to a manual restack until that canonical script path has been checked.
-- Resolve an unqualified base branch name to `<remote>/<base>` by default. Do not silently fall back to a local branch.
+- Resolve an unqualified base branch name to `<remote>/<base>` by default. Use `origin` when present, otherwise the only configured remote; ask when multiple non-`origin` remotes exist.
+- Do not silently fall back to a local branch with the same name as the requested remote base.
 - Before any execution, show the user both the base branch they provided and the resolved base ref, then wait for approval.
 - Abort if the working tree is dirty unless the user explicitly asks to proceed.
 - Abort if there are no branch-only commits to cherry-pick.
@@ -108,7 +114,7 @@ Report:
 - the base branch provided by the user
 - the source branch
 - the base ref used
-- whether the base ref was resolved as a remote-tracking ref or an explicit local ref
+- whether the base ref was resolved as a remote-tracking ref, an explicit local ref, or another explicit ref
 - the new branch name
 - the commits selected for cherry-pick
 - whether fetch was executed or skipped
