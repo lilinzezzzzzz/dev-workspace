@@ -17,6 +17,8 @@ By default, treat an unqualified base branch name such as `dev`, `main`, `master
 4. Return at least the `base_branch`, `source_branch`, and `new_branch` to the user and ask whether to continue.
 5. Execute the restack only after explicit user confirmation.
 6. Validate the resulting branch and report any unresolved conflicts or gaps.
+7. After a successful restack and validation, ask the user whether to delete the source branch locally and remotely.
+8. Delete the source branch only after the user explicitly confirms the deletion request.
 
 Prefer using `scripts/restack_from_base.py` for branch naming, commit discovery, and command generation. Resolve that relative path against the directory containing this `SKILL.md`; do not assume the current working directory is the skill directory. The canonical helper path is `<skill-dir>/scripts/restack_from_base.py`. The script defaults to plan mode and prints `status: awaiting_confirmation`. Only run with `--apply --confirm` after the user has reviewed the printed branches and explicitly approved continuation.
 
@@ -89,7 +91,35 @@ Useful flags:
 - Use `git log --reverse <base_ref>..<source_branch>` semantics so cherry-pick order matches the original history.
 - Prefer `git switch --no-track -c <new_branch> <base_ref>` to create the fresh branch without tracking the base branch.
 - If a cherry-pick conflicts, stop immediately, report the conflicting commit, and tell the user to resolve and continue with `git cherry-pick --continue` or abort with `git cherry-pick --abort`.
-- Do not delete the source branch automatically.
+- Do not delete the source branch as part of the restack apply command.
+
+## Source Branch Deletion
+
+After apply mode completes successfully and verification shows `HEAD` is on the new branch, ask whether to delete the source branch locally and remotely. This must be a separate confirmation after restack completion, not part of the pre-apply confirmation.
+
+Before asking, resolve and show the exact refs that would be deleted:
+
+- local source branch: `refs/heads/<source_branch>`
+- remote source branch: use the source branch upstream from `git for-each-ref --format=%(upstream:short) refs/heads/<source_branch>` when present; otherwise use `<remote>/<source_branch>` only when that remote-tracking ref exists and the remote is unambiguous
+
+Ask in natural language, for example:
+
+`Restack 已完成。是否删除源分支？将删除本地 refs/heads/<source_branch> 和远程 <remote>/<source_branch>。`
+
+Only run deletion commands after explicit user confirmation. Use:
+
+```bash
+git branch -D <source_branch>
+git push <remote> --delete <remote_branch>
+```
+
+Deletion rules:
+
+- Never delete the source branch if restack failed, stopped on conflict, or verification has not completed.
+- Never delete the branch currently checked out; `HEAD` must be on `<new_branch>`.
+- If no remote source branch is found, delete only the local source branch after confirming that no remote ref will be deleted.
+- If multiple candidate remote branches exist, ask which one to delete instead of guessing.
+- Report deletion results separately from the restack result.
 
 ## Verification
 
@@ -119,6 +149,7 @@ Report:
 - the commits selected for cherry-pick
 - whether fetch was executed or skipped
 - whether the run is awaiting confirmation, completed, or stopped on conflict
+- whether source branch deletion was skipped, awaiting confirmation, completed, or partially completed
 
 ## References
 
