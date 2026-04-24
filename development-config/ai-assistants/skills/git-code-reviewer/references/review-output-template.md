@@ -27,15 +27,29 @@ Preferred per-finding structure:
 - `Counterexample`: Optional. A concrete failure scenario that makes the risk obvious, especially for races, retries, rollout, or stateful consistency issues.
 - `Unverified assumption`: Optional. Include only when part of the impact depends on behavior you did not verify.
 
-## Review Basis
+## Scope
 
-Use this section when the review scope depends on a base ref rather than an explicit PR or patch artifact.
+Use this section in every review. Keep it brief, but make the reviewed boundary unambiguous.
 
 Example:
 
 - Review scope: `origin/main...HEAD`
 - Base ref type: `remote-tracking`
 - Fetch: `executed`
+- Included: tracked staged and unstaged changes
+- Excluded: untracked files
+
+When the user provides an explicit PR, MR, commit range, or patch artifact, state that exact artifact instead of inventing a base ref.
+
+## Verification
+
+Use this section in every review when commands, tests, lint, type checks, schema checks, or runtime probes were run or intentionally skipped.
+
+Example:
+
+- Ran: `pytest tests/test_payment_retry.py -q` passed
+- Not run: broader test suite, not needed for this focused retry-path review
+- Blocked: none
 
 ## Open Questions / Assumptions
 
@@ -60,6 +74,7 @@ Keep this short. Mention one of:
 - Prefer one finding per root cause. If multiple symptoms share one defect, combine them and explain the blast radius in `Impact`.
 - Explain why the issue matters, not just what changed.
 - Prefer file and line references over vague location hints.
-- When review scope depends on an inferred or resolved base ref, state the exact ref used and whether it was remote-tracking or local. Also say whether fetch was executed or skipped when freshness matters.
+- Always state the reviewed scope. When review scope depends on an inferred or resolved base ref, state the exact ref used and whether it was remote-tracking or local. For remote-tracking bases, say whether fetch was executed, skipped, or blocked.
+- Always state what verification was run. If no commands were run, say so and explain whether the review was limited to static inspection.
 - Do not bury the main issue inside long prose.
 - If there are no findings, say so explicitly instead of padding with praise.

@@ -1,6 +1,6 @@
 ---
 name: git-code-reviewer
-description: 审查 PR、MR、commit、diff 或工作区改动，识别 Python 服务端与通用后端改动中的 bug、回归、API 契约破坏、FastAPI/Pydantic 边界验证缺失、SQLAlchemy/Alembic 数据与迁移风险、async 并发与阻塞 I/O、安全漏洞、性能退化和测试缺口。当用户要求 review、CR、PR review、MR review、代码审查、找风险、审核实现，或判断 Python、后端、API 服务改动是否可合入时使用此 skill。
+description: Review PRs, MRs, commits, diffs, or workspace changes for Python backend services. Use for code review, CR, PR review, MR review, 风险审查, 代码审查, 找风险, 审核实现, or 判断 Python 后端、API、worker、RAG 服务改动是否可合入. Focus on bugs, regressions, API contract breaks, FastAPI/Pydantic validation, SQLAlchemy/Alembic data risks, Redis/cache consistency, async/concurrency, LLM/RAG workflows, security, performance, and meaningful test gaps.
 ---
 
 # Code Review
@@ -16,21 +16,23 @@ Use this skill to turn a change set into a small number of high-signal review fi
 5. Focus on issues that matter: correctness, contracts, data safety, concurrency, security, performance, observability, and test adequacy.
 6. When the change touches persisted, cached, indexed, or otherwise derived state, identify the authoritative state, the derived state, and the sync and cleanup paths before judging correctness.
 7. Prefer reporting one finding per root cause. Fold downstream symptoms such as missing tests, tail-latency regressions, or stale cleanup effects into the same finding unless the remediation meaningfully differs.
-8. Include low-severity maintainability findings when the changed code becomes materially harder to reason about or easier to misuse, for example opaque positional tuples or flags that encode multiple semantics, dead parameters or branches, or wrappers whose behavior is no longer live.
-9. Use validation to confirm or narrow ambiguous concerns when a nearby check is cheap and high-signal. Do not claim verification you did not run.
-10. Do not spend review budget on style-only or speculative issues unless repository policy makes them blocking.
-11. By default, report findings instead of fixing code. Only patch code when the user explicitly asks for fixes.
+8. Report missing tests as a standalone finding only when the gap hides a concrete changed risk, such as API contract breakage, state migration, security boundary, retry behavior, concurrency, or a regression-prone bug path. Otherwise mention test gaps as residual risk or fold them into the root-cause finding.
+9. Include low-severity maintainability findings only when the issue is on the changed path and materially increases misuse or future defect risk, for example opaque positional tuples or flags that encode multiple semantics, dead parameters or branches, or wrappers whose behavior is no longer live.
+10. Use validation to confirm or narrow ambiguous concerns when a nearby check is cheap and high-signal. Do not claim verification you did not run.
+11. Do not spend review budget on style-only or speculative issues unless repository policy makes them blocking.
+12. By default, report findings instead of fixing code. Only patch code when the user explicitly asks for fixes.
 
 ## Workflow
 
 1. Define review scope.
    - If the user provides a PR, MR, commit range, or diff, use that as the scope.
    - If the user asks to review workspace changes without a narrower scope, review tracked staged and unstaged changes by default. Ignore untracked files unless the user includes them explicitly or the changed code depends on them.
-   - Otherwise infer a reasonable base branch and review the diff from that base to `HEAD`.
-   - Resolve an unqualified base branch name such as `dev`, `main`, or `master` to the corresponding remote-tracking ref `<remote>/<branch>` by default.
+   - If the user provides an unqualified base branch name such as `dev`, `main`, or `master`, resolve it to the corresponding remote-tracking ref by default. For example, treat `dev` as `origin/dev`, not local `dev`.
+   - Use `origin` as the default remote when it exists. If `origin` is absent and exactly one remote exists, use that remote. If multiple non-`origin` remotes exist and correctness depends on the base, ask which remote to use.
+   - Fetch the specific remote base before reviewing an inferred or unqualified base branch, for example `git fetch origin dev`, then review against `origin/dev`. Skip fetch only when the user explicitly asks to avoid it or the environment blocks it; state skipped or blocked fetch explicitly.
    - Use a local base ref only when the user explicitly asks for local branch state or provides a full local ref such as `refs/heads/main`.
-   - If the user wants review against the latest base branch, sync the remote-tracking ref first, for example `git fetch origin main`, then review against `origin/main`. Do not assume a local branch ref is current.
-   - If the base is ambiguous and correctness depends on it, state the assumption or ask. Also state the exact ref used for review when it matters, whether it was a remote-tracking or local ref, and whether fetch was executed or skipped.
+   - Otherwise infer the base in this order: PR or MR target branch if available; repository integration branch as a remote-tracking ref, preferring `origin/dev`, then `origin/main`, then `origin/master`; ask when multiple plausible bases remain.
+   - State the exact scope used, for example `origin/dev...HEAD`, whether the base was remote-tracking or local, and whether fetch was executed, skipped, or blocked.
 
 2. Understand the change before judging it.
    - Read the diff summary first.
@@ -49,6 +51,7 @@ Use this skill to turn a change set into a small number of high-signal review fi
    - If the change mainly touches Python backend code such as `.py` files, FastAPI or Starlette handlers, Pydantic models, SQLAlchemy ORM, Alembic migrations, Celery or worker code, settings, or API schemas, also load [references/python-backend-review-checklist.md](./references/python-backend-review-checklist.md).
    - If the change touches persisted state, caches, indexes, status transitions, denormalized data, background repair, or multi-step workflows, also load [references/stateful-systems-review-checklist.md](./references/stateful-systems-review-checklist.md).
    - If the change touches Redis, cache helpers, message history, session indexes, or other key-value persistence, also load [references/redis-cache-review-checklist.md](./references/redis-cache-review-checklist.md).
+   - If the change touches LLM calls, prompts, tool/function schemas, retrieval, vector indexes, embeddings, reranking, streaming, agent workflows, or AI evaluation paths, also load [references/llm-rag-review-checklist.md](./references/llm-rag-review-checklist.md).
    - Use only the sections relevant to the changed behavior.
    - For large changes, prioritize the most failure-prone surfaces first.
 
@@ -68,14 +71,14 @@ Use this skill to turn a change set into a small number of high-signal review fi
 
 - `critical`: security breach, auth bypass, data loss/corruption, irreversible migration failure, or outage-class bug.
 - `high`: user-visible bug, contract break, race condition, bad rollback story, or major failure-path gap.
-- `medium`: missing validation, incomplete error handling, meaningful performance regression, observability gap, or missing regression test.
+- `medium`: missing validation, incomplete error handling, meaningful performance regression, observability gap, or missing regression coverage that hides a concrete changed risk.
 - `low`: maintainability issue on the changed path that obscures semantics, leaves dead logic behind, or otherwise increases future defect risk.
 
 Use severity for user impact, not for stylistic preference.
 
 ## Scope Guidance
 
-- Treat generated files, snapshots, vendored code, and lockfiles as secondary evidence unless the change specifically targets them.
+- Treat generated files, snapshots, vendored code, and lockfiles as secondary evidence unless the change specifically targets them or changes API, SDK, OpenAPI, protobuf, message schema, or other generated contract surfaces.
 - When reviewing workspace changes, state whether the scope included staged changes, unstaged changes, both, or an explicit diff artifact.
 - Distinguish local branch refs from remote-tracking refs. `main` and `origin/main` may point to different commits; if review correctness depends on the latest integration branch, prefer the fetched remote-tracking ref and say which ref was used.
 - Follow unchanged code when a claim depends on shared helpers, framework hooks, middleware, serializers, migrations, or config.
@@ -85,12 +88,15 @@ Use severity for user impact, not for stylistic preference.
 - For async or concurrent code, check idempotency, cancellation, retries, locking, ordering, and shared-state ownership.
 - For Redis, cache, or key-value collection changes, inspect collection cardinality, query shape, point lookup vs full fetch, and whether multi-command sequences rely on atomicity they do not actually have.
 - For security-sensitive code, check trust boundaries, authn/authz, input validation, secret handling, injection, SSRF, path traversal, and unsafe rendering as relevant.
+- For LLM or RAG changes, check prompt and tool schema compatibility, retrieval scope and source quality, vector index lifecycle, streaming and cancellation semantics, model or embedding version changes, cost and rate-limit behavior, and leakage of user content or retrieved data.
+- For PR or MR platform reviews, treat the description, title, comments, and commit messages as context only. Base findings on the diff, runtime code, tests, schemas, config, CI logs, or verified platform metadata.
 
 ## Output Rules
 
 - Findings are the primary deliverable.
 - Each finding should explain impact, evidence, and the smallest reasonable correction or follow-up.
 - Include file references and line numbers when available.
+- Include a concise review scope and verification summary, including the exact base ref when a base ref is used.
 - Keep summary sections brief.
 - Prefer one finding per root cause. If one defect causes multiple symptoms, combine them unless the fixes are meaningfully different.
 - When Redis or cache-backed collections are part of the changed path and you report no findings, state whether cardinality, membership query shape, and atomicity or TOCTOU risk were checked or remain unverified.
@@ -104,3 +110,4 @@ Use severity for user impact, not for stylistic preference.
 - Read [references/python-backend-review-checklist.md](./references/python-backend-review-checklist.md) when the change is centered on Python services, APIs, workers, persistence, or migrations.
 - Read [references/stateful-systems-review-checklist.md](./references/stateful-systems-review-checklist.md) when the change touches persisted state, caches, indexes, denormalized data, status transitions, background repair, or multi-step workflows.
 - Read [references/redis-cache-review-checklist.md](./references/redis-cache-review-checklist.md) when the change introduces or modifies Redis or cache-backed collections, indexes, or hot-path key-value access.
+- Read [references/llm-rag-review-checklist.md](./references/llm-rag-review-checklist.md) when the change touches LLM calls, prompts, tool/function schemas, retrieval, vector indexes, embeddings, reranking, streaming, agent workflows, or AI evaluation paths.
