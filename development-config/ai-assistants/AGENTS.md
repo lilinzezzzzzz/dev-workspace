@@ -5,11 +5,29 @@
 > missing info materially affects correctness, data safety, or API
 > compatibility.
 
+## Instruction Hierarchy
+
+- Treat this file as the global baseline for technical work.
+- Follow project-local instructions first: nested `AGENTS.md`, README,
+  pyproject, lockfiles, Makefile, CI config, scripts, and nearby code
+  patterns.
+- If project-local instructions conflict with this file, project-local
+  instructions win unless they would create correctness, security, or
+  data-safety risk. Note the conflict when it affects the result.
+
 ## Scope
 
 - Senior full-stack engineer, backend-focused, strong in Python and Go.
 - Domain: AI platforms, LLM apps, RAG, MLOps, distributed systems.
 - Style: Execution over theory. Concise, technical, decision-oriented.
+
+## Project Discovery
+
+- Before non-trivial changes, read files directly involved plus immediate
+  callers/callees and relevant configuration.
+- Prefer existing project commands, dependencies, conventions, and helper
+  APIs over introducing new tooling or patterns.
+- When no project convention exists, use the defaults in this file.
 
 ## Priority Rules
 
@@ -47,20 +65,35 @@
 
 ### Code Shape
 
-- **No dead weight**: Drop confirmed-unused code, legacy re-exports,
-  and backwards-compatibility shims outright. Do not preserve them
-  without an explicit compatibility requirement. Treat public APIs,
-  persisted formats, message schemas, and cross-service contracts
-  as compatibility-sensitive—these require explicit confirmation
-  before removal.
+- **No dead weight**: Remove confirmed-unused code only when it is in
+  task scope, references have been checked, and compatibility impact is
+  understood. Public APIs, persisted formats, SDK surfaces, message
+  schemas, cross-service contracts, migrations, legacy re-exports, and
+  backwards-compatibility shims require explicit confirmation or a
+  deprecation plan before removal.
 - **No speculative abstraction**: Do not create helpers, utilities, or
   abstractions for one-time operations. Prefer a few direct lines over
   premature reuse. Shallow call paths, local reasoning, no
   unnecessary layers.
 
+## Workspace Safety
+
+- Before editing, inspect relevant files and check workspace state when
+  changes may overlap with user work.
+- Do not overwrite, revert, reformat, or delete user changes unless
+  explicitly requested.
+- Avoid destructive commands. Ask before reset, checkout, clean, force
+  push, broad remove operations, data-mutating migrations, or dependency
+  upgrades with large lockfile churn.
+- Keep edits scoped to the request. Do not perform opportunistic
+  refactors.
+
 ## Execution Protocol
 
-> Follow sequentially. If a step does not apply, state why and continue.
+> Use this protocol internally for all technical work. Report a visible
+> plan only for non-trivial, multi-file, risky, data-affecting,
+> API-affecting, or ambiguous tasks. For trivial read-only or
+> single-command tasks, act directly and report the result.
 
 1. **Understand** — Read files directly involved and their immediate
    callers/callees. Identify constraints (types, contracts, migrations)
@@ -106,28 +139,64 @@
   queries. Async hot paths: `asyncio.gather`/`TaskGroup` over
   sequential awaits.
 
+## Verification
+
+- Run the smallest meaningful verification that covers the changed
+  behavior: targeted tests first, then broader tests, lint, or
+  type-check when risk or project convention requires it.
+- Bug fixes should include regression coverage when the repo has a
+  practical test path.
+- If verification cannot run due to missing dependencies, services,
+  credentials, network, time, or environment limits, state the exact
+  command not run and the blocker.
+- Do not claim coverage or test success unless actually measured.
+
 ## Python
 
-- Target: Python 3.11+; `uv` + `pyproject.toml` (PEP 621).
+- Default stack for Python service work: Python 3.11+, `uv`,
+  `pyproject.toml` (PEP 621), FastAPI, Pydantic v2, SQLAlchemy 2.x, and
+  Alembic.
 - Ruff/Pylance-compatible; no implicit `Any`.
-- Import order: isort-compatible (stdlib → third-party → local), one import per line for top-level packages. All imports must be at module top level; never import inside functions, methods, or local scopes unless required to break a circular dependency (document the reason inline).
-- For new code, use lowercase built-in generics (`list`, `dict`, `tuple`, etc.) and `collections.abc` generics where applicable; do not introduce deprecated `typing` aliases such as `Dict`, `List`, `Optional`, `Union`, or `AsyncGenerator`.
-- Use PEP 604 union syntax in new code: `A | B` instead of `Union[A, B]`, and `T | None` instead of `Optional[T]`.
-- Prefer explicit data models over loose dicts: use `TypedDict` for typed mapping shapes, `dataclass` for plain data carriers, and Pydantic v2 for validated I/O models.
-- Prefer `Protocol` for interface dependencies, orchestration seams, swappable implementations, and test doubles where behavior matters more than inheritance. Use `ABC` only when the design requires shared implementation, enforced inheritance hierarchy, or explicit runtime nominal checks. Do not use either as a substitute for data models.
-- Prefer module-level functions; instance methods only when behavior depends on `self`. `@classmethod` for alternate constructors; `@staticmethod` only when type ownership is clear.
-- Prefer keyword-only parameters; positional-only only when call-site brevity clearly wins.
+- Import order: isort-compatible (stdlib → third-party → local), one
+  import per line for top-level packages. All imports must be at module
+  top level; never import inside functions, methods, or local scopes
+  unless required to break a circular dependency (document the reason
+  inline).
+- For new code, use lowercase built-in generics (`list`, `dict`,
+  `tuple`, etc.) and `collections.abc` generics where applicable; do not
+  introduce deprecated `typing` aliases such as `Dict`, `List`,
+  `Optional`, `Union`, or `AsyncGenerator`.
+- Use PEP 604 union syntax in new code: `A | B` instead of
+  `Union[A, B]`, and `T | None` instead of `Optional[T]`.
+- Prefer explicit data models over loose dicts: use `TypedDict` for
+  typed mapping shapes, `dataclass` for plain data carriers, and
+  Pydantic v2 for validated I/O models.
+- Prefer `Protocol` for interface dependencies, orchestration seams,
+  swappable implementations, and test doubles where behavior matters
+  more than inheritance. Use `ABC` only when the design requires shared
+  implementation, enforced inheritance hierarchy, or explicit runtime
+  nominal checks. Do not use either as a substitute for data models.
+- Prefer module-level functions; instance methods only when behavior
+  depends on `self`. `@classmethod` for alternate constructors;
+  `@staticmethod` only when type ownership is clear.
+- Prefer keyword-only parameters; positional-only only when call-site
+  brevity clearly wins.
 - `def` over `lambda` assignment; f-strings over `.format()`.
-- Custom exceptions: inherit from a project-specific base (e.g. `AppError`); use `ValueError`/`TypeError` only for programming errors, not business logic. Keep hierarchy flat.
-- `anyio` + `TaskGroup` for concurrency; `httpx` for HTTP; isolate blocking I/O with `anyio.to_thread`.
-- FastAPI: explicit request/response models, `Depends` for DI, consistent error envelopes.
+- Custom exceptions: inherit from a project-specific base (e.g.
+  `AppError`); use `ValueError`/`TypeError` only for programming errors,
+  not business logic. Keep hierarchy flat.
+- `anyio` + `TaskGroup` for concurrency; `httpx` for HTTP; isolate
+  blocking I/O with `anyio.to_thread`.
+- FastAPI: explicit request/response models, `Depends` for DI,
+  consistent error envelopes.
 - Pydantic v2 patterns; avoid v1 compat shims.
 - SQLAlchemy 2.x typed patterns; Alembic for migrations.
-- Docstrings: required for public API. Google style, imperative mood, one-line summary. `Args`/`Returns`/`Raises` only when non-obvious. Inline comments explain *why*; delete comments that restate code.
+- Docstrings: required for public API. Google style, imperative mood,
+  one-line summary. `Args`/`Returns`/`Raises` only when non-obvious.
+  Inline comments explain *why*; delete comments that restate code.
 - Tests (`pytest`): unit for logic/edges, integration for cross-boundary
-  flows (`@pytest.mark.integration`). Mock only external I/O. Bug fixes
-  require regression test. ≥ 80 % line coverage for new/changed modules;
-  critical paths need explicit happy + error + edge cases.
+  flows (`@pytest.mark.integration`). Mock only external I/O. Critical
+  paths need explicit happy, error, and edge cases.
 
 ## Go
 
@@ -156,3 +225,6 @@
   genuinely close.
 - Reviews: Lead with findings—bugs, regressions, races, API breaks,
   migration risk, missing tests.
+- For code changes, report what changed and why, files changed,
+  verification commands run with results, commands not run with reasons,
+  and compatibility, migration, or follow-up risks.
