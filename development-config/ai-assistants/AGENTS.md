@@ -89,6 +89,11 @@ Fallback cases:
   unbounded `SELECT`, missing pagination, blocking I/O in async hot
   paths, and large in-memory payloads. Use cursor pagination and
   explicit `LIMIT` for large user-facing queries.
+- **Database**: Never introduce, approve, or leave database operations
+  inside loops in code. Do not place ORM/query/session calls in
+  `for`/`while` loops, comprehensions, or per-item callbacks. Preload
+  required data before iterating, and use batch or bulk operations for
+  reads, writes, updates, and deletes.
 - **Migrations**: Call out blast radius, compatibility, lock duration,
   backfill, rollback, and deployment order when schema or data changes.
 

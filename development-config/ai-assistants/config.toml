@@ -1,37 +1,63 @@
 #:schema https://developers.openai.com/codex/config-schema.json
 
-model = "gpt-5.4"
-model_reasoning_effort = "high"
-model_verbosity = "medium"
+# VS Code + Codex 插件默认使用的唯一后端开发 profile。
+profile = "backend"
+
+# 默认沟通风格：保持直接、务实、少废话。
 personality = "pragmatic"
 
-# IDE 里建议直接开 live，查最新资料更顺手
-# 如果你更想要稳定/少联网，可改成 "cached"
-web_search = "live"
-
-# 需要越权时再弹确认
+# 需要越权、联网、写出工作区等高风险动作时再弹确认。
 approval_policy = "on-request"
 
-# 日常开发最实用
+# 允许读写当前 workspace，适合日常编码；不会给出全盘写权限。
 sandbox_mode = "workspace-write"
 
-history.persistence = "save-all"
+# VS Code 中点击文件引用时用 vscode scheme 打开。
 file_opener = "vscode"
+
+# 单次工具输出保留的 token 上限；后端测试日志较长，保留 12000 便于定位失败。
 tool_output_token_limit = 12000
 
+# 保存会话历史，便于恢复上下文和排查之前的操作。
+history.persistence = "save-all"
+
+# 限制本地历史文件体积，避免长期使用后无限增长；当前为 100 MiB。
+history.max_bytes = 104857600
+
+# `/review` 使用更强模型，优先提升代码审查质量。
+review_model = "gpt-5.5"
+
 [sandbox_workspace_write]
+# shell 命令默认不允许直接访问外网；依赖安装、curl 等需要按需审批。
 network_access = false
+
+# 除当前 workspace 外，额外允许写入 /tmp，方便测试、构建和临时产物。
 writable_roots = ["/tmp"]
 
+[profiles.backend]
+# 日常后端开发默认模型；当前 VS Code 插件内置 Codex 已支持 gpt-5.5。
+model = "gpt-5.5"
+
+# 后端编码、排障和重构默认需要较强推理，但不默认拉到最慢的 xhigh。
+model_reasoning_effort = "high"
+
+# 输出详细度保持中等，兼顾解释、diff 总结和响应速度。
+model_verbosity = "medium"
+
+# 默认使用缓存搜索，降低实时网页 prompt injection 风险；需要最新资料时在会话里显式要求联网查询。
+web_search = "cached"
+
 [features]
-multi_agent = true
-personality = true
-unified_exec = true
-shell_snapshot = true
+# 开启 undo 支持，方便在 IDE 中回滚 Codex 生成的改动。
+undo = true
 
 [tools]
+# 允许 Codex 读取本地图片，便于分析截图、设计稿和错误界面。
 view_image = true
 
 [mcp_servers.openaiDeveloperDocs]
+# 官方 OpenAI/Codex 文档 MCP，用于查询最新配置、模型和 API 文档。
 url = "https://developers.openai.com/mcp"
+
+# 文档 MCP 不作为启动硬依赖，避免网络或服务异常导致 Codex 无法启动。
 required = false
