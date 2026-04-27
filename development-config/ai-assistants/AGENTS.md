@@ -115,6 +115,9 @@ Fallback cases:
   `pyproject.toml` (PEP 621), FastAPI, Pydantic v2, SQLAlchemy 2.x, and
   Alembic.
 - Ruff/Pylance-compatible; no implicit `Any`.
+- New code should add type annotations wherever practical,
+  especially for function parameters, return values, module-level
+  constants, data models, and variables whose inferred type is unclear.
 - Imports: isort order, one import per line for top-level packages, all
   imports at module top level. Local imports are allowed only to break a
   circular dependency; document the reason inline.
