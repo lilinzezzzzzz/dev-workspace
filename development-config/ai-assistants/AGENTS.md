@@ -102,6 +102,11 @@ Fallback cases:
 - Run the smallest meaningful verification that covers changed behavior:
   targeted tests first, then broader tests, lint, or type-check when risk
   or project convention requires it.
+- Test cases should be layered as a test pyramid: unit tests cover
+  isolated logic and edge cases and should be the largest share,
+  integration tests cover cross-boundary behavior and should be fewer,
+  and system/E2E tests cover only critical end-to-end workflows and
+  should be the fewest.
 - Bug fixes should include regression coverage when the repo has a
   practical test path.
 - Do not infer test results from code reading. Do not claim coverage
@@ -152,13 +157,6 @@ Fallback cases:
 - Tests: use `pytest`; unit tests for logic and edges, integration tests
   for cross-boundary flows. Mock only external I/O. Critical paths need
   explicit happy, error, and edge cases.
-
-## Go
-
-- Follow Effective Go. Keep packages small and calls direct.
-- Use interfaces only for real polymorphism or test seams.
-- Handle errors explicitly; `context.Context` first for cancellable ops.
-- Document non-obvious shared-state ownership.
 
 ## Git
 
