@@ -190,6 +190,10 @@
   "workbench.productIconTheme": "material-product-icons", // 产品图标主题
   // -------------------- 标签页颜色自定义 --------------------
   "workbench.colorCustomizations": {
+    "editor.selectionBackground": "#0e639c", // 编辑器选区背景
+    "editor.selectionForeground": "#ffffff", // 编辑器选区文字
+    "editor.inactiveSelectionBackground": "#264f78", // 非焦点编辑器选区背景
+    "editor.selectionHighlightBackground": "#ffcc0033", // 相同文本选区高亮
     "tab.activeBackground": "#005fb8", // 激活标签页背景色
     "tab.activeForeground": "#ffffff", // 激活标签页文字颜色
     "tab.activeBorder": "#2f81f7", // 激活标签页边框色
@@ -214,6 +218,9 @@
     "list.focusAndSelectionOutline": "#ffcc00", // 选中项焦点轮廓
     "list.activeSelectionIconForeground": "#ffcc00", // 激活选中项图标
     "list.inactiveSelectionIconForeground": "#ffcc00" // 非焦点选中项图标
+  },
+  "editor.tokenColorCustomizations": {
+    "comments": "#9fd88d"
   },
   // -------------------- 终端配置（跨平台）--------------------
   // 跨平台终端环境变量配置，确保各系统行为一致
