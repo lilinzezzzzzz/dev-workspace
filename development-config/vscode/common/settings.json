@@ -190,22 +190,30 @@
   "workbench.productIconTheme": "material-product-icons", // 产品图标主题
   // -------------------- 标签页颜色自定义 --------------------
   "workbench.colorCustomizations": {
-    "tab.activeBackground": "#2d5a88", // 激活标签页背景色
+    "tab.activeBackground": "#005fb8", // 激活标签页背景色
     "tab.activeForeground": "#ffffff", // 激活标签页文字颜色
-    "tab.activeBorder": "#61afef", // 激活标签页边框色
-    "tab.activeBorderTop": "#ff9f1c", // 激活标签页顶边框
-    "tab.inactiveBackground": "#1a1d23", // 非激活标签页背景色
-    "tab.inactiveForeground": "#5a6270", // 非激活标签页文字颜色
-    "tab.unfocusedActiveBorder": "#61afef",
-    "tab.unfocusedActiveBorderTop": "#ff9f1c",
+    "tab.activeBorder": "#2f81f7", // 激活标签页边框色
+    "tab.activeBorderTop": "#ffcc00", // 激活标签页顶边框
+    "tab.unfocusedActiveBackground": "#003f73", // 非焦点激活标签页背景色
+    "tab.unfocusedActiveForeground": "#ffffff", // 非焦点激活标签页文字颜色
+    "tab.inactiveBackground": "#111827", // 非激活标签页背景色
+    "tab.inactiveForeground": "#c9d1d9", // 非激活标签页文字颜色
+    "tab.hoverBackground": "#1f2937", // 标签页悬停背景
+    "tab.hoverForeground": "#ffffff", // 标签页悬停文字
+    "tab.border": "#334155", // 标签页分隔线
+    "tab.unfocusedActiveBorder": "#2f81f7",
+    "tab.unfocusedActiveBorderTop": "#ffcc00",
     // 资源管理器激活文件高亮
-    "list.activeSelectionBackground": "#2d5a88", // 激活选中项背景
+    "list.activeSelectionBackground": "#005fb8", // 激活选中项背景
     "list.activeSelectionForeground": "#ffffff", // 激活选中项文字
-    "list.inactiveSelectionBackground": "#37415a", // 非焦点选中项背景
-    "list.inactiveSelectionForeground": "#e0e0e0", // 非焦点选中项文字
-    "list.hoverBackground": "#2a3a4d", // 悬停背景
-    "list.focusOutline": "#ff9f1c", // 焦点轮廓
-    "list.activeSelectionIconForeground": "#ff9f1c" // 激活选中项图标
+    "list.inactiveSelectionBackground": "#26364f", // 非焦点选中项背景
+    "list.inactiveSelectionForeground": "#f0f6fc", // 非焦点选中项文字
+    "list.hoverBackground": "#1f2937", // 悬停背景
+    "list.hoverForeground": "#ffffff", // 悬停文字
+    "list.focusOutline": "#ffcc00", // 焦点轮廓
+    "list.focusAndSelectionOutline": "#ffcc00", // 选中项焦点轮廓
+    "list.activeSelectionIconForeground": "#ffcc00", // 激活选中项图标
+    "list.inactiveSelectionIconForeground": "#ffcc00" // 非焦点选中项图标
   },
   // -------------------- 终端配置（跨平台）--------------------
   // 跨平台终端环境变量配置，确保各系统行为一致
