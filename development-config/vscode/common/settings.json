@@ -192,7 +192,7 @@
   "workbench.colorCustomizations": {
     "editor.selectionBackground": "#0e639c", // 编辑器选区背景
     "editor.selectionForeground": "#ffffff", // 编辑器选区文字
-    "editor.inactiveSelectionBackground": "#264f78", // 非焦点编辑器选区背景
+    "editor.inactiveSelectionBackground": "#264f7899", // 非焦点编辑器选区背景
     "editor.selectionHighlightBackground": "#ffcc0033", // 相同文本选区高亮
     "tab.activeBackground": "#005fb8", // 激活标签页背景色
     "tab.activeForeground": "#ffffff", // 激活标签页文字颜色
