@@ -71,7 +71,8 @@
         "PLR1714"
       ],
       "ignore": [
-        "I001"
+        "I001",
+        "E501"
       ],
       "flake8-bugbear": {
         "extend-immutable-calls": [
