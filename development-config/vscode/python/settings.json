@@ -10,7 +10,9 @@
   "python.envFile": "${workspaceFolder}/.env",
   // -------------------- Python 编辑体验 --------------------
   "python.analysis.autoSearchPaths": false, // 禁用自动搜索路径，避免引入隐式路径
-  "python.analysis.extraPaths": [],
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}"
+  ],
   "python.analysis.exclude": [
     "**/.*",
     "**/node_modules",
@@ -85,8 +87,9 @@
   },
   // -------------------- Pylance / 分析配置 --------------------
   "python.languageServer": "Pylance",
-  "python.analysis.diagnosticMode": "openFilesOnly", // 仅分析打开的文件
-  "python.analysis.autoImportCompletions": true, // 关闭自动导入补全
+  "python.analysis.diagnosticMode": "openFilesOnly", // 仅分析打开的文件，避免大型仓库性能开销
+  "python.analysis.typeCheckingMode": "basic", // 启用基础类型检查
+  "python.analysis.autoImportCompletions": true, // 启用自动导入补全
   "python.analysis.completeFunctionParens": true, // 补全函数时自动补全括号
   "python.analysis.inlayHints.functionReturnTypes": true, // 显示函数返回值提示
   "python.analysis.inlayHints.variableTypes": false, // 不显示变量类型提示
