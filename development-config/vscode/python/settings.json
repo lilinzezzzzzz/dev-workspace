@@ -36,7 +36,7 @@
     "editor.formatOnSave": false, // 关闭保存时自动格式化
     "editor.codeActionsOnSave": {
       "source.fixAll.ruff": "never", // 不在保存时自动修复
-      "source.organizeImports.ruff": "explicit" // 保存时自动整理导入
+      "source.organizeImports.ruff": "always" // 保存时自动整理导入
     },
     "editor.rulers": [
       88,
@@ -69,7 +69,7 @@
         "PLR1714"
       ],
       "ignore": [
-        "E501"
+        "I001"
       ],
       "flake8-bugbear": {
         "extend-immutable-calls": [
