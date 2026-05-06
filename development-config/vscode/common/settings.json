@@ -156,6 +156,8 @@
   "editor.letterSpacing": 0.5, // 字母间距
   // -------------------- 工作台与窗口 --------------------
   "window.title": "${dirty}${activeEditorShort}${separator}${rootName}", // 窗口标题格式
+  "workbench.editor.enablePreview": false, // 禁用单击文件预览模式
+  "workbench.editor.enablePreviewFromQuickOpen": false, // 禁用 Quick Open 预览模式
   "workbench.editor.labelFormat": "short", // 编辑器标签显示短格式
   "workbench.editor.limit.enabled": true, // 启用编辑器数量限制
   "workbench.editor.limit.value": 6, // 最多同时打开 6 个编辑器
