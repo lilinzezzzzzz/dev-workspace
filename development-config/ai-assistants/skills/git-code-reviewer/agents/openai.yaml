@@ -1,4 +1,4 @@
 interface:
   display_name: "Git Code Reviewer"
-  short_description: "面向 Python 后端服务的高信号代码审查"
-  default_prompt: "Use $git-code-reviewer to review this Python backend change and report concrete findings with severity, file references, confirmed evidence, unverified assumptions, scope, verification, and residual risks; follow the shared remote-base rule for any base branch or base ref."
+  short_description: "必须先显示明确指定的基础分支，再审查 Python 后端改动"
+  default_prompt: "Use $git-code-reviewer to require an explicitly provided base branch or base ref before doing anything else. If it is missing, ask only `基础分支是什么？` and stop. If it is provided, first visibly show the specified base, then follow the shared remote-base rule, inspect the review scope, and report concrete findings with severity, file references, confirmed evidence, unverified assumptions, scope, verification, and residual risks. Do not infer a base branch from PR metadata, repository defaults, current branch names, or local context."

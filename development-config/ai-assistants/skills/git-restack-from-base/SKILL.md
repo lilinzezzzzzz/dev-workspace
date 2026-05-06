@@ -1,6 +1,6 @@
 ---
 name: git-restack-from-base
-description: Recreate the current git branch from an explicitly provided base branch and cherry-pick the branch-only commits onto a new versioned branch. Use when a feature branch must be retargeted onto the newest integration branch or another base branch, especially for workflows like `A` 到 `A-v2`, `A-v2` 到 `A-v3`, or any request to cut a fresh branch from updated base history and migrate the current branch's commits with cherry-pick. Treat an unqualified base branch name such as `dev`, `main`, or `master` as the corresponding remote-tracking branch by default, not a local branch. In IDE workflows, first ask the user in natural language which base branch to use, then show the resolved base ref and current branch for confirmation before execution.
+description: Recreate the current git branch from an explicitly provided base branch and cherry-pick the branch-only commits onto a new versioned branch. Use when a feature branch must be retargeted onto the newest integration branch or another base branch, especially for workflows like `A` 到 `A-v2`, `A-v2` 到 `A-v3`, or any request to cut a fresh branch from updated base history and migrate the current branch's commits with cherry-pick. Treat an unqualified base branch name such as `dev`, `main`, or `master` as the corresponding remote-tracking branch by default, not a local branch. If the user has not explicitly provided a base branch or base ref, ask for it and stop. After the user provides it, visibly show that specified base before any task execution, then show the resolved base ref and current branch for confirmation before applying.
 ---
 
 # Git Restack From Base
@@ -11,14 +11,16 @@ For base ref resolution, freshness, and downgrade reporting, load and follow [..
 
 ## Workflow
 
-1. Ask the user in natural language: `基础分支是什么？` Do not infer it from context and do not start with a command.
-2. Inspect the repository state before changing anything.
-3. Run the helper script in plan mode with the provided base branch.
-4. Return at least the `base_branch`, `source_branch`, and `new_branch` to the user and ask whether to continue.
-5. Execute the restack only after explicit user confirmation.
-6. Validate the resulting branch and report any unresolved conflicts or gaps.
-7. After a successful restack and validation, ask the user whether to delete the source branch locally and remotely.
-8. Delete the source branch only after the user explicitly confirms the deletion request.
+1. Require an explicitly provided base branch or base ref before doing anything else.
+2. If the request does not include one, ask the user in natural language: `基础分支是什么？` Then stop and wait. Do not infer it from context and do not start with a command.
+3. If the request includes one, first visibly show the base branch or base ref exactly as the user specified it before running commands or continuing the task.
+4. Inspect the repository state before changing anything.
+5. Run the helper script in plan mode with the provided base branch.
+6. Return at least the `base_branch`, `base_ref`, `source_branch`, and `new_branch` to the user and ask whether to continue.
+7. Execute the restack only after explicit user confirmation.
+8. Validate the resulting branch and report any unresolved conflicts or gaps.
+9. After a successful restack and validation, ask the user whether to delete the source branch locally and remotely.
+10. Delete the source branch only after the user explicitly confirms the deletion request.
 
 Prefer using `scripts/restack_from_base.py` for branch naming, commit discovery, and command generation. Resolve that relative path against the directory containing this `SKILL.md`; do not assume the current working directory is the skill directory. The canonical helper path is `<skill-dir>/scripts/restack_from_base.py`. The script defaults to plan mode and prints `status: awaiting_confirmation`. Only run with `--apply --confirm` after the user has reviewed the printed branches and explicitly approved continuation.
 
@@ -32,13 +34,16 @@ In IDE usage, the first response must be a natural-language question asking for 
 
 The first response must contain only the base-branch question. Do not include explanations, command examples, workflow summaries, confirmation templates, or any extra text in that first turn.
 
+If the user already provided the base branch or base ref in the current request, the first visible response must show it explicitly, for example `基础分支：dev`. Only then may you inspect repository state or run the plan command.
+
 Use this sequence:
 
 1. Ask only `基础分支是什么？`
 2. Wait for the user's answer.
-3. Run the script in plan mode with that base branch.
-4. Reply with the base branch, current branch, and new branch, then ask whether to continue.
-5. Only after the user confirms, run the apply command.
+3. Reply first with the specified base branch or base ref.
+4. Run the script in plan mode with that base branch.
+5. Reply with the base branch, resolved base ref, current branch, and new branch, then ask whether to continue.
+6. Only after the user confirms, run the apply command.
 
 ## Naming Rule
 
@@ -76,6 +81,7 @@ Useful flags:
 
 - Require the base branch as an explicit input from the user before running the script.
 - In IDE conversations, obtain that input by asking a natural-language question first, not by telling the user to execute a command.
+- Do not continue the task, inspect repository state, or run commands until the user has provided a base branch or base ref and you have visibly shown that specified base to the user.
 - Resolve `scripts/restack_from_base.py` relative to this skill directory before executing it. Do not run `python3 scripts/restack_from_base.py` unless the shell is already in `<skill-dir>`.
 - If the first attempt says the script is missing, check the sibling `scripts/` directory under this skill and rerun with the resolved path. Do not fall back to a manual restack until that canonical script path has been checked.
 - Resolve an unqualified base branch name to `<remote>/<base>` by default. Use `origin` when present, otherwise the only configured remote; ask when multiple non-`origin` remotes exist.

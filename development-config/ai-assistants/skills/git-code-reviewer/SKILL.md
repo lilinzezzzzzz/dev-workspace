@@ -1,6 +1,6 @@
 ---
 name: git-code-reviewer
-description: Review PRs, MRs, commits, diffs, or workspace changes for Python backend services. Use for code review, CR, PR review, MR review, 风险审查, 代码审查, 找风险, 审核实现, or 判断 Python 后端、API、worker、RAG 服务改动是否可合入. Focus on bugs, regressions, API contract breaks, FastAPI/Pydantic validation, SQLAlchemy/Alembic data risks, Redis/cache consistency, async/concurrency, LLM/RAG workflows, security, performance, and meaningful test gaps.
+description: Review PRs, MRs, commits, diffs, or workspace changes for Python backend services, but only after the user explicitly provides a base branch or base ref. Use for code review, CR, PR review, MR review, 风险审查, 代码审查, 找风险, 审核实现, or 判断 Python 后端、API、worker、RAG 服务改动是否可合入. If the request lacks an explicit base branch or base ref, ask for it and stop. After the user provides it, visibly show that specified base before inspecting diffs or continuing the review. Focus on bugs, regressions, API contract breaks, FastAPI/Pydantic validation, SQLAlchemy/Alembic data risks, Redis/cache consistency, async/concurrency, LLM/RAG workflows, security, performance, and meaningful test gaps.
 ---
 
 # Code Review
@@ -9,28 +9,33 @@ Use this skill to turn a change set into a small number of high-signal review fi
 
 ## Core Rules
 
-1. Review the actual change set and its runtime path, not the author's intent alone.
-2. Base every finding on concrete evidence from code, config, tests, schema, or runtime wiring.
-3. Prefer changed-code review first; read surrounding context only when needed to validate behavior.
-4. Trace changed behavior across request boundary, service logic, persistence, async or background execution, external calls, and rollout or config surfaces when relevant.
-5. Focus on issues that matter: correctness, contracts, data safety, concurrency, security, performance, observability, and test adequacy.
-6. When the change touches persisted, cached, indexed, or otherwise derived state, identify the authoritative state, the derived state, and the sync and cleanup paths before judging correctness.
-7. Prefer reporting one finding per root cause. Fold downstream symptoms such as missing tests, tail-latency regressions, or stale cleanup effects into the same finding unless the remediation meaningfully differs.
-8. Report missing tests as a standalone finding only when the gap hides a concrete changed risk, such as API contract breakage, state migration, security boundary, retry behavior, concurrency, or a regression-prone bug path. Otherwise mention test gaps as residual risk or fold them into the root-cause finding.
-9. Include low-severity maintainability findings only when the issue is on the changed path and materially increases misuse or future defect risk, for example opaque positional tuples or flags that encode multiple semantics, dead parameters or branches, or wrappers whose behavior is no longer live.
-10. Use validation to confirm or narrow ambiguous concerns when a nearby check is cheap and high-signal. Do not claim verification you did not run.
-11. Do not spend review budget on style-only or speculative issues unless repository policy makes them blocking.
-12. By default, report findings instead of fixing code. Only patch code when the user explicitly asks for fixes.
+1. Require an explicitly provided base branch or base ref before doing anything else.
+2. If the request does not include one, ask `基础分支是什么？` and stop. Do not infer a base from PR metadata, repository defaults, branch names, or local context.
+3. If the request includes one, first visibly show the base branch or base ref exactly as the user specified it before inspecting diffs, running git commands, reading review artifacts, or continuing the task.
+4. Review the actual change set and its runtime path, not the author's intent alone.
+5. Base every finding on concrete evidence from code, config, tests, schema, or runtime wiring.
+6. Prefer changed-code review first; read surrounding context only when needed to validate behavior.
+7. Trace changed behavior across request boundary, service logic, persistence, async or background execution, external calls, and rollout or config surfaces when relevant.
+8. Focus on issues that matter: correctness, contracts, data safety, concurrency, security, performance, observability, and test adequacy.
+9. When the change touches persisted, cached, indexed, or otherwise derived state, identify the authoritative state, the derived state, and the sync and cleanup paths before judging correctness.
+10. Prefer reporting one finding per root cause. Fold downstream symptoms such as missing tests, tail-latency regressions, or stale cleanup effects into the same finding unless the remediation meaningfully differs.
+11. Report missing tests as a standalone finding only when the gap hides a concrete changed risk, such as API contract breakage, state migration, security boundary, retry behavior, concurrency, or a regression-prone bug path. Otherwise mention test gaps as residual risk or fold them into the root-cause finding.
+12. Include low-severity maintainability findings only when the issue is on the changed path and materially increases misuse or future defect risk, for example opaque positional tuples or flags that encode multiple semantics, dead parameters or branches, or wrappers whose behavior is no longer live.
+13. Use validation to confirm or narrow ambiguous concerns when a nearby check is cheap and high-signal. Do not claim verification you did not run.
+14. Do not spend review budget on style-only or speculative issues unless repository policy makes them blocking.
+15. By default, report findings instead of fixing code. Only patch code when the user explicitly asks for fixes.
 
 ## Workflow
 
 1. Define review scope.
    - If the user provides a PR, MR, commit range, or diff, use that as the scope.
    - If the user asks to review workspace changes without a narrower scope, review tracked staged and unstaged changes by default. Ignore untracked files unless the user includes them explicitly or the changed code depends on them.
-   - If the user provides, or the workflow infers, a base branch or base ref, load and follow [../_shared/git-remote-base-resolution.md](../_shared/git-remote-base-resolution.md).
+   - The user must explicitly provide a base branch or base ref before scope inspection. If missing, ask `基础分支是什么？` and stop without running commands or reading diffs.
+   - First show the specified base branch or base ref exactly as provided, for example `基础分支：dev`.
+   - Load and follow [../_shared/git-remote-base-resolution.md](../_shared/git-remote-base-resolution.md) for that specified base branch or base ref.
    - Use `origin` as the default remote when it exists. If `origin` is absent and exactly one remote exists, use that remote. If multiple non-`origin` remotes exist and correctness depends on the base, ask which remote to use.
    - Use a local base ref only when the user explicitly asks for local branch state or provides a full local ref such as `refs/heads/main`.
-   - Otherwise infer the base in this order: PR or MR target branch if available; repository integration branch as a remote-tracking ref, preferring `origin/dev`, then `origin/main`, then `origin/master`; ask when multiple plausible bases remain.
+   - Do not infer the base from PR or MR target branches, repository integration branches, remote-tracking refs such as `origin/dev`, `origin/main`, or `origin/master`, current branch names, or other local context.
    - State the exact scope used, for example `origin/dev...HEAD`, and include the base freshness details required by the shared remote-base rule.
 
 2. Understand the change before judging it.
@@ -80,6 +85,7 @@ Use severity for user impact, not for stylistic preference.
 - Treat generated files, snapshots, vendored code, and lockfiles as secondary evidence unless the change specifically targets them or changes API, SDK, OpenAPI, protobuf, message schema, or other generated contract surfaces.
 - When reviewing workspace changes, state whether the scope included staged changes, unstaged changes, both, or an explicit diff artifact.
 - Distinguish local branch refs from remote-tracking refs. `main` and `origin/main` may point to different commits; use the shared remote-base rule whenever review correctness depends on a base branch.
+- Never continue a review without a user-specified base branch or base ref. PR or MR target metadata can confirm or contextualize a user-specified base, but it is not a substitute for explicit user input.
 - Follow unchanged code when a claim depends on shared helpers, framework hooks, middleware, serializers, migrations, or config.
 - For dependency bumps, especially changes to `pyproject.toml`, `uv.lock`, `requirements*.txt`, `poetry.lock`, or container images used by Python services, check compatibility, transitive risk, runtime defaults, packaging impact, and required follow-up changes.
 - For migrations and infra changes, check rollout safety, backward compatibility, lock duration, defaults, and rollback path.

@@ -34,13 +34,14 @@ Use this section in every review. Keep it brief, but make the reviewed boundary 
 Example:
 
 - Review scope: `origin/main...HEAD`
+- User-specified base: `main`
 - Base ref type: `remote-tracking`
 - Fetch: `executed`
 - Base commit: `<sha>`
 - Included: tracked staged and unstaged changes
 - Excluded: untracked files
 
-When the user provides an explicit PR, MR, commit range, or patch artifact, state that exact artifact instead of inventing a base ref.
+When the user provides an explicit PR, MR, commit range, or patch artifact, state that exact artifact together with the user-specified base. Do not invent or replace the base ref.
 
 ## Verification
 
@@ -75,7 +76,7 @@ Keep this short. Mention one of:
 - Prefer one finding per root cause. If multiple symptoms share one defect, combine them and explain the blast radius in `Impact`.
 - Explain why the issue matters, not just what changed.
 - Prefer file and line references over vague location hints.
-- Always state the reviewed scope. When review scope depends on an inferred or resolved base ref, state the exact ref used and whether it was remote-tracking or local. For remote-tracking bases, follow the shared remote-base reporting rule: fetch executed with base commit SHA, or explicit downgrade with local cached freshness warning.
+- Always state the reviewed scope. When review scope depends on a user-specified and resolved base ref, state the user-specified base, the exact ref used, and whether it was remote-tracking or local. For remote-tracking bases, follow the shared remote-base reporting rule: fetch executed with base commit SHA, or explicit downgrade with local cached freshness warning.
 - Always state what verification was run. If no commands were run, say so and explain whether the review was limited to static inspection.
 - Do not bury the main issue inside long prose.
 - If there are no findings, say so explicitly instead of padding with praise.
