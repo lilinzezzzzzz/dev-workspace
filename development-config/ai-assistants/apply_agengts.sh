@@ -5,6 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_AGENTS_FILE="$SCRIPT_DIR/AGENTS.md"
 SOURCE_AGENTS_DIR="$SCRIPT_DIR/agents"
 SOURCE_SKILLS_DIR="$SCRIPT_DIR/skills"
+SOURCE_SHARED_SKILLS_DIR="$SOURCE_SKILLS_DIR/_shared"
 CODEX_ROOT="${CODEX_ROOT:-$HOME/.codex}"
 QODER_ROOT="${QODER_ROOT:-$HOME/.qoder}"
 EXIT_SENTINEL="__SYNC_AGENTS_EXIT__"
@@ -247,6 +248,7 @@ sync_skill_dir() {
     local -a skills=()
     local -a selected_skills=()
     local -a target_roots=()
+    local shared_skill_dir="$SOURCE_SHARED_SKILLS_DIR"
     local skill=""
     local selected_skill=""
     local selected_target=""
@@ -278,6 +280,8 @@ sync_skill_dir() {
     done < <(resolve_target_roots "$selected_target")
 
     for target_root in "${target_roots[@]}"; do
+        sync_path "$shared_skill_dir" "$target_root/skills/$(basename "$shared_skill_dir")"
+
         for skill in "${selected_skills[@]}"; do
             sync_path "$skill" "$target_root/skills/$(basename "$skill")"
         done
@@ -329,6 +333,11 @@ main() {
 
     if [[ ! -d "$SOURCE_SKILLS_DIR" ]]; then
         echo "Skills source directory not found: $SOURCE_SKILLS_DIR" >&2
+        exit 1
+    fi
+
+    if [[ ! -d "$SOURCE_SHARED_SKILLS_DIR" ]]; then
+        echo "Shared skills source directory not found: $SOURCE_SHARED_SKILLS_DIR" >&2
         exit 1
     fi
 
