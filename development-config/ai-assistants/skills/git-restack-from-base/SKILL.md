@@ -7,7 +7,7 @@ description: Recreate the current git branch from an explicitly provided base br
 
 Use this skill to rebuild the current branch on top of an explicitly specified base branch while preserving the branch's own commits.
 
-By default, treat an unqualified base branch name such as `dev`, `main`, `master`, or `release/1.0` as a remote branch. Resolve it to the corresponding remote-tracking ref, for example `dev` -> `origin/dev`. Only use a local base ref when the user explicitly asks for local branch state or provides a full local ref.
+For base ref resolution, freshness, and downgrade reporting, load and follow [../_shared/git-remote-base-resolution.md](../_shared/git-remote-base-resolution.md).
 
 ## Workflow
 
@@ -24,12 +24,7 @@ Prefer using `scripts/restack_from_base.py` for branch naming, commit discovery,
 
 ## Base Ref Resolution
 
-1. If the user provides a full remote-tracking ref such as `origin/main` or `upstream/release/1.0`, use it directly as the base ref.
-2. If the user provides an unqualified branch name such as `dev`, `main`, `master`, or `release/1.0`, resolve it to the corresponding remote-tracking ref `<remote>/<branch>` by default.
-3. Use `origin` as the default remote when it exists. If `origin` is absent and exactly one remote exists, use that remote. If multiple non-`origin` remotes exist, ask which remote to use.
-4. Fetch the specific remote base before planning or applying, for example `git fetch origin dev`, then use `origin/dev`. Skip fetch only when the user explicitly asks to avoid it, the environment blocks it, or an explicit `--base-ref` was provided as already-fetched input.
-5. Do not silently fall back to a local branch with the same name. Use a local base only when the user explicitly asks for local branch state or provides a full local ref such as `refs/heads/main`.
-6. For a full remote-tracking ref such as `origin/release/1.0`, parse the first path component as the remote and fetch the remaining branch name. For an unqualified branch with slashes such as `release/1.0`, do not treat `release` as a remote unless it is a configured git remote.
+Follow the shared remote-base rule in [../_shared/git-remote-base-resolution.md](../_shared/git-remote-base-resolution.md). The restack-specific requirement is that planning and applying both use the same resolved base ref and report the same freshness status.
 
 ## IDE Interaction Rule
 
@@ -73,8 +68,8 @@ Useful flags:
 - `--remote <name>`: remote for unqualified base branches. Omit it to use `origin` when present or the only configured remote.
 - `--source-branch <name>`: restack a branch other than `HEAD`
 - `--new-branch <name>`: override the generated versioned branch name
-- `--base-ref <ref>`: use an already-fetched ref instead of `<remote>/<base>`
-- `--skip-fetch`: avoid `git fetch` when the environment is offline or the user wants to control fetch manually
+- `--base-ref <ref>`: use an explicit ref instead of resolving `<remote>/<base>`; this is not a remote-latest base unless the relevant fetch already succeeded in this session
+- `--skip-fetch`: degrade to the local cached remote-tracking ref only after the user explicitly allows proceeding without verifying the latest remote base
 - `--confirm`: required together with `--apply` after the user reviews the printed branches
 
 ## Execution Rules
@@ -84,6 +79,7 @@ Useful flags:
 - Resolve `scripts/restack_from_base.py` relative to this skill directory before executing it. Do not run `python3 scripts/restack_from_base.py` unless the shell is already in `<skill-dir>`.
 - If the first attempt says the script is missing, check the sibling `scripts/` directory under this skill and rerun with the resolved path. Do not fall back to a manual restack until that canonical script path has been checked.
 - Resolve an unqualified base branch name to `<remote>/<base>` by default. Use `origin` when present, otherwise the only configured remote; ask when multiple non-`origin` remotes exist.
+- Resolve and fetch the base using the shared remote-base rule before planning or applying.
 - Do not silently fall back to a local branch with the same name as the requested remote base.
 - Before any execution, show the user both the base branch they provided and the resolved base ref, then wait for approval.
 - Abort if the working tree is dirty unless the user explicitly asks to proceed.
@@ -144,13 +140,16 @@ Report:
 - the base branch provided by the user
 - the source branch
 - the base ref used
+- the fetched base commit SHA when fetch succeeded
+- the base freshness, such as `fetched` or `local-cached`
 - whether the base ref was resolved as a remote-tracking ref, an explicit local ref, or another explicit ref
 - the new branch name
 - the commits selected for cherry-pick
-- whether fetch was executed or skipped
+- whether fetch was executed, or whether the user explicitly allowed degrading to the local cached remote-tracking ref
 - whether the run is awaiting confirmation, completed, or stopped on conflict
 - whether source branch deletion was skipped, awaiting confirmation, completed, or partially completed
 
 ## References
 
-- Read [references/base-ref-resolution.md](./references/base-ref-resolution.md) for the default base-ref resolution, freshness, and reporting rules.
+- Read [../_shared/git-remote-base-resolution.md](../_shared/git-remote-base-resolution.md) for shared base-ref resolution, freshness, and reporting rules.
+- Read [references/base-ref-resolution.md](./references/base-ref-resolution.md) for restack-specific confirmation and reporting rules.

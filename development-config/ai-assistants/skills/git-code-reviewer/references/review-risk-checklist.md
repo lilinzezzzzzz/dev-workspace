@@ -5,9 +5,9 @@ Use only the sections relevant to the change. This is a thinking aid, not a temp
 ## 0. Review Basis and Freshness
 
 - What exact review scope am I using, for example `origin/main...HEAD` or a PR patch?
-- If a base branch name was unqualified, was it resolved to the corresponding remote-tracking ref `<remote>/<branch>` by default?
+- If a base branch name was unqualified, was it resolved with the shared remote-base rule?
 - Did I intentionally review against local branch state, and if so, is that called out explicitly?
-- If latest remote state matters, was fetch executed, skipped, or not needed?
+- If a remote-tracking base was used, did fetch succeed and was the base commit SHA recorded, or did the user explicitly allow downgrade?
 
 ## 1. Correctness and Control Flow
 

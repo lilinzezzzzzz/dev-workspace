@@ -27,12 +27,11 @@ Use this skill to turn a change set into a small number of high-signal review fi
 1. Define review scope.
    - If the user provides a PR, MR, commit range, or diff, use that as the scope.
    - If the user asks to review workspace changes without a narrower scope, review tracked staged and unstaged changes by default. Ignore untracked files unless the user includes them explicitly or the changed code depends on them.
-   - If the user provides an unqualified base branch name such as `dev`, `main`, or `master`, resolve it to the corresponding remote-tracking ref by default. For example, treat `dev` as `origin/dev`, not local `dev`.
+   - If the user provides, or the workflow infers, a base branch or base ref, load and follow [../_shared/git-remote-base-resolution.md](../_shared/git-remote-base-resolution.md).
    - Use `origin` as the default remote when it exists. If `origin` is absent and exactly one remote exists, use that remote. If multiple non-`origin` remotes exist and correctness depends on the base, ask which remote to use.
-   - Fetch the specific remote base before reviewing an inferred or unqualified base branch, for example `git fetch origin dev`, then review against `origin/dev`. Skip fetch only when the user explicitly asks to avoid it or the environment blocks it; state skipped or blocked fetch explicitly.
    - Use a local base ref only when the user explicitly asks for local branch state or provides a full local ref such as `refs/heads/main`.
    - Otherwise infer the base in this order: PR or MR target branch if available; repository integration branch as a remote-tracking ref, preferring `origin/dev`, then `origin/main`, then `origin/master`; ask when multiple plausible bases remain.
-   - State the exact scope used, for example `origin/dev...HEAD`, whether the base was remote-tracking or local, and whether fetch was executed, skipped, or blocked.
+   - State the exact scope used, for example `origin/dev...HEAD`, and include the base freshness details required by the shared remote-base rule.
 
 2. Understand the change before judging it.
    - Read the diff summary first.
@@ -80,7 +79,7 @@ Use severity for user impact, not for stylistic preference.
 
 - Treat generated files, snapshots, vendored code, and lockfiles as secondary evidence unless the change specifically targets them or changes API, SDK, OpenAPI, protobuf, message schema, or other generated contract surfaces.
 - When reviewing workspace changes, state whether the scope included staged changes, unstaged changes, both, or an explicit diff artifact.
-- Distinguish local branch refs from remote-tracking refs. `main` and `origin/main` may point to different commits; if review correctness depends on the latest integration branch, prefer the fetched remote-tracking ref and say which ref was used.
+- Distinguish local branch refs from remote-tracking refs. `main` and `origin/main` may point to different commits; use the shared remote-base rule whenever review correctness depends on a base branch.
 - Follow unchanged code when a claim depends on shared helpers, framework hooks, middleware, serializers, migrations, or config.
 - For dependency bumps, especially changes to `pyproject.toml`, `uv.lock`, `requirements*.txt`, `poetry.lock`, or container images used by Python services, check compatibility, transitive risk, runtime defaults, packaging impact, and required follow-up changes.
 - For migrations and infra changes, check rollout safety, backward compatibility, lock duration, defaults, and rollback path.

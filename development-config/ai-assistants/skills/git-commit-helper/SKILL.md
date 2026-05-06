@@ -15,6 +15,7 @@ Use this skill to derive a commit message from the actual change set. Prefer one
 4. Prefer a short, imperative subject.
 5. Do not auto-push.
 6. If the user asked for a message only, draft the message only. If the user asked to commit, commit only after the staged scope is clear enough to justify a single message.
+7. When the user provides a base branch or base ref for context, load and follow [../_shared/git-remote-base-resolution.md](../_shared/git-remote-base-resolution.md). Default to the latest remote base for non-local branch names.
 
 ## Language Policy (IMPORTANT)
 
@@ -41,6 +42,7 @@ Use this skill to derive a commit message from the actual change set. Prefer one
    - Prefer `git status --short`, `git diff --staged --stat`, and `git diff --staged`.
    - If nothing is staged, say so clearly.
    - If the user asks for a commit but only unstaged changes exist, stop and explain the gap.
+   - If the user provides a base branch or base ref for context, resolve freshness and reporting through the shared remote-base rule before using it.
 
 3. Classify the change.
    - Load [references/commit-type-selection.md](./references/commit-type-selection.md).
@@ -55,6 +57,7 @@ Use this skill to derive a commit message from the actual change set. Prefer one
 5. Produce the result in a stable shape.
    - Use [references/commit-message-template.md](./references/commit-message-template.md) as the default output shape.
    - When committing, show the exact message used.
+   - When a base ref was used for context, state the exact base ref, whether it was remote-tracking or local, whether fetch was executed, and the fetched base commit SHA when fetch succeeded.
    - If you did not commit, say whether the result is a draft, a recommendation, or blocked by staging ambiguity.
 
 ## Safety Guidance

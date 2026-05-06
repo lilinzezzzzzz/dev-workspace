@@ -7,7 +7,7 @@ Use this template as the default output shape when drafting a PR or MR.
 ```markdown
 基于 `<base-ref>` 生成。
 
-基线说明：`<remote-tracking|local>`；fetch: `<executed|skipped|blocked|not-needed>`
+基线说明：`<remote-tracking|local>`；fetch: `<executed|not-needed|degraded>`；base commit: `<sha|not-needed>`
 
 标题：
 <title>
@@ -31,7 +31,7 @@ Use this version when the user asks for a shorter description.
 ```markdown
 基于 `<base-ref>` 生成。
 
-基线说明：`<remote-tracking|local>`；fetch: `<executed|skipped|blocked|not-needed>`
+基线说明：`<remote-tracking|local>`；fetch: `<executed|not-needed|degraded>`；base commit: `<sha|not-needed>`
 
 标题：
 <title>
@@ -55,5 +55,4 @@ Use this version when the user asks for a shorter description.
 ## Base Ref Guidance
 
 - Always include the exact base ref near the top.
-- State whether the base ref was a remote-tracking ref or an explicit local ref.
-- If fetch was skipped, blocked, or not needed, say so explicitly when that affects freshness expectations.
+- Use [../../_shared/git-remote-base-resolution.md](../../_shared/git-remote-base-resolution.md) for resolution, freshness, downgrade, and reporting rules.

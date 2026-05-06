@@ -1,4 +1,4 @@
 interface:
   display_name: "Git Code Reviewer"
   short_description: "面向 Python 后端服务的高信号代码审查"
-  default_prompt: "Use $git-code-reviewer to review this Python backend change and report concrete findings with severity, file references, confirmed evidence, unverified assumptions, scope, verification, and residual risks; resolve an unqualified base branch such as dev to the remote-tracking ref such as origin/dev unless a local ref is explicitly requested."
+  default_prompt: "Use $git-code-reviewer to review this Python backend change and report concrete findings with severity, file references, confirmed evidence, unverified assumptions, scope, verification, and residual risks; follow the shared remote-base rule for any base branch or base ref."

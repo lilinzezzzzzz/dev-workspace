@@ -25,7 +25,9 @@ class RestackPlan:
     source_branch: str
     new_branch: str
     base_ref: str
+    base_commit_sha: str
     base_ref_kind: str
+    base_freshness: str
     commits: list[Commit]
     fetch_executed: bool
 
@@ -100,6 +102,11 @@ def ensure_ref_exists(ref: str) -> None:
     result = run_git("rev-parse", "--verify", ref, check=False)
     if result.returncode != 0:
         raise SystemExit(f"Git ref not found: {ref}")
+
+
+def ref_commit_sha(ref: str) -> str:
+    """Return the commit SHA for a resolved git ref."""
+    return git_output("rev-parse", "--verify", ref)
 
 
 def ref_exists(ref: str) -> bool:
@@ -206,6 +213,13 @@ def collect_commits(*, base_ref: str, source_branch: str) -> list[Commit]:
     return commits
 
 
+def base_freshness(*, base_ref_kind: str, fetch_executed: bool) -> str:
+    """Describe whether the base ref was freshly fetched or locally cached."""
+    if base_ref_kind == "remote-tracking":
+        return "fetched" if fetch_executed else "local-cached"
+    return base_ref_kind
+
+
 def ensure_branch_absent(branch_name: str) -> None:
     """Avoid reusing an existing branch name."""
     result = run_git("show-ref", "--verify", f"refs/heads/{branch_name}", check=False)
@@ -257,6 +271,7 @@ def build_plan(
     else:
         fetch_executed = False
     ensure_ref_exists(base_resolution.base_ref)
+    base_commit_sha = ref_commit_sha(base_resolution.base_ref)
     ensure_ref_exists(source_branch)
 
     resolved_new_branch = new_branch or next_versioned_branch(source_branch)
@@ -271,7 +286,12 @@ def build_plan(
         source_branch=source_branch,
         new_branch=resolved_new_branch,
         base_ref=base_resolution.base_ref,
+        base_commit_sha=base_commit_sha,
         base_ref_kind=base_resolution.base_ref_kind,
+        base_freshness=base_freshness(
+            base_ref_kind=base_resolution.base_ref_kind,
+            fetch_executed=fetch_executed,
+        ),
         commits=commits,
         fetch_executed=fetch_executed,
     )
@@ -282,7 +302,9 @@ def print_plan(plan: RestackPlan) -> None:
     print(f"base_branch: {plan.base_branch}")
     print(f"source_branch: {plan.source_branch}")
     print(f"base_ref: {plan.base_ref}")
+    print(f"base_commit_sha: {plan.base_commit_sha}")
     print(f"base_ref_kind: {plan.base_ref_kind}")
+    print(f"base_freshness: {plan.base_freshness}")
     print(f"new_branch: {plan.new_branch}")
     print(f"fetch_executed: {'yes' if plan.fetch_executed else 'no'}")
     print("commits:")
@@ -318,7 +340,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--skip-fetch",
         action="store_true",
-        help="Skip `git fetch <remote> <base>` before building the plan",
+        help=(
+            "Use the local cached remote-tracking ref without fetching. "
+            "Only use after the user explicitly allows degrading freshness."
+        ),
     )
     parser.add_argument(
         "--allow-dirty",
