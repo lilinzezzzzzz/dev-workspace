@@ -130,6 +130,12 @@ Fallback cases:
   generics. Do not introduce deprecated `typing` aliases such as `Dict`,
   `List`, `Optional`, `Union`, or `AsyncGenerator`.
 - Use PEP 604 syntax: `A | B` and `T | None`.
+- Container parameter types follow variance: read-only inputs use
+  covariant `collections.abc` types (`Sequence`, `Mapping`, `Set`,
+  `Iterable`) so subtypes pass without friction; use concrete mutable
+  generics (`list`, `dict`, `set`) only when the function mutates the
+  argument or the concrete type is part of the contract. Returns may
+  stay concrete when ownership is handed to the caller.
 - Prefer explicit data models over loose dicts: `TypedDict` for typed
   mappings, `dataclass` for plain data carriers, Pydantic v2 for
   validated I/O models.

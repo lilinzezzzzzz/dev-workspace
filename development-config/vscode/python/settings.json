@@ -89,7 +89,6 @@
   // -------------------- Pylance / 分析配置 --------------------
   "python.languageServer": "Pylance",
   "python.analysis.diagnosticMode": "openFilesOnly", // 仅分析打开的文件，避免大型仓库性能开销
-  "python.analysis.typeCheckingMode": "basic", // 启用基础类型检查
   "python.analysis.importFormat": "absolute", // 自动导入使用绝对导入
   "python.analysis.autoImportCompletions": true, // 启用自动导入补全
   "python.analysis.completeFunctionParens": true, // 补全函数时自动补全括号
