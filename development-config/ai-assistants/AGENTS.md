@@ -148,9 +148,6 @@ Fallback cases:
 - Prefer keyword-only parameters unless positional calls clearly improve
   readability. Use `def` over lambda assignment and f-strings over
   `.format()`.
-- Custom exceptions inherit from a project-specific base such as
-  `AppError`. Use `ValueError`/`TypeError` for programming errors, not
-  business logic. Keep exception hierarchy flat.
 - Use `anyio` + `TaskGroup` for concurrency, `httpx` for HTTP, and
   `anyio.to_thread` for blocking I/O.
 - FastAPI: explicit request/response models, `Depends` for DI, and
