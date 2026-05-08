@@ -13,7 +13,8 @@ AGENTS 指令与 skills，同一份内容可以服务于 Codex 以及其他支�
 ```text
 development-config/ai-assistants/
 ├── apply_agengts.sh          # 统一同步入口：AGENTS.md / rules / skills
-├── codex-config.toml         # 同步到 Codex 根目录 config.toml 的源配置
+├── configs/
+│   └── codex-config.toml     # 同步到 Codex 根目录 config.toml 的源配置
 ├── rules/                    # 规则源文件；Codex 同步时生成 AGENTS.md
 │   ├── agents.md             # 同步到 Codex 根目录 AGENTS.md 的源模板
 │   └── python.md             # Python 规则
@@ -108,8 +109,8 @@ skills/<skill-name>/
 **脚本功能说明**:
 
 - **内容选择**: 支持 `rules`、`skills`、`codex-config`
-- **config 流程**: 选择后直接把 `codex-config.toml` 同步到 Codex 根目录
-  的 `config.toml`
+- **config 流程**: 选择后直接把 `configs/codex-config.toml` 同步到
+  Codex 根目录的 `config.toml`
 - **rules 流程**: 先选择 `codex` 或 `qoder`；选择 `qoder` 时必须输入
   以 `.qoder` 结尾的目标项目目录，例如 `/path/to/project/.qoder`
 - **skills 流程**: 先选择具体 skill 或全部 skills，再选择目标 assistant
@@ -128,8 +129,8 @@ skills/<skill-name>/
 - 选择 `rules` -> `qoder`：输入以 `.qoder` 结尾的项目目录，并把
   `rules/*.md` 同步到该目录下的 `rules/`；目标 `agents.md` 会移除
   `Language Defaults` 章节
-- 选择 `codex-config`：把 `codex-config.toml` 同步为 Codex 根目录的
-  `config.toml`
+- 选择 `codex-config`：把 `configs/codex-config.toml` 同步为 Codex
+  根目录的 `config.toml`
 - 选择 `skills`：选择一个 skill 或全部 skills，并同步到目标 assistant 的 `skills/`
 - skills 选择 `both`：将选中的 skill 同步到当前配置的所有目标目录
 

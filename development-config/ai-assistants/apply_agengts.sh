@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_RULES_DIR="$SCRIPT_DIR/rules"
 SOURCE_AGENTS_FILE="$SOURCE_RULES_DIR/agents.md"
-SOURCE_CODEX_CONFIG_FILE="$SCRIPT_DIR/codex-config.toml"
+SOURCE_CODEX_CONFIG_FILE="$SCRIPT_DIR/configs/codex-config.toml"
 SOURCE_SKILLS_DIR="$SCRIPT_DIR/skills"
 SOURCE_SHARED_SKILLS_DIR="$SOURCE_SKILLS_DIR/_shared"
 CODEX_ROOT="${CODEX_ROOT:-$HOME/.codex}"
