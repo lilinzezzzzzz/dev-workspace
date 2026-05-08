@@ -1,3 +1,7 @@
+---
+trigger: model_decision
+description: For Python implementation, review, refactor, dependency, test, or   packaging work
+---
 # Python Rules
 
 Use these rules for Python implementation, review, refactor, dependency,

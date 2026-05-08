@@ -1,3 +1,7 @@
+---
+trigger: always_on
+alwaysApply: true
+---
 # Agent Instructions
 
 > Apply to technical work only. For non-technical chat, respond

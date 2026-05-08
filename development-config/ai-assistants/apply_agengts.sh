@@ -2,9 +2,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SOURCE_AGENTS_FILE="$SCRIPT_DIR/AGENTS.md"
-SOURCE_AGENTS_DIR="$SCRIPT_DIR/agents"
-SOURCE_REFERENCES_DIR="$SCRIPT_DIR/references"
+SOURCE_RULES_DIR="$SCRIPT_DIR/rules"
+SOURCE_AGENTS_FILE="$SOURCE_RULES_DIR/agents.md"
 SOURCE_SKILLS_DIR="$SCRIPT_DIR/skills"
 SOURCE_SHARED_SKILLS_DIR="$SOURCE_SKILLS_DIR/_shared"
 CODEX_ROOT="${CODEX_ROOT:-$HOME/.codex}"
@@ -112,13 +111,23 @@ choose_content() {
     echo "Select content to sync:" >&2
     local content=""
 
-    select content in "AGENTS.md" "skills" "agents" "exit"; do
+    while true; do
+        echo "1) rules" >&2
+        echo "2) skills" >&2
+        echo "3) exit" >&2
+        read -r -p "#? " content
+        content="$(trim_spaces "$content")"
+
         case "$content" in
-            "AGENTS.md"|"agents"|"skills")
-                printf '%s\n' "$content"
+            1|rules)
+                printf '%s\n' "rules"
                 return 0
                 ;;
-            "exit")
+            2|skills)
+                printf '%s\n' "skills"
+                return 0
+                ;;
+            3|exit)
                 printf '%s\n' "$EXIT_SENTINEL"
                 return 0
                 ;;
@@ -127,6 +136,64 @@ choose_content() {
                 ;;
         esac
     done
+}
+
+choose_rules_target() {
+    echo "Select rules target:" >&2
+    local target=""
+
+    while true; do
+        echo "1) codex -> AGENTS.md + references" >&2
+        echo "2) qoder -> project .qoder path" >&2
+        echo "3) exit" >&2
+        read -r -p "#? " target
+        target="$(trim_spaces "$target")"
+
+        case "$target" in
+            1|codex)
+                printf '%s\n' "codex"
+                return 0
+                ;;
+            2|qoder)
+                printf '%s\n' "qoder"
+                return 0
+                ;;
+            3|exit)
+                printf '%s\n' "$EXIT_SENTINEL"
+                return 0
+                ;;
+            *)
+                echo "Invalid selection, try again." >&2
+                ;;
+        esac
+    done
+}
+
+prompt_qoder_root_dir() {
+    local target_root=""
+
+    while true; do
+        read -r -p "Enter Qoder project .qoder path (for example: /path/to/project/.qoder): " target_root
+        target_root="$(trim_spaces "$target_root")"
+
+        if [[ -n "$target_root" ]]; then
+            if [[ "$(basename "$target_root")" != ".qoder" ]]; then
+                echo "Qoder project path must end with .qoder." >&2
+                continue
+            fi
+
+            printf '%s\n' "$target_root"
+            return 0
+        fi
+
+        echo "Qoder project .qoder path cannot be empty." >&2
+    done
+}
+
+resolve_qoder_rules_dir() {
+    local target_root="$1"
+
+    printf '%s\n' "$target_root/rules"
 }
 
 choose_target() {
@@ -239,16 +306,15 @@ sync_references_dir() {
     while IFS= read -r entry; do
         sync_path "$entry" "$target_dir/$(basename "$entry")"
         entry_count=$((entry_count + 1))
-    done < <(find "$SOURCE_REFERENCES_DIR" -mindepth 1 -maxdepth 1 ! -name '.gitkeep' | sort)
+    done < <(find "$SOURCE_RULES_DIR" -mindepth 1 -maxdepth 1 ! -name '.gitkeep' ! -name 'agents.md' | sort)
 
     if [[ "$entry_count" -eq 0 ]]; then
-        echo "No syncable entries found under $SOURCE_REFERENCES_DIR. Ensured target directory exists: $target_dir"
+        echo "No syncable entries found under $SOURCE_RULES_DIR. Ensured target directory exists: $target_dir"
     fi
 }
 
-sync_agents_dir() {
-    local target_root="$1"
-    local target_dir="$target_root/agents"
+sync_qoder_rules_dir() {
+    local target_dir="$1"
     local entry=""
     local entry_count=0
 
@@ -257,10 +323,10 @@ sync_agents_dir() {
     while IFS= read -r entry; do
         sync_path "$entry" "$target_dir/$(basename "$entry")"
         entry_count=$((entry_count + 1))
-    done < <(find "$SOURCE_AGENTS_DIR" -mindepth 1 -maxdepth 1 ! -name '.gitkeep' | sort)
+    done < <(find "$SOURCE_RULES_DIR" -mindepth 1 -maxdepth 1 ! -name '.gitkeep' | sort)
 
     if [[ "$entry_count" -eq 0 ]]; then
-        echo "No syncable entries found under $SOURCE_AGENTS_DIR. Ensured target directory exists: $target_dir"
+        echo "No syncable entries found under $SOURCE_RULES_DIR. Ensured target directory exists: $target_dir"
     fi
 }
 
@@ -308,33 +374,11 @@ sync_skill_dir() {
     done
 }
 
-sync_selected_content() {
-    local content="$1"
-    local target_root="$2"
-
-    case "$content" in
-        "AGENTS.md")
-            sync_agents_file "$target_root"
-            ;;
-        agents)
-            sync_agents_dir "$target_root"
-            ;;
-        skills)
-            sync_skill_dir
-            ;;
-        *)
-            echo "Unsupported content type: $content" >&2
-            exit 1
-            ;;
-    esac
-}
-
 main() {
     local content=""
-    local selected_target=""
-    local target_root=""
-    local -a target_roots=()
-    local continue_sync=""
+    local qoder_rules_dir=""
+    local qoder_root=""
+    local rules_target=""
 
     if [[ $# -ne 0 ]]; then
         echo "This script is interactive and does not accept command-line arguments." >&2
@@ -342,17 +386,12 @@ main() {
     fi
 
     if [[ ! -f "$SOURCE_AGENTS_FILE" ]]; then
-        echo "AGENTS source file not found: $SOURCE_AGENTS_FILE" >&2
+        echo "Codex AGENTS source file not found: $SOURCE_AGENTS_FILE" >&2
         exit 1
     fi
 
-    if [[ ! -d "$SOURCE_AGENTS_DIR" ]]; then
-        echo "Agents source directory not found: $SOURCE_AGENTS_DIR" >&2
-        exit 1
-    fi
-
-    if [[ ! -d "$SOURCE_REFERENCES_DIR" ]]; then
-        echo "References source directory not found: $SOURCE_REFERENCES_DIR" >&2
+    if [[ ! -d "$SOURCE_RULES_DIR" ]]; then
+        echo "Rules source directory not found: $SOURCE_RULES_DIR" >&2
         exit 1
     fi
 
@@ -368,48 +407,35 @@ main() {
 
     require_command diff
 
-    while true; do
-        content="$(choose_content)"
-        if [[ "$content" == "$EXIT_SENTINEL" ]]; then
-            exit 0
-        fi
+    content="$(choose_content)"
+    if [[ "$content" == "$EXIT_SENTINEL" ]]; then
+        exit 0
+    fi
 
-        if [[ "$content" == "skills" ]]; then
-            sync_skill_dir
-        else
-            selected_target="$(choose_target)"
-            if [[ "$selected_target" == "$EXIT_SENTINEL" ]]; then
-                exit 0
-            fi
+    if [[ "$content" == "skills" ]]; then
+        sync_skill_dir
+        return 0
+    fi
 
-            target_roots=()
-            while IFS= read -r target_root; do
-                [[ -n "$target_root" ]] && target_roots+=("$target_root")
-            done < <(resolve_target_roots "$selected_target")
+    rules_target="$(choose_rules_target)"
+    if [[ "$rules_target" == "$EXIT_SENTINEL" ]]; then
+        exit 0
+    fi
 
-            if [[ "${#target_roots[@]}" -eq 0 ]]; then
-                echo "Target root cannot be empty." >&2
-                exit 1
-            fi
+    if [[ "$rules_target" == "qoder" ]]; then
+        qoder_root="$(prompt_qoder_root_dir)"
+        qoder_rules_dir="$(resolve_qoder_rules_dir "$qoder_root")"
+        sync_qoder_rules_dir "$qoder_rules_dir"
+        return 0
+    fi
 
-            for target_root in "${target_roots[@]}"; do
-                target_root="$(trim_spaces "$target_root")"
+    CODEX_ROOT="$(trim_spaces "$CODEX_ROOT")"
+    if [[ -z "$CODEX_ROOT" ]]; then
+        echo "CODEX_ROOT cannot be empty." >&2
+        exit 1
+    fi
 
-                if [[ -z "$target_root" ]]; then
-                    echo "Target root cannot be empty." >&2
-                    exit 1
-                fi
-
-                sync_selected_content "$content" "$target_root"
-            done
-        fi
-
-        read -r -p "Sync another item? [y/N]: " continue_sync
-        continue_sync="$(trim_spaces "$continue_sync")"
-        if [[ ! "$continue_sync" =~ ^([yY]|[yY][eE][sS])$ ]]; then
-            break
-        fi
-    done
+    sync_agents_file "$CODEX_ROOT"
 }
 
 main "$@"

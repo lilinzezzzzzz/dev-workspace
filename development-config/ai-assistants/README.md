@@ -1,10 +1,10 @@
 # AI Assistant 用户级配置
 
-> 面向 Codex、Qoder 及其他 IDE 内 AI assistant 的通用个人配置和指令集
+> 面向 Codex 及其他支持 AGENTS.md 的 AI assistant 的通用个人配置和指令集
 
 一套可复用的个人级 AI assistant 配置，包含编码规范、Git 工作流、
-AGENTS 指令与 skills，同一份内容可以同时服务于 Codex、Qoder 以及
-其他支持类似机制的开发工具。
+AGENTS 指令与 skills，同一份内容可以服务于 Codex 以及其他支持
+类似机制的开发工具。
 
 ---
 
@@ -12,9 +12,9 @@ AGENTS 指令与 skills，同一份内容可以同时服务于 Codex、Qoder 以
 
 ```text
 development-config/ai-assistants/
-├── AGENTS.md                 # 通用 AGENTS 指令和开发规范
-├── apply_agengts.sh          # 统一同步入口：AGENTS.md / references / agents / skills
-├── references/               # AGENTS.md 按需加载的细分规则
+├── apply_agengts.sh          # 统一同步入口：AGENTS.md / rules / skills
+├── rules/                    # 规则源文件；Codex 同步时生成 AGENTS.md
+│   ├── agents.md             # 同步到 Codex 根目录 AGENTS.md 的源模板
 │   └── python.md             # Python 规则
 ├── agents/                   # Agent 配置文件（预留）
 ├── events/                   # 事件处理配置（预留）
@@ -31,26 +31,28 @@ development-config/ai-assistants/
 
 ## 🎯 核心组件
 
-### AGENTS.md
+### rules/
 
-用户的通用 AGENTS 指令和开发规范：
+规则源文件。同步 Codex 时，`rules/agents.md` 只会写入 Codex 根目录的
+`AGENTS.md`，其他规则文件会同步到 Codex 根目录的 `references/`，供
+渐进式披露读取。同步 Qoder 时，脚本会要求输入项目 `.qoder` 目录，
+并把 `rules/*.md` 同步到该目录下的 `rules/`：
 
-- **适用范围**: Codex、Qoder 和其他支持类似规则注入的工具
+- **适用范围**: Codex 和其他支持 `AGENTS.md` 规则注入的工具
 - **角色定位**: 个人开发者的技术偏好和习惯
 - **技术栈**: 根据个人项目需求定制
 - **编码标准**: 符合个人编码风格的最佳实践
 - **Git 规范**: 个性化的提交信息规范
-- **兼容目标**: 优先兼容 Qoder 与 Codex 的 `AGENTS.md` 加载机制
-- **渐进式披露**: 语言或技术栈细则下沉到 `references/`，通过明确路径
+- **渐进式披露**: 语言或技术栈细则下沉到 `rules/`，通过明确路径
   指令在相关任务中读取，不依赖 Markdown 链接自动展开
 
 ### Skills 与同步脚本
 
 当前目录已经包含一组可复用能力：
 
-- **apply_agengts.sh**: 统一同步入口，可交互选择 `AGENTS.md`、
-  `agents/` 或单个 `skill`；同步 `AGENTS.md` 时会同时同步顶层
-  `references/`
+- **apply_agengts.sh**: 统一同步入口，可交互选择 `rules` 或单个
+  `skill`；同步 rules 到 Codex 时写入 `AGENTS.md` 和顶层
+  `references/`，同步 rules 到 Qoder 时写入指定项目 rules 目录
 - **api-endpoint-analyzer**: 系统化分析 API endpoint 的请求、响应、业务流程与错误处理
 - **git-code-reviewer**: 基于 diff 输出高信号代码审查结论，优先发现 bug、回归和风险
 - **git-commit-helper**: 基于 staged diff 生成或执行规范的 Conventional Commit
@@ -93,7 +95,8 @@ skills/<skill-name>/
 
 ### 1. 应用个人配置
 
-执行统一同步脚本后，按提示选择要同步的内容类型，再选择目标 assistant：
+执行统一同步脚本后，按提示选择要同步的内容类型。选择 `skills` 时，
+脚本会继续要求选择目标 assistant：
 
 ```bash
 ./development-config/ai-assistants/apply_agengts.sh
@@ -101,22 +104,26 @@ skills/<skill-name>/
 
 **脚本功能说明**:
 
-- **内容选择**: 支持 `AGENTS.md`、`agents/`、`skills/`
+- **内容选择**: 支持 `rules`、`skills`
+- **rules 流程**: 先选择 `codex` 或 `qoder`；选择 `qoder` 时必须输入
+  以 `.qoder` 结尾的目标项目目录，例如 `/path/to/project/.qoder`
 - **skills 流程**: 先选择具体 skill 或全部 skills，再选择目标 assistant
-- **目标选择**: 支持 `codex`、`qoder` 或 `both`
-- **覆盖策略**: `AGENTS.md` 直接覆盖；顶层 `references/`、
-  `agents/` 和 `skills/` 仅覆盖同名项
+- **目标选择**: rules 支持 `codex` 或 `qoder`；`skills` 支持 `codex`、
+  `qoder` 或 `both`
+- **覆盖策略**: `AGENTS.md` 直接覆盖；顶层 `references/` 和 `skills/`
+  仅覆盖同名项
 - **完整性校验**: 文件使用 SHA-256 校验，目录使用 `diff -qr`
 - **依赖要求**: 需要系统安装 `diff`，文件校验会优先使用
   `sha256sum`，并兼容 `shasum` 或 `openssl`
 
 ### 2. 典型用法
 
-- 选择 `AGENTS.md`：同步个人规则文件到目标 assistant 根目录，并同步
-  `references/` 供按需加载
-- 选择 `agents`：同步仓库中的 agent 配置目录到目标 assistant 的 `agents/`
+- 选择 `rules` -> `codex`：把 `rules/agents.md` 同步为 Codex 根目录的
+  `AGENTS.md`，并把其他源规则同步到 `references/`
+- 选择 `rules` -> `qoder`：输入以 `.qoder` 结尾的项目目录，并把
+  `rules/*.md` 同步到该目录下的 `rules/`
 - 选择 `skills`：选择一个 skill 或全部 skills，并同步到目标 assistant 的 `skills/`
-- 选择 `both`：将选中的内容同步到当前配置的所有目标目录
+- skills 选择 `both`：将选中的 skill 同步到当前配置的所有目标目录
 
 当前已维护的 skill 更适合以下场景：
 
