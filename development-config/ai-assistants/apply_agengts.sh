@@ -22,6 +22,26 @@ require_command() {
     fi
 }
 
+require_file() {
+    local file_path="$1"
+    local description="$2"
+
+    if [[ ! -f "$file_path" ]]; then
+        echo "$description not found: $file_path" >&2
+        exit 1
+    fi
+}
+
+require_dir() {
+    local dir_path="$1"
+    local description="$2"
+
+    if [[ ! -d "$dir_path" ]]; then
+        echo "$description not found: $dir_path" >&2
+        exit 1
+    fi
+}
+
 command_exists() {
     local command_name="$1"
 
@@ -73,6 +93,15 @@ verify_file_copy() {
     fi
 }
 
+assert_safe_directory_dest() {
+    local dest_path="$1"
+
+    if [[ -z "$dest_path" || "$dest_path" == "/" || "$dest_path" == "$HOME" ]]; then
+        echo "Refusing to replace unsafe directory path: $dest_path" >&2
+        exit 1
+    fi
+}
+
 sync_path() {
     local source_path="$1"
     local dest_path="$2"
@@ -95,6 +124,7 @@ sync_path() {
         exit 1
     fi
 
+    assert_safe_directory_dest "$dest_path"
     base_name="$(basename "$dest_path")"
     staging_path="$(mktemp -d "$dest_parent/.${base_name}.XXXXXX")"
     cp -R "$source_path"/. "$staging_path"/
@@ -309,9 +339,10 @@ sync_codex_config_file() {
     sync_path "$SOURCE_CODEX_CONFIG_FILE" "$target_root/config.toml"
 }
 
-sync_references_dir() {
-    local target_root="$1"
-    local target_dir="$target_root/references"
+sync_directory_entries() {
+    local source_dir="$1"
+    local target_dir="$2"
+    local empty_message="$3"
     local entry=""
     local entry_count=0
 
@@ -320,22 +351,30 @@ sync_references_dir() {
     while IFS= read -r entry; do
         sync_path "$entry" "$target_dir/$(basename "$entry")"
         entry_count=$((entry_count + 1))
-    done < <(find "$SOURCE_REFERENCES_DIR" -mindepth 1 -maxdepth 1 ! -name '.gitkeep' | sort)
+    done < <(find "$source_dir" -mindepth 1 -maxdepth 1 ! -name '.gitkeep' | sort)
 
     if [[ "$entry_count" -eq 0 ]]; then
-        echo "No syncable entries found under $SOURCE_REFERENCES_DIR. Ensured target directory exists: $target_dir"
+        echo "$empty_message. Ensured target directory exists: $target_dir"
     fi
+}
+
+sync_references_dir() {
+    local target_dir="$1"
+
+    sync_directory_entries \
+        "$SOURCE_REFERENCES_DIR" \
+        "$target_dir/references" \
+        "No syncable entries found under $SOURCE_REFERENCES_DIR"
 }
 
 sync_qoder_rules_dir() {
     local target_dir="$1"
+    local references_dir="$target_dir/references"
     local entry=""
-    local entry_count=0
 
     mkdir -p "$target_dir"
 
     sync_path "$SOURCE_AGENTS_FILE" "$target_dir/$(basename "$SOURCE_AGENTS_FILE")"
-    entry_count=$((entry_count + 1))
 
     while IFS= read -r entry; do
         if [[ "$entry" == "$SOURCE_AGENTS_FILE" || "$entry" == "$SOURCE_REFERENCES_DIR" ]]; then
@@ -343,17 +382,12 @@ sync_qoder_rules_dir() {
         fi
 
         sync_path "$entry" "$target_dir/$(basename "$entry")"
-        entry_count=$((entry_count + 1))
     done < <(find "$SOURCE_RULES_DIR" -mindepth 1 -maxdepth 1 ! -name '.gitkeep' | sort)
 
-    while IFS= read -r entry; do
-        sync_path "$entry" "$target_dir/$(basename "$entry")"
-        entry_count=$((entry_count + 1))
-    done < <(find "$SOURCE_REFERENCES_DIR" -mindepth 1 -maxdepth 1 ! -name '.gitkeep' | sort)
-
-    if [[ "$entry_count" -eq 0 ]]; then
-        echo "No syncable entries found under $SOURCE_RULES_DIR. Ensured target directory exists: $target_dir"
-    fi
+    sync_directory_entries \
+        "$SOURCE_REFERENCES_DIR" \
+        "$references_dir" \
+        "No syncable entries found under $SOURCE_REFERENCES_DIR"
 }
 
 sync_skill_dir() {
@@ -411,35 +445,12 @@ main() {
         exit 1
     fi
 
-    if [[ ! -f "$SOURCE_AGENTS_FILE" ]]; then
-        echo "Codex AGENTS source file not found: $SOURCE_AGENTS_FILE" >&2
-        exit 1
-    fi
-
-    if [[ ! -f "$SOURCE_CODEX_CONFIG_FILE" ]]; then
-        echo "Codex config source file not found: $SOURCE_CODEX_CONFIG_FILE" >&2
-        exit 1
-    fi
-
-    if [[ ! -d "$SOURCE_RULES_DIR" ]]; then
-        echo "Rules source directory not found: $SOURCE_RULES_DIR" >&2
-        exit 1
-    fi
-
-    if [[ ! -d "$SOURCE_REFERENCES_DIR" ]]; then
-        echo "Rules references source directory not found: $SOURCE_REFERENCES_DIR" >&2
-        exit 1
-    fi
-
-    if [[ ! -d "$SOURCE_SKILLS_DIR" ]]; then
-        echo "Skills source directory not found: $SOURCE_SKILLS_DIR" >&2
-        exit 1
-    fi
-
-    if [[ ! -d "$SOURCE_SHARED_SKILLS_DIR" ]]; then
-        echo "Shared skills source directory not found: $SOURCE_SHARED_SKILLS_DIR" >&2
-        exit 1
-    fi
+    require_file "$SOURCE_AGENTS_FILE" "Codex AGENTS source file"
+    require_file "$SOURCE_CODEX_CONFIG_FILE" "Codex config source file"
+    require_dir "$SOURCE_RULES_DIR" "Rules source directory"
+    require_dir "$SOURCE_REFERENCES_DIR" "Rules references source directory"
+    require_dir "$SOURCE_SKILLS_DIR" "Skills source directory"
+    require_dir "$SOURCE_SHARED_SKILLS_DIR" "Shared skills source directory"
 
     require_command diff
 
