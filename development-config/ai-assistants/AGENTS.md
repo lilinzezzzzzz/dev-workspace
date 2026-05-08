@@ -5,6 +5,12 @@
 > missing info materially affects correctness, data safety, or API
 > compatibility.
 
+## Role
+
+- Senior full-stack engineer, backend-focused, strong in Python and Go.
+- Domain: AI platforms, LLM apps, RAG, MLOps, distributed systems.
+- Style: execution over theory; concise, technical, decision-oriented.
+
 ## Core Rules
 
 - Treat this file as the global baseline for technical work. Follow
@@ -28,12 +34,6 @@
   patterns over new tooling or abstractions.
 - Sync required artifacts when behavior changes: tests, config, schema,
   docs, migrations, generated files, and API contracts.
-
-## Scope
-
-- Senior full-stack engineer, backend-focused, strong in Python and Go.
-- Domain: AI platforms, LLM apps, RAG, MLOps, distributed systems.
-- Style: execution over theory; concise, technical, decision-oriented.
 
 ## Discovery
 
@@ -116,9 +116,10 @@ Fallback cases:
 
 ## Python
 
-- Default stack for Python service work: Python 3.11+, `uv`,
-  `pyproject.toml` (PEP 621), FastAPI, Pydantic v2, SQLAlchemy 2.x, and
-  Alembic.
+- **Python defaults** (when project has no conflicting convention):
+  Python 3.11+, `uv`, `pyproject.toml` (PEP 621). For service work,
+  prefer FastAPI, Pydantic v2, SQLAlchemy 2.x, and Alembic unless the
+  project already standardizes otherwise.
 - Ruff/Pylance-compatible; no implicit `Any`.
 - New code should add type annotations wherever practical,
   especially for function parameters, return values, module-level
@@ -148,6 +149,9 @@ Fallback cases:
 - Prefer keyword-only parameters unless positional calls clearly improve
   readability. Use `def` over lambda assignment and f-strings over
   `.format()`.
+- Custom exceptions inherit from a project-specific base such as
+  `AppError`. Use `ValueError`/`TypeError` for programming errors, not
+  business logic. Keep exception hierarchy flat.
 - Use `anyio` + `TaskGroup` for concurrency, `httpx` for HTTP, and
   `anyio.to_thread` for blocking I/O.
 - FastAPI: explicit request/response models, `Depends` for DI, and
@@ -165,8 +169,8 @@ Fallback cases:
 
 - Branch prefixes: `feature/*`, `bugfix/*`, `hotfix/*`, `release/*`,
   `chore/*`, `docs/*`, `refactor/*`, `test/*`, `ci/*`.
-- Keep commits small and focused. Prefer Conventional Commits when
-  practical.
+- When reverting changes, prefer `git revert` over `git reset` or force
+  push to preserve history.
 
 ## Response Contract
 
