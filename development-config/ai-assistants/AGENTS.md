@@ -114,9 +114,11 @@ Fallback cases:
 - If verification cannot run, state the exact command not run and the
   blocker.
 
-## Python
+## Language Defaults
 
-- **Python defaults** (when project has no conflicting convention):
+### Python
+
+- When the project has no conflicting convention:
   Python 3.11+, `uv`, `pyproject.toml` (PEP 621). For service work,
   prefer FastAPI, Pydantic v2, SQLAlchemy 2.x, and Alembic unless the
   project already standardizes otherwise.
