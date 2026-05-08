@@ -4,6 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_AGENTS_FILE="$SCRIPT_DIR/AGENTS.md"
 SOURCE_AGENTS_DIR="$SCRIPT_DIR/agents"
+SOURCE_REFERENCES_DIR="$SCRIPT_DIR/references"
 SOURCE_SKILLS_DIR="$SCRIPT_DIR/skills"
 SOURCE_SHARED_SKILLS_DIR="$SOURCE_SKILLS_DIR/_shared"
 CODEX_ROOT="${CODEX_ROOT:-$HOME/.codex}"
@@ -224,6 +225,25 @@ sync_agents_file() {
     local target_root="$1"
 
     sync_path "$SOURCE_AGENTS_FILE" "$target_root/AGENTS.md"
+    sync_references_dir "$target_root"
+}
+
+sync_references_dir() {
+    local target_root="$1"
+    local target_dir="$target_root/references"
+    local entry=""
+    local entry_count=0
+
+    mkdir -p "$target_dir"
+
+    while IFS= read -r entry; do
+        sync_path "$entry" "$target_dir/$(basename "$entry")"
+        entry_count=$((entry_count + 1))
+    done < <(find "$SOURCE_REFERENCES_DIR" -mindepth 1 -maxdepth 1 ! -name '.gitkeep' | sort)
+
+    if [[ "$entry_count" -eq 0 ]]; then
+        echo "No syncable entries found under $SOURCE_REFERENCES_DIR. Ensured target directory exists: $target_dir"
+    fi
 }
 
 sync_agents_dir() {
@@ -328,6 +348,11 @@ main() {
 
     if [[ ! -d "$SOURCE_AGENTS_DIR" ]]; then
         echo "Agents source directory not found: $SOURCE_AGENTS_DIR" >&2
+        exit 1
+    fi
+
+    if [[ ! -d "$SOURCE_REFERENCES_DIR" ]]; then
+        echo "References source directory not found: $SOURCE_REFERENCES_DIR" >&2
         exit 1
     fi
 

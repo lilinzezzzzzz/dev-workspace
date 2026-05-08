@@ -2,7 +2,9 @@
 
 > 面向 Codex、Qoder 及其他 IDE 内 AI assistant 的通用个人配置和指令集
 
-一套可复用的个人级 AI assistant 配置，包含编码规范、Git 工作流、AGENTS 指令与 skills，同一份内容可以同时服务于 Codex、Qoder 以及其他支持类似机制的开发工具。
+一套可复用的个人级 AI assistant 配置，包含编码规范、Git 工作流、
+AGENTS 指令与 skills，同一份内容可以同时服务于 Codex、Qoder 以及
+其他支持类似机制的开发工具。
 
 ---
 
@@ -11,7 +13,9 @@
 ```text
 development-config/ai-assistants/
 ├── AGENTS.md                 # 通用 AGENTS 指令和开发规范
-├── apply_agengts.sh          # 统一同步入口：AGENTS.md / agents / skills
+├── apply_agengts.sh          # 统一同步入口：AGENTS.md / references / agents / skills
+├── references/               # AGENTS.md 按需加载的细分规则
+│   └── python.md             # Python 规则
 ├── agents/                   # Agent 配置文件（预留）
 ├── events/                   # 事件处理配置（预留）
 ├── skills/
@@ -36,12 +40,17 @@ development-config/ai-assistants/
 - **技术栈**: 根据个人项目需求定制
 - **编码标准**: 符合个人编码风格的最佳实践
 - **Git 规范**: 个性化的提交信息规范
+- **兼容目标**: 优先兼容 Qoder 与 Codex 的 `AGENTS.md` 加载机制
+- **渐进式披露**: 语言或技术栈细则下沉到 `references/`，通过明确路径
+  指令在相关任务中读取，不依赖 Markdown 链接自动展开
 
 ### Skills 与同步脚本
 
 当前目录已经包含一组可复用能力：
 
-- **apply_agengts.sh**: 统一同步入口，可交互选择 `AGENTS.md`、`agents/` 或单个 `skill`
+- **apply_agengts.sh**: 统一同步入口，可交互选择 `AGENTS.md`、
+  `agents/` 或单个 `skill`；同步 `AGENTS.md` 时会同时同步顶层
+  `references/`
 - **api-endpoint-analyzer**: 系统化分析 API endpoint 的请求、响应、业务流程与错误处理
 - **git-code-reviewer**: 基于 diff 输出高信号代码审查结论，优先发现 bug、回归和风险
 - **git-commit-helper**: 基于 staged diff 生成或执行规范的 Conventional Commit
@@ -72,9 +81,11 @@ skills/<skill-name>/
 - `SKILL.md` 保持精简，只放高价值流程和决策规则
 - 细节模板、checklist、示例下沉到 `references/`
 - `agents/openai.yaml` 负责展示层和默认触发入口
-- `scripts/` 只放 skill 专属、值得复用的执行逻辑，避免把复杂 shell 直接塞进说明文档
+- `scripts/` 只放 skill 专属、值得复用的执行逻辑，避免把复杂 shell
+  直接塞进说明文档
 - skill 命名与目录名保持一致，避免同步或调用时混淆
-- `apply_agengts.sh` 会自动发现包含 `SKILL.md` 的一级 skill 目录，无需手动维护 skill 列表
+- `apply_agengts.sh` 会自动发现包含 `SKILL.md` 的一级 skill 目录，
+  无需手动维护 skill 列表
 
 ---
 
@@ -93,13 +104,16 @@ skills/<skill-name>/
 - **内容选择**: 支持 `AGENTS.md`、`agents/`、`skills/`
 - **skills 流程**: 先选择具体 skill 或全部 skills，再选择目标 assistant
 - **目标选择**: 支持 `codex`、`qoder` 或 `both`
-- **覆盖策略**: `AGENTS.md` 直接覆盖；`agents/` 和 `skills/` 仅覆盖同名项
+- **覆盖策略**: `AGENTS.md` 直接覆盖；顶层 `references/`、
+  `agents/` 和 `skills/` 仅覆盖同名项
 - **完整性校验**: 文件使用 SHA-256 校验，目录使用 `diff -qr`
-- **依赖要求**: 需要系统安装 `diff`，文件校验会优先使用 `sha256sum`，并兼容 `shasum` 或 `openssl`
+- **依赖要求**: 需要系统安装 `diff`，文件校验会优先使用
+  `sha256sum`，并兼容 `shasum` 或 `openssl`
 
 ### 2. 典型用法
 
-- 选择 `AGENTS.md`：同步个人规则文件到目标 assistant 根目录
+- 选择 `AGENTS.md`：同步个人规则文件到目标 assistant 根目录，并同步
+  `references/` 供按需加载
 - 选择 `agents`：同步仓库中的 agent 配置目录到目标 assistant 的 `agents/`
 - 选择 `skills`：选择一个 skill 或全部 skills，并同步到目标 assistant 的 `skills/`
 - 选择 `both`：将选中的内容同步到当前配置的所有目标目录
@@ -107,10 +121,13 @@ skills/<skill-name>/
 当前已维护的 skill 更适合以下场景：
 
 - `api-endpoint-analyzer`：解释接口契约、梳理调用链、核对实现与文档是否一致
-- `git-code-reviewer`：审查 PR、MR、commit 或 diff，输出带 severity 的具体 findings
+- `git-code-reviewer`：审查 PR、MR、commit 或 diff，输出带 severity 的
+  具体 findings
 - `git-commit-helper`：根据 staged changes 生成 commit message，或在范围清晰时执行提交
-- `git-draft-pr-or-mr`：基于显式 base branch 或 base ref，生成可直接粘贴到 GitHub/GitLab 的 PR/MR 文案
-- `git-restack-from-base`：把当前功能分支基于新 base 重建为 `-v2`、`-v3` 等版本化分支，并在确认后执行 cherry-pick
+- `git-draft-pr-or-mr`：基于显式 base branch 或 base ref，生成可直接
+  粘贴到 GitHub/GitLab 的 PR/MR 文案
+- `git-restack-from-base`：把当前功能分支基于新 base 重建为 `-v2`、
+  `-v3` 等版本化分支，并在确认后执行 cherry-pick
 
 ### 3. 个性化定制
 
@@ -119,7 +136,9 @@ skills/<skill-name>/
 - 个人偏好的 Agent 行为规则
 - 符合个人工作流的事件处理
 - 专业领域的个人技能模块
-- 遵循 `SKILL.md + agents/openai.yaml + optional references/ + optional scripts/` 的 skill 结构
+- 遵循
+  `SKILL.md + agents/openai.yaml + optional references/ + optional scripts/`
+  的 skill 结构
 
 ---
 
@@ -152,7 +171,7 @@ skills/<skill-name>/
 
 **提交信息格式**:
 
-```
+```text
 <type>(<scope>): <subject>
 
 [optional body]

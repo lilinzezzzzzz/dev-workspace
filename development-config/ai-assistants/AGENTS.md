@@ -118,54 +118,13 @@ Fallback cases:
 
 ### Python
 
-- When the project has no conflicting convention:
-  Python 3.11+, `uv`, `pyproject.toml` (PEP 621). For service work,
-  prefer FastAPI, Pydantic v2, SQLAlchemy 2.x, and Alembic unless the
-  project already standardizes otherwise.
-- Ruff/Pylance-compatible; no implicit `Any`.
-- New code should add type annotations wherever practical,
-  especially for function parameters, return values, module-level
-  constants, data models, and variables whose inferred type is unclear.
-- Imports: isort order, one import per line for top-level packages, all
-  imports at module top level. Local imports are allowed only to break a
-  circular dependency; document the reason inline.
-- New code uses lowercase built-in generics and `collections.abc`
-  generics. Do not introduce deprecated `typing` aliases such as `Dict`,
-  `List`, `Optional`, `Union`, or `AsyncGenerator`.
-- Use PEP 604 syntax: `A | B` and `T | None`.
-- Container parameter types follow variance: read-only inputs use
-  covariant `collections.abc` types (`Sequence`, `Mapping`, `Set`,
-  `Iterable`) so subtypes pass without friction; use concrete mutable
-  generics (`list`, `dict`, `set`) only when the function mutates the
-  argument or the concrete type is part of the contract. Returns may
-  stay concrete when ownership is handed to the caller.
-- Prefer explicit data models over loose dicts: `TypedDict` for typed
-  mappings, `dataclass` for plain data carriers, Pydantic v2 for
-  validated I/O models.
-- Prefer `Protocol` for interface dependencies and test seams. Use `ABC`
-  only when shared implementation, enforced inheritance, or runtime
-  nominal checks are required.
-- Prefer module-level functions. Use instance methods only when behavior
-  depends on `self`; `@classmethod` for alternate constructors;
-  `@staticmethod` only when type ownership is clear.
-- Prefer keyword-only parameters unless positional calls clearly improve
-  readability. Use `def` over lambda assignment and f-strings over
-  `.format()`.
-- Custom exceptions inherit from a project-specific base such as
-  `AppError`. Use `ValueError`/`TypeError` for programming errors, not
-  business logic. Keep exception hierarchy flat.
-- Use `anyio` + `TaskGroup` for concurrency, `httpx` for HTTP, and
-  `anyio.to_thread` for blocking I/O.
-- FastAPI: explicit request/response models, `Depends` for DI, and
-  consistent error envelopes.
-- Pydantic: v2 patterns only; avoid v1 compatibility shims.
-- SQLAlchemy: 2.x typed patterns; Alembic for migrations.
-- Docstrings are required for public API. Use Google style, imperative
-  mood, and one-line summary. Add `Args`/`Returns`/`Raises` only when
-  non-obvious. Inline comments explain why.
-- Tests: use `pytest`; unit tests for logic and edges, integration tests
-  for cross-boundary flows. Mock only external I/O. Critical paths need
-  explicit happy, error, and edge cases.
+- For Python implementation, review, refactor, dependency, test, or
+  packaging work, use available file-reading tools to load
+  `references/python.md` before planning or editing. Treat that file as
+  task-specific guidance, not as optional background reading.
+- If the repository has stronger local Python conventions, follow the
+  local project first unless correctness, security, or data safety would
+  be weakened.
 
 ## Git
 
