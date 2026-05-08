@@ -36,7 +36,8 @@ development-config/ai-assistants/
 规则源文件。同步 Codex 时，`rules/agents.md` 只会写入 Codex 根目录的
 `AGENTS.md`，其他规则文件会同步到 Codex 根目录的 `references/`，供
 渐进式披露读取。同步 Qoder 时，脚本会要求输入项目 `.qoder` 目录，
-并把 `rules/*.md` 同步到该目录下的 `rules/`：
+并把 `rules/*.md` 同步到该目录下的 `rules/`；其中 `agents.md` 会在
+同步时移除 `Language Defaults` 章节，避免和独立的 `python.md` 规则重复：
 
 - **适用范围**: Codex 和其他支持 `AGENTS.md` 规则注入的工具
 - **角色定位**: 个人开发者的技术偏好和习惯
@@ -121,7 +122,8 @@ skills/<skill-name>/
 - 选择 `rules` -> `codex`：把 `rules/agents.md` 同步为 Codex 根目录的
   `AGENTS.md`，并把其他源规则同步到 `references/`
 - 选择 `rules` -> `qoder`：输入以 `.qoder` 结尾的项目目录，并把
-  `rules/*.md` 同步到该目录下的 `rules/`
+  `rules/*.md` 同步到该目录下的 `rules/`；目标 `agents.md` 会移除
+  `Language Defaults` 章节
 - 选择 `skills`：选择一个 skill 或全部 skills，并同步到目标 assistant 的 `skills/`
 - skills 选择 `both`：将选中的 skill 同步到当前配置的所有目标目录
 

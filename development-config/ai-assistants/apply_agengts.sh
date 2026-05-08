@@ -313,6 +313,33 @@ sync_references_dir() {
     fi
 }
 
+sync_qoder_rule_file() {
+    local source_path="$1"
+    local dest_path="$2"
+    local dest_parent=""
+    local rendered_path=""
+
+    dest_parent="$(dirname "$dest_path")"
+    mkdir -p "$dest_parent"
+
+    if [[ "$(basename "$source_path")" != "agents.md" ]]; then
+        sync_path "$source_path" "$dest_path"
+        return 0
+    fi
+
+    rendered_path="$(mktemp "$dest_parent/.agents.XXXXXX")"
+    awk '
+        /^## Language Defaults$/ { skip = 1; next }
+        skip && /^## / { skip = 0 }
+        !skip { print }
+    ' "$source_path" > "$rendered_path"
+
+    install -m 0644 "$rendered_path" "$dest_path"
+    verify_file_copy "$rendered_path" "$dest_path"
+    rm -f "$rendered_path"
+    echo "Synced generated file -> $dest_path"
+}
+
 sync_qoder_rules_dir() {
     local target_dir="$1"
     local entry=""
@@ -321,7 +348,7 @@ sync_qoder_rules_dir() {
     mkdir -p "$target_dir"
 
     while IFS= read -r entry; do
-        sync_path "$entry" "$target_dir/$(basename "$entry")"
+        sync_qoder_rule_file "$entry" "$target_dir/$(basename "$entry")"
         entry_count=$((entry_count + 1))
     done < <(find "$SOURCE_RULES_DIR" -mindepth 1 -maxdepth 1 ! -name '.gitkeep' | sort)
 
