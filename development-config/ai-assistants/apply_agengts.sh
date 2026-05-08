@@ -4,6 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_RULES_DIR="$SCRIPT_DIR/rules"
 SOURCE_AGENTS_FILE="$SOURCE_RULES_DIR/agents.md"
+SOURCE_CODEX_CONFIG_FILE="$SCRIPT_DIR/codex-config.toml"
 SOURCE_SKILLS_DIR="$SCRIPT_DIR/skills"
 SOURCE_SHARED_SKILLS_DIR="$SOURCE_SKILLS_DIR/_shared"
 CODEX_ROOT="${CODEX_ROOT:-$HOME/.codex}"
@@ -114,7 +115,8 @@ choose_content() {
     while true; do
         echo "1) rules" >&2
         echo "2) skills" >&2
-        echo "3) exit" >&2
+        echo "3) codex-config" >&2
+        echo "4) exit" >&2
         read -r -p "#? " content
         content="$(trim_spaces "$content")"
 
@@ -127,7 +129,11 @@ choose_content() {
                 printf '%s\n' "skills"
                 return 0
                 ;;
-            3|exit)
+            3|codex-config|config)
+                printf '%s\n' "config"
+                return 0
+                ;;
+            4|exit)
                 printf '%s\n' "$EXIT_SENTINEL"
                 return 0
                 ;;
@@ -173,7 +179,8 @@ prompt_qoder_root_dir() {
     local target_root=""
 
     while true; do
-        read -r -p "Enter Qoder project .qoder path (for example: /path/to/project/.qoder): " target_root
+        echo "Enter Qoder project .qoder path(Example: /path/to/project/.qoder):" >&2
+        read -r -p "#? " target_root
         target_root="$(trim_spaces "$target_root")"
 
         if [[ -n "$target_root" ]]; then
@@ -293,6 +300,12 @@ sync_agents_file() {
 
     sync_path "$SOURCE_AGENTS_FILE" "$target_root/AGENTS.md"
     sync_references_dir "$target_root"
+}
+
+sync_codex_config_file() {
+    local target_root="$1"
+
+    sync_path "$SOURCE_CODEX_CONFIG_FILE" "$target_root/config.toml"
 }
 
 sync_references_dir() {
@@ -417,6 +430,11 @@ main() {
         exit 1
     fi
 
+    if [[ ! -f "$SOURCE_CODEX_CONFIG_FILE" ]]; then
+        echo "Codex config source file not found: $SOURCE_CODEX_CONFIG_FILE" >&2
+        exit 1
+    fi
+
     if [[ ! -d "$SOURCE_RULES_DIR" ]]; then
         echo "Rules source directory not found: $SOURCE_RULES_DIR" >&2
         exit 1
@@ -441,6 +459,17 @@ main() {
 
     if [[ "$content" == "skills" ]]; then
         sync_skill_dir
+        return 0
+    fi
+
+    if [[ "$content" == "config" ]]; then
+        CODEX_ROOT="$(trim_spaces "$CODEX_ROOT")"
+        if [[ -z "$CODEX_ROOT" ]]; then
+            echo "CODEX_ROOT cannot be empty." >&2
+            exit 1
+        fi
+
+        sync_codex_config_file "$CODEX_ROOT"
         return 0
     fi
 
