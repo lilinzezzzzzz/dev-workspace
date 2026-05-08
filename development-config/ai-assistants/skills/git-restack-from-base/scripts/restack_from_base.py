@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Restack the current branch onto the latest base branch with cherry-pick."""
+"""Restack the current branch onto the latest base branch using git rebase."""
 
 from __future__ import annotations
 
@@ -17,6 +17,8 @@ VERSION_SUFFIX_RE = re.compile(r"^(?P<name>.+)-v(?P<version>\d+)$")
 class Commit:
     sha: str
     subject: str
+    is_merge: bool
+    is_signed: bool
 
 
 @dataclass(frozen=True)
@@ -30,6 +32,9 @@ class RestackPlan:
     base_freshness: str
     commits: list[Commit]
     fetch_executed: bool
+    has_merge_commits: bool
+    signed_commit_count: int
+    stacked_refs: list[str]
 
 
 @dataclass(frozen=True)
@@ -204,13 +209,51 @@ def resolve_base_ref(
 
 
 def collect_commits(*, base_ref: str, source_branch: str) -> list[Commit]:
-    """Collect commits that exist on the source branch but not on the base ref."""
-    output = git_output("log", "--reverse", "--format=%H%x09%s", f"{base_ref}..{source_branch}")
+    """Collect commits that exist on the source branch but not on the base ref.
+
+    The `%P` parent list is used to detect merge commits, because `git rebase`
+    flattens merges by default and the user should be warned before apply.
+    The `%G?` signature flag is used to detect GPG-signed commits, because
+    plain rebase drops signatures unless a re-signing strategy is applied.
+    """
+    output = git_output(
+        "log", "--reverse", "--format=%H%x09%P%x09%G?%x09%s", f"{base_ref}..{source_branch}"
+    )
     commits: list[Commit] = []
     for line in output.splitlines():
-        sha, subject = line.split("\t", 1)
-        commits.append(Commit(sha=sha, subject=subject))
+        sha, parents, signature, subject = line.split("\t", 3)
+        is_merge = len(parents.split()) > 1
+        is_signed = signature in {"G", "U", "X", "Y", "R", "E"}
+        commits.append(
+            Commit(sha=sha, subject=subject, is_merge=is_merge, is_signed=is_signed)
+        )
     return commits
+
+
+def detect_stacked_refs(*, base_ref: str, source_branch: str) -> list[str]:
+    """Find other local branches whose tip lies inside the branch-only range.
+
+    When such refs exist, a plain rebase leaves them stranded on the pre-rebase
+    commits. Git 2.38+ supports `git rebase --update-refs` to move them along,
+    but we surface a warning instead of enabling it silently.
+    """
+    commits_output = git_output("log", "--format=%H", f"{base_ref}..{source_branch}")
+    branch_commit_set = set(commits_output.splitlines())
+    if not branch_commit_set:
+        return []
+    refs_output = git_output(
+        "for-each-ref", "--format=%(refname:short) %(objectname)", "refs/heads/"
+    )
+    stacked: list[str] = []
+    for line in refs_output.splitlines():
+        if not line:
+            continue
+        name, _, sha = line.partition(" ")
+        if name == source_branch:
+            continue
+        if sha in branch_commit_set:
+            stacked.append(name)
+    return stacked
 
 
 def base_freshness(*, base_ref_kind: str, fetch_executed: bool) -> str:
@@ -227,26 +270,35 @@ def ensure_branch_absent(branch_name: str) -> None:
         raise SystemExit(f"Branch already exists: {branch_name}")
 
 
-def create_branch(*, new_branch: str, base_ref: str) -> None:
-    """Create and check out the new branch from the base ref without inheriting upstream."""
+def create_branch_from_source(*, new_branch: str, source_branch: str) -> None:
+    """Create and check out the new branch from the source branch as a safety-net copy."""
     try:
-        run_git("switch", "--no-track", "-c", new_branch, base_ref)
+        run_git("switch", "--no-track", "-c", new_branch, source_branch)
     except subprocess.CalledProcessError as exc:
         message = exc.stderr.strip() or exc.stdout.strip() or "Failed to create branch."
         raise SystemExit(message) from exc
 
 
-def cherry_pick_commits(commits: list[Commit]) -> None:
-    """Cherry-pick commits one by one to provide precise conflict reporting."""
-    for commit in commits:
-        result = run_git("cherry-pick", commit.sha, check=False)
-        if result.returncode != 0:
-            conflict_message = (
-                f"Cherry-pick stopped on {commit.sha} {commit.subject}\n"
-                "Resolve conflicts, then run `git cherry-pick --continue`, or abort with "
-                "`git cherry-pick --abort`."
-            )
-            raise SystemExit(conflict_message)
+def rebase_onto_base(*, base_ref: str) -> None:
+    """Rebase the branch-only commits onto the latest base ref in a single atomic step.
+
+    `--empty=drop` guarantees deterministic handling of commits whose changes
+    already exist in the new base; without it, older git versions stop the
+    rebase and newer versions may keep or drop depending on configuration.
+    """
+    result = run_git(
+        "rebase", "--empty=drop", "--onto", base_ref, base_ref, check=False
+    )
+    if result.returncode != 0:
+        conflict_message = (
+            "Rebase stopped before completing. The most common cause is a merge conflict,\n"
+            "but it may also be a pre-rebase hook rejection or another git-side error.\n"
+            "Check the git output above for the exact reason.\n"
+            "For conflicts: resolve them, then run `git rebase --continue`, "
+            "or abort with `git rebase --abort`.\n"
+            "The versioned branch is your safety net; the original source branch is untouched."
+        )
+        raise SystemExit(conflict_message)
 
 
 def build_plan(
@@ -278,8 +330,14 @@ def build_plan(
     commits = collect_commits(base_ref=base_resolution.base_ref, source_branch=source_branch)
     if not commits:
         raise SystemExit(
-            f"No commits found in {source_branch} that are not already in {base_resolution.base_ref}."
+            f"No commits to rebase: {source_branch} is already up to date with "
+            f"{base_resolution.base_ref}."
         )
+    has_merge_commits = any(commit.is_merge for commit in commits)
+    signed_commit_count = sum(1 for commit in commits if commit.is_signed)
+    stacked_refs = detect_stacked_refs(
+        base_ref=base_resolution.base_ref, source_branch=source_branch
+    )
 
     return RestackPlan(
         base_branch=base_resolution.base_branch,
@@ -294,6 +352,9 @@ def build_plan(
         ),
         commits=commits,
         fetch_executed=fetch_executed,
+        has_merge_commits=has_merge_commits,
+        signed_commit_count=signed_commit_count,
+        stacked_refs=stacked_refs,
     )
 
 
@@ -307,20 +368,55 @@ def print_plan(plan: RestackPlan) -> None:
     print(f"base_freshness: {plan.base_freshness}")
     print(f"new_branch: {plan.new_branch}")
     print(f"fetch_executed: {'yes' if plan.fetch_executed else 'no'}")
-    print("commits:")
+    print(f"commits_to_rebase: {len(plan.commits)}")
     for commit in plan.commits:
-        print(f"  - {commit.sha} {commit.subject}")
+        markers: list[str] = []
+        if commit.is_merge:
+            markers.append("merge")
+        if commit.is_signed:
+            markers.append("signed")
+        marker = f" [{', '.join(markers)}]" if markers else ""
+        print(f"  - {commit.sha} {commit.subject}{marker}")
+    if plan.has_merge_commits:
+        print(
+            "warning: merge commits detected; git rebase will flatten them by default. "
+            "If you must preserve the merge topology, abort and rerun with a manual "
+            "`git rebase --rebase-merges --onto <base_ref> <base_ref>`."
+        )
+    if plan.signed_commit_count:
+        print(
+            f"warning: {plan.signed_commit_count} signed commit(s) detected; git rebase drops "
+            "GPG signatures unless `commit.gpgSign=true` is configured or the rebase is "
+            "rerun with `-S`. After apply, re-sign if required."
+        )
+    if plan.stacked_refs:
+        refs_list = ", ".join(plan.stacked_refs)
+        print(
+            f"warning: other local branches point into the rebase range: {refs_list}. "
+            "A plain rebase will leave them stranded on pre-rebase commits. Consider "
+            "`git rebase --update-refs` (git 2.38+) or update those branches manually."
+        )
     print("commands:")
-    print(f"  git switch --no-track -c {plan.new_branch} {plan.base_ref}")
-    for commit in plan.commits:
-        print(f"  git cherry-pick {commit.sha}")
+    print(f"  git switch --no-track -c {plan.new_branch} {plan.source_branch}")
+    print(f"  git rebase --empty=drop --onto {plan.base_ref} {plan.base_ref}")
     print("status: awaiting_confirmation")
+
+
+def print_rewritten_commits(*, new_branch: str, base_ref: str) -> None:
+    """Print the rewritten commits on the new branch for post-apply verification."""
+    output = git_output(
+        "log", "--reverse", "--format=%H%x09%s", f"{base_ref}..{new_branch}"
+    )
+    print("rewritten_commits:")
+    for line in output.splitlines():
+        sha, subject = line.split("\t", 1)
+        print(f"  - {sha} {subject}")
 
 
 def parse_args() -> argparse.Namespace:
     """Parse CLI arguments."""
     parser = argparse.ArgumentParser(
-        description="Recreate a branch from the latest base branch and cherry-pick source-only commits.",
+        description="Recreate a branch on top of the latest base branch by rebasing source-only commits onto it.",
     )
     parser.add_argument(
         "--base",
@@ -387,8 +483,9 @@ def main() -> None:
         raise SystemExit("`--apply` requires `--confirm` after the user reviews the branches.")
 
     ensure_branch_absent(plan.new_branch)
-    create_branch(new_branch=plan.new_branch, base_ref=plan.base_ref)
-    cherry_pick_commits(plan.commits)
+    create_branch_from_source(new_branch=plan.new_branch, source_branch=plan.source_branch)
+    rebase_onto_base(base_ref=plan.base_ref)
+    print_rewritten_commits(new_branch=plan.new_branch, base_ref=plan.base_ref)
     print("status: completed")
 
 

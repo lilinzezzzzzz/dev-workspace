@@ -1,11 +1,11 @@
 ---
 name: git-restack-from-base
-description: Recreate the current git branch from an explicitly provided base branch and cherry-pick the branch-only commits onto a new versioned branch. Use when a feature branch must be retargeted onto the newest integration branch or another base branch, especially for workflows like `A` 到 `A-v2`, `A-v2` 到 `A-v3`, or any request to cut a fresh branch from updated base history and migrate the current branch's commits with cherry-pick. Treat an unqualified base branch name such as `dev`, `main`, or `master` as the corresponding remote-tracking branch by default, not a local branch. If the user has not explicitly provided a base branch or base ref, ask for it and stop. After the user provides it, visibly show that specified base before any task execution, then show the resolved base ref and current branch for confirmation before applying.
+description: Recreate the current git branch on top of an explicitly provided base branch by rebasing the branch-only commits onto a new versioned branch. The new versioned branch acts as a safety net so the original source branch stays untouched. Use when a feature branch must be retargeted onto the newest integration branch or another base branch, especially for workflows like `A` 到 `A-v2`, `A-v2` 到 `A-v3`, or any request to cut a fresh branch from updated base history and migrate the current branch's commits onto it. Treat an unqualified base branch name such as `dev`, `main`, or `master` as the corresponding remote-tracking branch by default, not a local branch. If the user has not explicitly provided a base branch or base ref, ask for it and stop. After the user provides it, visibly show that specified base before any task execution, then show the resolved base ref and current branch for confirmation before applying.
 ---
 
 # Git Restack From Base
 
-Use this skill to rebuild the current branch on top of an explicitly specified base branch while preserving the branch's own commits.
+Use this skill to rebuild the current branch on top of an explicitly specified base branch while preserving the branch's own commits. The restack is performed with `git rebase --onto` for atomicity, and a new versioned branch (for example `A-v2`, `A-v2 -> A-v3`) is created as a safety net so the original source branch stays intact and recoverable.
 
 For base ref resolution, freshness, and downgrade reporting, load and follow [../_shared/git-remote-base-resolution.md](../_shared/git-remote-base-resolution.md).
 
@@ -16,13 +16,13 @@ For base ref resolution, freshness, and downgrade reporting, load and follow [..
 3. If the request includes one, first visibly show the base branch or base ref exactly as the user specified it before running commands or continuing the task.
 4. Inspect the repository state before changing anything.
 5. Run the helper script in plan mode with the provided base branch.
-6. Return at least the `base_branch`, `base_ref`, `source_branch`, and `new_branch` to the user and ask whether to continue.
+6. Return at least the `base_branch`, `base_ref`, `source_branch`, `new_branch`, `commits_to_rebase` count, and every plan `warning:` line (merge commits, GPG-signed commits, stacked refs, etc.), then ask whether to continue.
 7. Execute the restack only after explicit user confirmation.
 8. Validate the resulting branch and report any unresolved conflicts or gaps.
 9. After a successful restack and validation, ask the user whether to delete the source branch locally and remotely.
 10. Delete the source branch only after the user explicitly confirms the deletion request.
 
-Prefer using `scripts/restack_from_base.py` for branch naming, commit discovery, and command generation. Resolve that relative path against the directory containing this `SKILL.md`; do not assume the current working directory is the skill directory. The canonical helper path is `<skill-dir>/scripts/restack_from_base.py`. The script defaults to plan mode and prints `status: awaiting_confirmation`. Only run with `--apply --confirm` after the user has reviewed the printed branches and explicitly approved continuation.
+Prefer using `scripts/restack_from_base.py` for branch naming, commit discovery, and command generation. Resolve that relative path against the directory containing this `SKILL.md`; do not assume the current working directory is the skill directory. The canonical helper path is `<skill-dir>/scripts/restack_from_base.py`. The script defaults to plan mode and prints `status: awaiting_confirmation`. Only run with `--apply --confirm` after the user has reviewed the printed branches and explicitly approved continuation. In apply mode the script creates the new versioned branch from the source branch and runs a single `git rebase --onto <base_ref> <base_ref>` to move the branch-only commits onto the refreshed base.
 
 ## Base Ref Resolution
 
@@ -42,7 +42,7 @@ Use this sequence:
 2. Wait for the user's answer.
 3. Reply first with the specified base branch or base ref.
 4. Run the script in plan mode with that base branch.
-5. Reply with the base branch, resolved base ref, current branch, and new branch, then ask whether to continue.
+5. Reply with the base branch, resolved base ref, current branch, new branch, commit count to be rebased, and every plan `warning:` line (merge commits, GPG-signed commits, stacked refs, etc.), then ask whether to continue.
 6. Only after the user confirms, run the apply command.
 
 ## Naming Rule
@@ -52,6 +52,8 @@ Use this sequence:
 - Examples:
   - `feature/foo` -> `feature/foo-v2`
   - `feature/foo-v2` -> `feature/foo-v3`
+
+The versioned branch is the rebase target and the safety net. The original source branch is never modified by the apply command, so the user can always return to it if the rebase goes wrong.
 
 Do not guess a different naming scheme unless the repository already uses one and the user asks to follow it.
 
@@ -77,22 +79,35 @@ Useful flags:
 - `--skip-fetch`: degrade to the local cached remote-tracking ref only after the user explicitly allows proceeding without verifying the latest remote base
 - `--confirm`: required together with `--apply` after the user reviews the printed branches
 
+Rebase behaviors to be aware of (handled by the helper script and surfaced as plan warnings):
+
+- `--empty=drop` is always used so same-change commits are dropped deterministically across git versions.
+- GPG signatures on source commits are dropped by default; re-sign manually with `git rebase -S ...` if required.
+- Merge commits in the range are flattened by default; rerun manually with `git rebase --rebase-merges ...` to preserve topology.
+- Other local branches whose tips lie inside the rebase range are left stranded; use `git rebase --update-refs` (git 2.38+) manually to move them.
+- The new versioned branch is a fresh branch, so the first `git push` does not require `--force` or `--force-with-lease`.
+- Commit SHAs are rewritten by rebase. The apply output includes a `rewritten_commits:` list mapping original subjects to the new SHAs on the versioned branch.
+
 ## Execution Rules
 
 - Require the base branch as an explicit input from the user before running the script.
 - In IDE conversations, obtain that input by asking a natural-language question first, not by telling the user to execute a command.
 - Do not continue the task, inspect repository state, or run commands until the user has provided a base branch or base ref and you have visibly shown that specified base to the user.
 - Resolve `scripts/restack_from_base.py` relative to this skill directory before executing it. Do not run `python3 scripts/restack_from_base.py` unless the shell is already in `<skill-dir>`.
-- If the first attempt says the script is missing, check the sibling `scripts/` directory under this skill and rerun with the resolved path. Do not fall back to a manual restack until that canonical script path has been checked.
+- If the first attempt says the script is missing, check the sibling `scripts/` directory under this skill and rerun with the resolved path. Do not fall back to a manual restack until that canonical script path has been checked. If a manual fallback is unavoidable, the fallback must be `git switch --no-track -c <new_branch> <source_branch>` followed by `git rebase --empty=drop --onto <base_ref> <base_ref>`, never a cherry-pick loop.
 - Resolve an unqualified base branch name to `<remote>/<base>` by default. Use `origin` when present, otherwise the only configured remote; ask when multiple non-`origin` remotes exist.
 - Resolve and fetch the base using the shared remote-base rule before planning or applying.
 - Do not silently fall back to a local branch with the same name as the requested remote base.
 - Before any execution, show the user both the base branch they provided and the resolved base ref, then wait for approval.
 - Abort if the working tree is dirty unless the user explicitly asks to proceed.
-- Abort if there are no branch-only commits to cherry-pick.
-- Use `git log --reverse <base_ref>..<source_branch>` semantics so cherry-pick order matches the original history.
-- Prefer `git switch --no-track -c <new_branch> <base_ref>` to create the fresh branch without tracking the base branch.
-- If a cherry-pick conflicts, stop immediately, report the conflicting commit, and tell the user to resolve and continue with `git cherry-pick --continue` or abort with `git cherry-pick --abort`.
+- Abort if there are no branch-only commits to rebase (no commits in `<base_ref>..<source_branch>`).
+- Use `git log --reverse <base_ref>..<source_branch>` semantics to discover and display the branch-only commits in original order.
+- Create the new versioned branch from the source branch with `git switch --no-track -c <new_branch> <source_branch>` so it starts as an exact copy and the original source branch remains untouched.
+- Move the branch-only commits onto the refreshed base with a single `git rebase --empty=drop --onto <base_ref> <base_ref>` against the new versioned branch. Do not perform per-commit cherry-pick. Always pass `--empty=drop` so commits whose changes already exist in the new base are dropped deterministically across git versions.
+- If the plan reports `warning: merge commits detected`, surface the warning to the user and ask whether to proceed with the default flattening behavior or abort and rerun manually with `git rebase --rebase-merges --empty=drop --onto <base_ref> <base_ref>`.
+- If the plan reports `warning: ... signed commit(s) detected`, tell the user that plain rebase drops GPG signatures. Ask whether to proceed as-is, rerun with `-S` (e.g. `git rebase -S --empty=drop --onto <base_ref> <base_ref>`), or abort. Do not silently re-sign on the user's behalf.
+- If the plan reports `warning: other local branches point into the rebase range`, list the affected refs and ask whether to proceed (those refs will be left on the pre-rebase commits), rerun manually with `git rebase --update-refs` (git 2.38+) to move them, or abort. Never pass `--update-refs` automatically, because it rewrites refs the user may not intend to move.
+- If the rebase conflicts, stop immediately and tell the user to resolve conflicts and continue with `git rebase --continue`, or abort with `git rebase --abort`. If the git output shows a pre-rebase hook rejection or another non-conflict error, report that instead of assuming a conflict. Remind them the original source branch is untouched and can be returned to.
 - Do not delete the source branch as part of the restack apply command.
 
 ## Source Branch Deletion
@@ -130,29 +145,34 @@ After apply mode completes, verify:
 ```bash
 git status --short
 git log --oneline --decorate --graph -n 15
-git log --reverse <source_branch> --not <base_ref> --oneline
+git log --reverse <new_branch> --not <base_ref> --oneline
 ```
 
 Check that:
 
-- `HEAD` is on the new branch.
-- The new branch starts from the refreshed base branch.
-- Every branch-only commit from the source branch exists on the new branch in the same order.
+- `HEAD` is on the new versioned branch.
+- The new branch starts from the refreshed base ref (its merge-base with `<base_ref>` equals the fetched base commit SHA).
+- Every branch-only commit from the source branch exists on the new branch in the same order, with rewritten SHAs due to rebase.
+- The original source branch still points at its pre-restack commit and is untouched.
 
 ## Reporting
 
 Report:
 
 - the base branch provided by the user
-- the source branch
+- the source branch (unchanged after apply)
 - the base ref used
 - the fetched base commit SHA when fetch succeeded
 - the base freshness, such as `fetched` or `local-cached`
 - whether the base ref was resolved as a remote-tracking ref, an explicit local ref, or another explicit ref
-- the new branch name
-- the commits selected for cherry-pick
+- the new versioned branch name created as the rebase target
+- the commits selected to be rebased onto the new base, including the total count
+- whether any merge commits were detected in the range (they will be flattened by default rebase)
+- whether any GPG-signed commits were detected in the range (signatures will be dropped unless re-signed)
+- whether any other local branches were detected inside the rebase range (they will be left on pre-rebase commits unless `--update-refs` is used manually)
 - whether fetch was executed, or whether the user explicitly allowed degrading to the local cached remote-tracking ref
-- whether the run is awaiting confirmation, completed, or stopped on conflict
+- whether the run is awaiting confirmation, completed, or stopped on rebase conflict or hook rejection
+- after a successful apply, the `rewritten_commits:` list showing the new SHAs on the versioned branch
 - whether source branch deletion was skipped, awaiting confirmation, completed, or partially completed
 
 ## References
