@@ -4,6 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_RULES_DIR="$SCRIPT_DIR/rules"
 SOURCE_AGENTS_FILE="$SOURCE_RULES_DIR/agents.md"
+SOURCE_REFERENCES_DIR="$SOURCE_RULES_DIR/references"
 SOURCE_CODEX_CONFIG_FILE="$SCRIPT_DIR/configs/codex-config.toml"
 SOURCE_SKILLS_DIR="$SCRIPT_DIR/skills"
 SOURCE_SHARED_SKILLS_DIR="$SOURCE_SKILLS_DIR/_shared"
@@ -319,38 +320,11 @@ sync_references_dir() {
     while IFS= read -r entry; do
         sync_path "$entry" "$target_dir/$(basename "$entry")"
         entry_count=$((entry_count + 1))
-    done < <(find "$SOURCE_RULES_DIR" -mindepth 1 -maxdepth 1 ! -name '.gitkeep' ! -name 'agents.md' | sort)
+    done < <(find "$SOURCE_REFERENCES_DIR" -mindepth 1 -maxdepth 1 ! -name '.gitkeep' | sort)
 
     if [[ "$entry_count" -eq 0 ]]; then
-        echo "No syncable entries found under $SOURCE_RULES_DIR. Ensured target directory exists: $target_dir"
+        echo "No syncable entries found under $SOURCE_REFERENCES_DIR. Ensured target directory exists: $target_dir"
     fi
-}
-
-sync_qoder_rule_file() {
-    local source_path="$1"
-    local dest_path="$2"
-    local dest_parent=""
-    local rendered_path=""
-
-    dest_parent="$(dirname "$dest_path")"
-    mkdir -p "$dest_parent"
-
-    if [[ "$(basename "$source_path")" != "agents.md" ]]; then
-        sync_path "$source_path" "$dest_path"
-        return 0
-    fi
-
-    rendered_path="$(mktemp "$dest_parent/.agents.XXXXXX")"
-    awk '
-        /^## Language Defaults$/ { skip = 1; next }
-        skip && /^## / { skip = 0 }
-        !skip { print }
-    ' "$source_path" > "$rendered_path"
-
-    install -m 0644 "$rendered_path" "$dest_path"
-    verify_file_copy "$rendered_path" "$dest_path"
-    rm -f "$rendered_path"
-    echo "Synced generated file -> $dest_path"
 }
 
 sync_qoder_rules_dir() {
@@ -360,10 +334,22 @@ sync_qoder_rules_dir() {
 
     mkdir -p "$target_dir"
 
+    sync_path "$SOURCE_AGENTS_FILE" "$target_dir/$(basename "$SOURCE_AGENTS_FILE")"
+    entry_count=$((entry_count + 1))
+
     while IFS= read -r entry; do
-        sync_qoder_rule_file "$entry" "$target_dir/$(basename "$entry")"
+        if [[ "$entry" == "$SOURCE_AGENTS_FILE" || "$entry" == "$SOURCE_REFERENCES_DIR" ]]; then
+            continue
+        fi
+
+        sync_path "$entry" "$target_dir/$(basename "$entry")"
         entry_count=$((entry_count + 1))
     done < <(find "$SOURCE_RULES_DIR" -mindepth 1 -maxdepth 1 ! -name '.gitkeep' | sort)
+
+    while IFS= read -r entry; do
+        sync_path "$entry" "$target_dir/$(basename "$entry")"
+        entry_count=$((entry_count + 1))
+    done < <(find "$SOURCE_REFERENCES_DIR" -mindepth 1 -maxdepth 1 ! -name '.gitkeep' | sort)
 
     if [[ "$entry_count" -eq 0 ]]; then
         echo "No syncable entries found under $SOURCE_RULES_DIR. Ensured target directory exists: $target_dir"
@@ -437,6 +423,11 @@ main() {
 
     if [[ ! -d "$SOURCE_RULES_DIR" ]]; then
         echo "Rules source directory not found: $SOURCE_RULES_DIR" >&2
+        exit 1
+    fi
+
+    if [[ ! -d "$SOURCE_REFERENCES_DIR" ]]; then
+        echo "Rules references source directory not found: $SOURCE_REFERENCES_DIR" >&2
         exit 1
     fi
 

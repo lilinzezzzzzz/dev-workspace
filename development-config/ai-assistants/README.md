@@ -17,7 +17,8 @@ development-config/ai-assistants/
 │   └── codex-config.toml     # 同步到 Codex 根目录 config.toml 的源配置
 ├── rules/                    # 规则源文件；Codex 同步时生成 AGENTS.md
 │   ├── agents.md             # 同步到 Codex 根目录 AGENTS.md 的源模板
-│   └── python.md             # Python 规则
+│   └── references/
+│       └── python.md         # Python 规则
 ├── agents/                   # Agent 配置文件（预留）
 ├── events/                   # 事件处理配置（预留）
 ├── skills/
@@ -36,17 +37,17 @@ development-config/ai-assistants/
 ### rules/
 
 规则源文件。同步 Codex 时，`rules/agents.md` 只会写入 Codex 根目录的
-`AGENTS.md`，其他规则文件会同步到 Codex 根目录的 `references/`，供
-渐进式披露读取。同步 Qoder 时，脚本会要求输入项目 `.qoder` 目录，
-并把 `rules/*.md` 同步到该目录下的 `rules/`；其中 `agents.md` 会在
-同步时移除 `Language Defaults` 章节，避免和独立的 `python.md` 规则重复：
+`AGENTS.md`，`rules/references/` 下的规则文件会同步到 Codex 根目录的
+`references/`，供渐进式披露读取。同步 Qoder 时，脚本会要求输入项目
+`.qoder` 目录，并把 `agents.md` 和 `rules/references/` 下的规则文件
+增量同步到该目录下的 `rules/`：
 
 - **适用范围**: Codex 和其他支持 `AGENTS.md` 规则注入的工具
 - **角色定位**: 个人开发者的技术偏好和习惯
 - **技术栈**: 根据个人项目需求定制
 - **编码标准**: 符合个人编码风格的最佳实践
 - **Git 规范**: 个性化的提交信息规范
-- **渐进式披露**: 语言或技术栈细则下沉到 `rules/`，通过明确路径
+- **渐进式披露**: 语言或技术栈细则下沉到 `rules/references/`，通过明确路径
   指令在相关任务中读取，不依赖 Markdown 链接自动展开
 
 ### Skills 与同步脚本
@@ -125,10 +126,10 @@ skills/<skill-name>/
 ### 2. 典型用法
 
 - 选择 `rules` -> `codex`：把 `rules/agents.md` 同步为 Codex 根目录的
-  `AGENTS.md`，并把其他源规则同步到 `references/`
+  `AGENTS.md`，并把 `rules/references/` 下的源规则同步到 `references/`
 - 选择 `rules` -> `qoder`：输入以 `.qoder` 结尾的项目目录，并把
-  `rules/*.md` 同步到该目录下的 `rules/`；目标 `agents.md` 会移除
-  `Language Defaults` 章节
+  `agents.md` 和 `rules/references/` 下的规则文件同步到该目录下的
+  `rules/`
 - 选择 `codex-config`：把 `configs/codex-config.toml` 同步为 Codex
   根目录的 `config.toml`
 - 选择 `skills`：选择一个 skill 或全部 skills，并同步到目标 assistant 的 `skills/`

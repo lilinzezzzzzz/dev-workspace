@@ -122,13 +122,8 @@ Fallback cases:
 
 ### Python
 
-- For Python implementation, review, refactor, dependency, test, or
-  packaging work, use available file-reading tools to load
-  `references/python.md` before planning or editing. Treat that file as
-  task-specific guidance, not as optional background reading.
-- If the repository has stronger local Python conventions, follow the
-  local project first unless correctness, security, or data safety would
-  be weakened.
+- For Python implementation, review, refactor, dependency, test, or packaging work, use available file-reading tools to load `references/python.md` before planning or editing. Treat that file as task-specific guidance, not as optional background reading.
+- If the repository has stronger local Python conventions, follow the local project first unless correctness, security, or data safety would be weakened.
 
 ## Git
 

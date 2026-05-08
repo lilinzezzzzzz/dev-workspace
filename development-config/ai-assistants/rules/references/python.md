@@ -1,12 +1,10 @@
 ---
 trigger: model_decision
-description: For Python implementation, review, refactor, dependency, test, or   packaging work
+description: For Python implementation, review, refactor, dependency, test, or packaging work
 ---
 # Python Rules
 
-Use these rules for Python implementation, review, refactor, dependency,
-test, packaging, FastAPI, Pydantic, SQLAlchemy, Alembic, worker, or
-LLM/RAG service work.
+Use these rules for Python implementation, review, refactor, dependency, test, packaging, FastAPI, Pydantic, SQLAlchemy, Alembic, worker, or LLM/RAG service work.
 
 ## Baseline
 
