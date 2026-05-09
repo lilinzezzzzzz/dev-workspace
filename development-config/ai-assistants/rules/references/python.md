@@ -19,6 +19,29 @@ service work.
   especially for function parameters, return values, module-level
   constants, data models, and variables whose inferred type is unclear.
 
+## Environment And Commands
+
+- Prefer `uv` for Python environment creation, dependency management,
+  locking, packaging, and command execution. Avoid invoking bare
+  `python`, `pip`, `pytest`, `ruff`, or type checkers when the command
+  should run inside the project environment; use `uv run ...` instead.
+- New environments should use the project-declared Python version when
+  present. Common commands:
+  - `uv python install <version>` to install a missing interpreter.
+  - `uv python pin <version>` to pin the project interpreter when the
+    repository intentionally owns `.python-version`.
+  - `uv sync` to create or update the environment from `pyproject.toml`
+    and `uv.lock`.
+  - `uv add <package>` / `uv remove <package>` for dependency changes.
+  - `uv lock` when dependency metadata changed but installation is not
+    otherwise required.
+  - `uv run pytest ...`, `uv run ruff check ...`, and
+    `uv run <type-checker> ...` for verification.
+- For legacy requirements-only projects, use `uv venv` plus
+  `uv pip install -r requirements.txt`. Do not introduce
+  `pyproject.toml` or `uv.lock` solely to run a small task unless the
+  user asked to migrate dependency management.
+
 ## Imports And Typing
 
 - Imports: isort order, one import per line for top-level packages, all
