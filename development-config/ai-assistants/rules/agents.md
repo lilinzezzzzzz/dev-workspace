@@ -104,35 +104,51 @@ Reference search paths, in priority order:
 1. `<project-root>/.qoder/rules/references/<file>.md`
 2. `~/.codex/references/<file>.md`
 
-- For matching technical tasks, MUST read the relevant `references/*.md`
-  file with file-reading tools before planning, reviewing, editing, or
-  writing tests. Do not rely on memory, prior context, or Markdown link
-  expansion for these rules.
+- Use the Reference Trigger Matrix before planning, reviewing, editing, or
+  testing. For matching technical tasks, MUST read the relevant
+  `references/*.md` file with file-reading tools. Do not rely on memory,
+  prior context, or Markdown link expansion for these rules.
+- If multiple trigger rows match, load all matching references. Do not
+  choose only the most specific one.
+- If uncertain whether a reference applies, load it.
+- Before file edits, re-check the planned files and behavior against the
+  matrix. If a new category is discovered, load the missing reference
+  before editing.
 - Resolve each reference by trying the reference search paths above in
   order. Treat a reference as loaded when any candidate path is readable.
-  Report the actual path used when asked, when a reference cannot be read,
-  or when the task is non-trivial.
+  Do not claim a reference was loaded unless it was read with file-reading
+  tools in the current task.
 - If a matching reference cannot be read, continue with the task using the
   best available local project context and report the exact missing path
-  or blocker.
-- In the visible plan or final report for non-trivial tasks, state which
-  matching references were loaded and which could not be loaded.
+  or blocker. Stop and ask only when the missing rule materially affects
+  data safety, security, or API compatibility.
+- For non-trivial technical tasks, include a `References` entry in the
+  visible plan or final report:
+  `Loaded: <actual paths>; Missing: <attempted paths or none>`.
+- Do not list references that were not triggered unless their absence is
+  relevant to correctness, data safety, security, or API compatibility.
 - If the repository has stronger local conventions, follow the local
   project first unless correctness, security, or data safety would be
   weakened.
-- For Python-related tasks, load `references/python.md`. Python-related
-  tasks include changes or review involving `.py` files, `pyproject.toml`,
-  `uv.lock`, requirements files, pytest, Ruff, Pydantic, FastAPI,
-  SQLAlchemy, Alembic, workers, RAG, or LLM service code.
-- For backend API, service, worker, auth, permission, validation, error
-  handling, timeout, retry, idempotency, logging, observability, or
-  security-sensitive work, load `references/backend-reliability.md`.
-- For database, ORM, SQL, schema, migration, backfill, pagination, N+1,
-  bulk read/write, persistence, transaction, locking, or data-retention
-  work, load `references/database.md`.
-- For test planning, bug fixes, regression coverage, CI failures, lint,
-  type-check, verification strategy, or reporting test results, load
-  `references/verification.md`.
+
+### Reference Trigger Matrix
+
+- `references/python.md`: `.py`, `pyproject.toml`, `uv.lock`,
+  requirements files, pytest, Ruff, Pydantic, FastAPI, SQLAlchemy,
+  Alembic, worker, RAG, LLM service, Python packaging, or dependency work.
+- `references/backend-reliability.md`: API, service, handler, router,
+  middleware, worker, queue consumer, webhook, auth, permission,
+  dependency injection, config parsing, validation, error handling,
+  timeout, retry, idempotency, logging, observability, external service
+  client, or security-sensitive behavior.
+- `references/database.md`: database, ORM, SQL, SQLAlchemy, Alembic,
+  schema, migration, backfill, repository/DAO, model file, query builder,
+  pagination, N+1, bulk read/write, persistence, transaction, locking,
+  data retention, vector store persistence, cache-backed persistence, or
+  data cleanup job.
+- `references/verification.md`: test planning, bug fix, behavior change,
+  regression coverage, CI failure, lint, type-check, verification strategy,
+  test pyramid, running verification commands, or reporting test results.
 
 ## Git
 
