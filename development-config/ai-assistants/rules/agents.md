@@ -104,10 +104,11 @@ Reference search paths, in priority order:
 1. `<project-root>/.qoder/rules/references/<file>.md`
 2. `~/.codex/references/<file>.md`
 
+### Reference Loading Guardrails
+
 - Use the Reference Trigger Matrix before planning, reviewing, editing, or
-  testing. For matching technical tasks, MUST read the relevant
-  `references/*.md` file with file-reading tools. Do not rely on memory,
-  prior context, or Markdown link expansion for these rules.
+  testing. For matching technical tasks, MUST read the required
+  `references/*.md` files with file-reading tools.
 - If multiple trigger rows match, load all matching references. Do not
   choose only the most specific one.
 - If uncertain whether a reference applies, load it.
@@ -117,38 +118,53 @@ Reference search paths, in priority order:
 - Resolve each reference by trying the reference search paths above in
   order. Treat a reference as loaded when any candidate path is readable.
   Do not claim a reference was loaded unless it was read with file-reading
-  tools in the current task.
-- If a matching reference cannot be read, continue with the task using the
-  best available local project context and report the exact missing path
-  or blocker. Stop and ask only when the missing rule materially affects
-  data safety, security, or API compatibility.
-- For non-trivial technical tasks, include a `References` entry in the
+  tools in the current task. Do not rely on memory, prior context, or
+  Markdown link expansion for these rules.
+- If a required reference cannot be read, report the exact attempted paths
+  and continue with the best available local project context unless the
+  missing rule affects data safety, security, or API compatibility.
+- For non-trivial technical tasks, include this `References` entry in the
   visible plan or final report:
-  `Loaded: <actual paths>; Missing: <attempted paths or none>`.
-- Do not list references that were not triggered unless their absence is
-  relevant to correctness, data safety, security, or API compatibility.
+
+  ```md
+  References:
+  - Loaded: `<actual-path>/python.md`, `<actual-path>/verification.md`
+  - Not loaded: `database.md`
+  - Missing: none
+  ```
+
+- Keep `Not loaded` brief. List only intentionally skipped references.
 - If the repository has stronger local conventions, follow the local
   project first unless correctness, security, or data safety would be
   weakened.
 
 ### Reference Trigger Matrix
 
-- `references/python.md`: `.py`, `pyproject.toml`, `uv.lock`,
-  requirements files, pytest, Ruff, Pydantic, FastAPI, SQLAlchemy,
-  Alembic, worker, RAG, LLM service, Python packaging, or dependency work.
-- `references/backend-reliability.md`: API, service, handler, router,
-  middleware, worker, queue consumer, webhook, auth, permission,
-  dependency injection, config parsing, validation, error handling,
-  timeout, retry, idempotency, logging, observability, external service
-  client, or security-sensitive behavior.
-- `references/database.md`: database, ORM, SQL, SQLAlchemy, Alembic,
-  schema, migration, backfill, repository/DAO, model file, query builder,
-  pagination, N+1, bulk read/write, persistence, transaction, locking,
-  data retention, vector store persistence, cache-backed persistence, or
-  data cleanup job.
-- `references/verification.md`: test planning, bug fix, behavior change,
-  regression coverage, CI failure, lint, type-check, verification strategy,
-  test pyramid, running verification commands, or reporting test results.
+Load references before planning, reviewing, editing, or testing when any
+condition matches.
+
+Task signals are examples, not an exhaustive keyword list. Match by affected
+behavior and files, not only by exact words.
+
+| Task area | Required references |
+| --- | --- |
+| Python implementation | `python.md` |
+| Backend reliability | `backend-reliability.md` |
+| Persistence | `database.md` |
+| Verification | `verification.md` |
+
+Task area examples:
+
+- Python implementation: Python files, packaging, typing, linting,
+  framework code, workers, or RAG/LLM app code.
+- Backend reliability: request handling, service logic, auth, validation,
+  config, errors, retries, logging, external clients, or security-sensitive
+  behavior.
+- Persistence: database, ORM, migrations, repositories/DAOs, models,
+  queries, transactions, pagination, vector store, or cache-backed
+  persistence.
+- Verification: tests, bug fixes, behavior changes, CI/lint/type-check,
+  regression coverage, or reporting verification results.
 
 ## Git
 

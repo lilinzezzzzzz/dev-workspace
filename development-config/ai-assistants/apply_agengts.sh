@@ -12,6 +12,9 @@ CODEX_ROOT="${CODEX_ROOT:-$HOME/.codex}"
 QODER_ROOT="${QODER_ROOT:-$HOME/.qoder}"
 EXIT_SENTINEL="__SYNC_AGENTS_EXIT__"
 ALL_SKILLS_SENTINEL="__SYNC_AGENTS_ALL_SKILLS__"
+EXCLUDED_RULE_TOP_LEVEL_FILES=(
+    "reference-loading-test-prompts.md"
+)
 
 require_command() {
     local command_name="$1"
@@ -46,6 +49,22 @@ command_exists() {
     local command_name="$1"
 
     command -v "$command_name" >/dev/null 2>&1
+}
+
+is_excluded_rule_top_level_entry() {
+    local entry_path="$1"
+    local entry_name=""
+    local excluded_name=""
+
+    entry_name="$(basename "$entry_path")"
+
+    for excluded_name in "${EXCLUDED_RULE_TOP_LEVEL_FILES[@]}"; do
+        if [[ "$entry_name" == "$excluded_name" ]]; then
+            return 0
+        fi
+    done
+
+    return 1
 }
 
 sha256_file() {
@@ -383,6 +402,10 @@ sync_qoder_rules_dir() {
 
     while IFS= read -r entry; do
         if [[ "$entry" == "$SOURCE_AGENTS_FILE" || "$entry" == "$SOURCE_REFERENCES_DIR" ]]; then
+            continue
+        fi
+
+        if is_excluded_rule_top_level_entry "$entry"; then
             continue
         fi
 
