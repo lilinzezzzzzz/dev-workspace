@@ -17,6 +17,7 @@ development-config/ai-assistants/
 │   └── codex-config.toml     # 同步到 Codex 根目录 config.toml 的源配置
 ├── rules/                    # 规则源文件；Codex 同步时生成 AGENTS.md
 │   ├── agents.md             # 同步到 Codex 根目录 AGENTS.md 的源模板
+│   ├── reference-loading-test-prompts.md  # references 加载验证提示词
 │   └── references/
 │       ├── backend-reliability.md  # 后端可靠性、安全、API/worker 规则
 │       ├── database.md             # 数据库、持久化、迁移规则
@@ -53,9 +54,9 @@ development-config/ai-assistants/
 - **Git 规范**: 个性化的提交信息规范
 - **渐进式披露**: 语言、后端可靠性、数据库和验证细则下沉到
   `rules/references/`，同步到 Codex 后位于 `~/.codex/references/`。
-  `AGENTS.md` 会指示 AI 按 Qoder `.qoder/rules/references/`、Codex
-  默认全局 `~/.codex/references/` 的顺序解析，不依赖 Markdown 链接
-  自动展开
+  `AGENTS.md` 会集中定义 reference search paths，当前按项目根目录下的
+  Qoder `.qoder/rules/references/`、Codex 默认全局
+  `~/.codex/references/` 的顺序解析，不依赖 Markdown 链接自动展开
 
 ### Skills 与同步脚本
 

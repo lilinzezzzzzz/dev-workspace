@@ -99,15 +99,19 @@ Fallback cases:
 
 ## Task-Specific References
 
+Reference search paths, in priority order:
+
+1. `<project-root>/.qoder/rules/references/<file>.md`
+2. `~/.codex/references/<file>.md`
+
 - For matching technical tasks, MUST read the relevant `references/*.md`
   file with file-reading tools before planning, reviewing, editing, or
   writing tests. Do not rely on memory, prior context, or Markdown link
   expansion for these rules.
-- Resolve each reference by trying, in order:
-  `.qoder/rules/references/<file>.md`, then
-  `~/.codex/references/<file>.md`. Treat a reference as loaded when any
-  candidate path is readable. Report the actual path used when asked,
-  when a reference cannot be read, or when the task is non-trivial.
+- Resolve each reference by trying the reference search paths above in
+  order. Treat a reference as loaded when any candidate path is readable.
+  Report the actual path used when asked, when a reference cannot be read,
+  or when the task is non-trivial.
 - If a matching reference cannot be read, continue with the task using the
   best available local project context and report the exact missing path
   or blocker.
