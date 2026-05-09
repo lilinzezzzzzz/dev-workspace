@@ -89,43 +89,46 @@ Fallback cases:
   Ask before destructive commands, force push, broad remove operations,
   data-mutating migrations, or dependency upgrades with large lockfile
   churn.
-- **Performance**: Batch or bulk by default. Flag N+1 queries,
-  unbounded `SELECT`, missing pagination, blocking I/O in async hot
-  paths, and large in-memory payloads. Use cursor pagination and
-  explicit `LIMIT` for large user-facing queries.
-- **Database**: Never introduce, approve, or leave database operations
-  inside loops in code. Do not place ORM/query/session calls in
-  `for`/`while` loops, comprehensions, or per-item callbacks. Preload
-  required data before iterating, and use batch or bulk operations for
-  reads, writes, updates, and deletes.
-- **Migrations**: Call out blast radius, compatibility, lock duration,
-  backfill, rollback, and deployment order when schema or data changes.
+- **Performance & Database**: Batch or bulk by default. Never introduce,
+  approve, or leave database operations inside loops in code. Flag N+1
+  queries, unbounded reads, missing pagination, blocking I/O in async hot
+  paths, and large in-memory payloads.
+- **Verification**: Run the smallest meaningful verification that covers
+  changed behavior. Do not infer test results from code reading, and do
+  not claim coverage unless it was measured.
 
-## Verification
+## Task-Specific References
 
-- Run the smallest meaningful verification that covers changed behavior:
-  targeted tests first, then broader tests, lint, or type-check when risk
-  or project convention requires it.
-- Test cases should be layered as a test pyramid: unit tests cover
-  isolated logic and edge cases and should be the largest share,
-  integration tests cover cross-boundary behavior and should be fewer,
-  and system/E2E tests cover only critical end-to-end workflows and
-  should be the fewest.
-- Bug fixes should include regression coverage when the repo has a
-  practical test path.
-- Do not infer test results from code reading. Do not claim coverage
-  unless it was measured.
-- If verification cannot run, state the exact command not run and the
-  blocker.
-
-## Language Defaults
-
-### Python
-
-- For any Python-related technical task, MUST read `references/python.md` with file-reading tools before planning, reviewing, editing, or writing tests. Python-related tasks include changes or review involving `.py` files, `pyproject.toml`, `uv.lock`, requirements files, pytest, Ruff, Pydantic, FastAPI, SQLAlchemy, Alembic, workers, RAG, or LLM service code.
-- Do not rely on memory, prior context, or Markdown link expansion for Python rules. If `references/python.md` cannot be read, continue with the task using the best available local project context and report the exact missing path or blocker.
-- In the visible plan or final report for Python work, state whether `references/python.md` was loaded.
-- If the repository has stronger local Python conventions, follow the local project first unless correctness, security, or data safety would be weakened.
+- For matching technical tasks, MUST read the relevant `references/*.md`
+  file with file-reading tools before planning, reviewing, editing, or
+  writing tests. Do not rely on memory, prior context, or Markdown link
+  expansion for these rules.
+- Resolve each reference by trying, in order:
+  `.qoder/rules/references/<file>.md`, then
+  `~/.codex/references/<file>.md`. Treat a reference as loaded when any
+  candidate path is readable. Report the actual path used when asked,
+  when a reference cannot be read, or when the task is non-trivial.
+- If a matching reference cannot be read, continue with the task using the
+  best available local project context and report the exact missing path
+  or blocker.
+- In the visible plan or final report for non-trivial tasks, state which
+  matching references were loaded and which could not be loaded.
+- If the repository has stronger local conventions, follow the local
+  project first unless correctness, security, or data safety would be
+  weakened.
+- For Python-related tasks, load `references/python.md`. Python-related
+  tasks include changes or review involving `.py` files, `pyproject.toml`,
+  `uv.lock`, requirements files, pytest, Ruff, Pydantic, FastAPI,
+  SQLAlchemy, Alembic, workers, RAG, or LLM service code.
+- For backend API, service, worker, auth, permission, validation, error
+  handling, timeout, retry, idempotency, logging, observability, or
+  security-sensitive work, load `references/backend-reliability.md`.
+- For database, ORM, SQL, schema, migration, backfill, pagination, N+1,
+  bulk read/write, persistence, transaction, locking, or data-retention
+  work, load `references/database.md`.
+- For test planning, bug fixes, regression coverage, CI failures, lint,
+  type-check, verification strategy, or reporting test results, load
+  `references/verification.md`.
 
 ## Git
 

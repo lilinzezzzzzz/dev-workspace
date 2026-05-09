@@ -4,7 +4,9 @@ description: Must be loaded before any Python-related implementation, review, re
 ---
 # Python Rules
 
-Use these rules for Python implementation, review, refactor, dependency, test, packaging, FastAPI, Pydantic, SQLAlchemy, Alembic, worker, or LLM/RAG service work.
+Use these rules for Python implementation, review, refactor, dependency,
+test, packaging, FastAPI, Pydantic, SQLAlchemy, Alembic, worker, or LLM/RAG
+service work.
 
 ## Baseline
 
