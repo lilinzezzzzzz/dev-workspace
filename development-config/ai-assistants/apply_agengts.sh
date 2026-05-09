@@ -220,6 +220,11 @@ prompt_qoder_root_dir() {
                 continue
             fi
 
+            if [[ ! -d "$target_root" ]]; then
+                echo "Qoder project .qoder directory not found: $target_root" >&2
+                continue
+            fi
+
             printf '%s\n' "$target_root"
             return 0
         fi

@@ -1,6 +1,6 @@
 ---
 trigger: model_decision
-description: For Python implementation, review, refactor, dependency, test, or packaging work
+description: Must be loaded before any Python-related implementation, review, refactor, dependency, test, packaging, FastAPI, Pydantic, SQLAlchemy, Alembic, worker, RAG, or LLM service task.
 ---
 # Python Rules
 
@@ -50,8 +50,11 @@ Use these rules for Python implementation, review, refactor, dependency, test, p
 
 ## Errors And Runtime
 
-- Use `ValueError`/`TypeError` for programming errors, not
-  business logic. Keep exception hierarchy flat.
+- Prefer built-in exceptions that match the failure semantics for
+  programming errors, such as `ValueError`, `TypeError`, `KeyError`,
+  `IndexError`, `AttributeError`, `RuntimeError`, or
+  `NotImplementedError`. Do not use programming-error exceptions for
+  business logic. Keep custom business exception hierarchy flat.
 - Use `anyio` + `TaskGroup` for concurrency, `httpx` for HTTP, and
   `anyio.to_thread` for blocking I/O.
 

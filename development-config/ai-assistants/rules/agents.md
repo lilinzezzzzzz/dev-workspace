@@ -122,7 +122,9 @@ Fallback cases:
 
 ### Python
 
-- For Python implementation, review, refactor, dependency, test, or packaging work, use available file-reading tools to load `references/python.md` before planning or editing. Treat that file as task-specific guidance, not as optional background reading.
+- For any Python-related technical task, MUST read `references/python.md` with file-reading tools before planning, reviewing, editing, or writing tests. Python-related tasks include changes or review involving `.py` files, `pyproject.toml`, `uv.lock`, requirements files, pytest, Ruff, Pydantic, FastAPI, SQLAlchemy, Alembic, workers, RAG, or LLM service code.
+- Do not rely on memory, prior context, or Markdown link expansion for Python rules. If `references/python.md` cannot be read, continue with the task using the best available local project context and report the exact missing path or blocker.
+- In the visible plan or final report for Python work, state whether `references/python.md` was loaded.
 - If the repository has stronger local Python conventions, follow the local project first unless correctness, security, or data safety would be weakened.
 
 ## Git
