@@ -1,6 +1,6 @@
 # Endpoint Analysis Template
 
-Use this template as the default output shape. Remove sections that are truly irrelevant, but do not omit request, response, flow, or error handling.
+Use this template for full endpoint analysis. Remove sections that are irrelevant to the endpoint, but keep request, response, flow, errors, and evidence unless the user asked for a brief answer.
 
 ## 1. 接口概述
 
@@ -9,25 +9,21 @@ Use this template as the default output shape. Remove sections that are truly ir
 | Endpoint | `METHOD /path` |
 | 作用 | 用一句话说明接口目标 |
 | Handler / Controller | 入口函数或类 |
-| 鉴权 | 无 / Optional / Required，说明方式 |
-| Content-Type | `application/json` 等 |
-| 幂等性 | 幂等 / 非幂等 / 条件幂等，说明原因 |
+| 鉴权/权限 | 无 / Optional / Required，说明方式和权限点 |
+| Content-Type | `application/json`、`multipart/form-data` 等 |
+| 执行语义 | 同步 / 异步任务 / 流式 / webhook ack |
+| 幂等性 | 幂等 / 非幂等 / 条件幂等，说明依据 |
 | 关键依赖 | DB、Cache、MQ、外部 API、对象存储等 |
 
-补充：
-
-- 说明接口适用场景、上游调用方、是否有版本约束。
-- 如果行为依赖 feature flag、tenant、环境变量或 middleware，单独注明。
+补充：上游调用方、版本约束、feature flag、tenant、环境变量、middleware 注入行为。
 
 ## 2. 请求结构及参数说明
 
 ### 2.1 请求入口
 
-- Path params
-- Query params
-- Headers
-- Cookies
-- Body
+- Path params / Query params
+- Headers / Cookies
+- Body / Form / Multipart files
 - 隐式上下文：用户身份、tenant、trace id、feature flags、session 等
 
 ### 2.2 参数明细表
@@ -38,10 +34,10 @@ Use this template as the default output shape. Remove sections that are truly ir
 
 ### 2.3 请求前置条件
 
-- 鉴权、鉴权失败条件
-- 资源存在性校验
-- 状态机前置条件
+- 鉴权、权限、租户隔离
+- 资源存在性、状态机前置条件
 - 限流、配额、去重、幂等键
+- 文件大小/类型、schema、业务校验
 
 ## 3. 响应结构
 
@@ -59,15 +55,14 @@ Use this template as the default output shape. Remove sections that are truly ir
 
 ### 3.3 响应特性
 
-- 分页、游标、排序
-- 脱敏字段
-- 条件字段或多态响应
+- 分页、游标、排序、过滤
+- 脱敏字段、条件字段、多态响应
 - 异步受理响应，例如 `202 Accepted`
-- 流式返回、文件下载或重定向
+- 流式返回、文件下载、重定向、响应 cookies
 
-## 4. 详细业务逻辑流程图
+## 4. 业务流程
 
-先给 Mermaid，再补充关键说明：
+复杂流程先给 Mermaid；简单流程可只用步骤列表。
 
 ```mermaid
 flowchart TD
@@ -83,13 +78,13 @@ flowchart TD
     J --> K[Return success]
 ```
 
-补充说明至少覆盖：
+关键说明：
 
 - 主要分支条件
 - 外部依赖调用
-- 数据读写和状态变更
-- 事件发布、异步任务、缓存刷新
-- 事务边界和回滚点
+- 数据读写、状态变更、事务边界
+- 事件发布、异步任务、缓存刷新/失效
+- 超时、取消、重试、补偿、回滚点
 
 ## 5. 错误处理说明
 
@@ -97,9 +92,9 @@ flowchart TD
 | --- | --- | --- | --- | --- |
 | `400` | 参数校验失败 | Handler / Schema | `{error: ...}` | 示例 |
 
-按层说明：
+覆盖以下层级：
 
-- Boundary errors：请求格式、参数校验、鉴权、权限、限流
+- Boundary errors：请求格式、参数校验、鉴权、权限、租户、限流
 - Domain errors：业务前置条件不满足、状态冲突、资源不存在
 - Infrastructure errors：DB、Cache、外部 API、网络、超时
 - Framework defaults：未捕获异常、默认 404/405/422 等
@@ -117,5 +112,6 @@ flowchart TD
 
 ## 7. 证据清单
 
-- 列出关键文件路径、函数名、模型名、测试名
-- 若结论依赖推断，标出推断依据
+- 列出关键文件路径、函数名、模型名、测试名或 spec 位置。
+- 对每个重要结论标记来源；依赖推断时写明依据。
+- 明确哪些行为未验证，例如实现代码不可见、测试未覆盖、运行时配置未知。

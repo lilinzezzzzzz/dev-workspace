@@ -5,41 +5,44 @@ description: 分析 HTTP、REST、RPC 或 webhook API 端点的定义、实现�
 
 # API Endpoint Analyzer
 
-## Overview
+## Purpose
 
-Use this skill to turn scattered endpoint artifacts into a single, structured analysis. Prefer code and executable artifacts over comments, and clearly separate observed facts from inference.
+Turn scattered endpoint artifacts into a concise, evidence-backed analysis of request contract, response contract, execution flow, side effects, and error behavior. Prefer runnable code and generated contracts over comments or prose docs. Separate verified facts from inference.
+
+This is an analysis skill by default: read and explain. Do not edit code, schemas, tests, or docs unless the user explicitly asks for changes.
+
+## Analysis Depth
+
+- If the user asks for a quick explanation, provide a compact summary with request, response, main flow, and notable errors.
+- If the user asks for a full analysis, compatibility check, OpenAPI comparison, review, or troubleshooting, use the full template in [references/endpoint-analysis-template.md](./references/endpoint-analysis-template.md).
+- If artifacts are incomplete or the call path is unclear, use [references/source-tracing-checklist.md](./references/source-tracing-checklist.md).
+- If only docs/specs are available, analyze the declared contract and mark implementation behavior as `未验证`.
 
 ## Workflow
 
-1. Gather the minimum artifact set before concluding.
-   - Prefer route registration, handler/controller, request model, response model, service/use case, repository or gateway calls, and relevant tests.
-   - If the user only provides an endpoint path or method, locate the route definition first.
-   - If the user only provides OpenAPI or Swagger artifacts, state that implementation is not verified.
+1. Locate the endpoint entry.
+   - Search by path, method, route name, operation id, handler name, RPC method, or webhook topic.
+   - Confirm versioned routers, decorators, generated routes, middleware, and mounted prefixes before naming the final endpoint.
 
-2. Establish the endpoint contract.
-   - Record method, path, version, content type, auth requirements, idempotency expectations, sync or async semantics, and whether the endpoint supports pagination, streaming, file upload, or file download.
-   - Extract every explicit parameter from path, query, headers, cookies, and body.
-   - Identify implicit inputs injected by middleware, auth context, feature flags, tenant context, or server defaults.
+2. Establish the contract.
+   - Record method/path, content type, auth, permissions, idempotency, sync/async behavior, pagination, streaming, uploads/downloads, and version constraints.
+   - Extract explicit inputs from path, query, headers, cookies, body, form/multipart fields, and files.
+   - Identify implicit inputs from auth context, tenant context, dependency injection, middleware, feature flags, environment defaults, and server-generated values.
 
-3. Trace the execution path end to end.
-   - Follow the call chain from router to handler, then to service, domain logic, persistence, events, background jobs, and external integrations.
-   - Capture validation, authorization, branching, transactions, retries, fallback behavior, state transitions, side effects, and non-obvious defaults.
-   - Note which steps are synchronous, which are deferred, and which rely on eventual consistency.
+3. Trace the implementation.
+   - Follow router -> handler/controller -> service/use case -> domain logic -> repository/gateway/external clients.
+   - Capture validation, authorization, branching, transactions, retries, fallbacks, state transitions, side effects, async jobs, events, and cache behavior.
+   - Note consistency semantics: immediate write/read, eventual consistency, compensation, timeout, cancellation, and partial failure behavior.
 
-4. Reconstruct success and failure outputs.
-   - Enumerate success status codes, response body fields, headers, pagination metadata, and conditional response variants.
-   - Enumerate failure branches and map them to validation errors, auth failures, missing resources, conflicts, rate limits, dependency failures, and framework-default exceptions.
-   - Distinguish between declared errors in docs and errors actually reachable from implementation.
+4. Reconstruct outputs.
+   - Enumerate success status codes, response schemas, conditional fields, wrappers, headers, cookies, pagination metadata, redirects, files, or stream events.
+   - Enumerate reachable failures: validation, auth, permission, not found, conflict, rate limit, dependency failure, timeout, cancellation, and framework defaults.
+   - Distinguish documented errors from implementation-reachable errors.
 
-5. Produce the final analysis in a stable shape.
-   - Use [references/endpoint-analysis-template.md](./references/endpoint-analysis-template.md) as the default report format.
-   - Use Mermaid for the business flow. Keep the graph readable; collapse repetitive framework details into notes or bullets instead of overloading the diagram.
-   - Include file references when local code is available.
-
-6. Call out uncertainty explicitly.
-   - Mark anything not directly verified as `推断` or `未验证`.
-   - If docs and code differ, report both and identify the likely source of truth.
-   - Do not invent field types, status codes, validation rules, or side effects.
+5. Report with evidence.
+   - Include local file/function references when code is available.
+   - Mark unverified conclusions as `推断` or `未验证`.
+   - If docs/specs and code disagree, report both and identify the likely source of truth.
 
 ## Evidence Order
 
@@ -55,12 +58,15 @@ Use this priority order when sources disagree:
 
 ## Output Rules
 
-- Keep facts and inferences separate.
+- Match the output depth to the user's request; do not force the full template for a small question.
+- Keep facts, inference, and open questions separate.
 - Prefer tables for parameter and error enumeration.
-- Mention auth, idempotency, side effects, external dependencies, and persistence changes whenever they exist.
-- Explain validation and error handling at the boundary and in the domain layer.
-- If the endpoint mutates data, state what is written, emitted, or queued.
-- If the endpoint reads from multiple backends, mention consistency and failure propagation.
+- Include Mermaid only when explaining a non-trivial flow; keep diagrams focused on business branches, not framework boilerplate.
+- Always call out auth, idempotency, side effects, external dependencies, persistence changes, and cache behavior when present.
+- For mutating endpoints, state what is written, emitted, queued, invalidated, or called externally.
+- For multi-backend reads, state consistency expectations and failure propagation.
+- Do not invent field types, status codes, validation rules, side effects, or security behavior.
+- Avoid generic advice unless tied to evidence from the endpoint.
 
 ## Special Cases
 
@@ -80,6 +86,15 @@ Use this priority order when sources disagree:
 ### Webhooks
 
 - Explain signature verification, replay protection, idempotency strategy, downstream fan-out, and failure acknowledgement semantics.
+
+### RPC or protobuf APIs
+
+- Identify service/method, request and response messages, field presence/default semantics, metadata, auth interceptors, deadlines, streaming mode, and mapped error codes.
+
+### API reviews
+
+- Lead with concrete findings: contract breaks, auth or tenant gaps, unsafe side effects, data consistency risks, missing error mapping, N+1/unbounded reads, and meaningful test gaps.
+- Separate design suggestions from correctness issues.
 
 ## References
 

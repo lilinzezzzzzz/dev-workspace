@@ -1,42 +1,45 @@
 # Source Tracing Checklist
 
-Use this checklist when the endpoint is hard to follow or the repository is large.
+Use this checklist when endpoint artifacts are incomplete, generated, or spread across middleware, services, jobs, and external systems. Stop once the answer has enough evidence for the user's requested depth.
 
 ## 1. Route Discovery
 
-- Search route registration by path, method, router tag, operation id, or handler name.
-- Check versioned routers, nested routers, generated routes, and framework decorators.
-- Verify whether middleware rewrites the path, method, or request context.
+- Search path, method, route name, router tag, operation id, handler name, RPC method, or webhook topic.
+- Check versioned routers, mounted prefixes, nested routers, generated routes, decorators, and registration order.
+- Verify middleware or gateway behavior that rewrites path, method, headers, body, or request context.
 
 ## 2. Input Schema Discovery
 
-- Find request DTOs, Pydantic models, serializers, protobuf messages, or form definitions.
-- Trace field aliases, validators, defaults, enum constraints, and hidden server-side defaults.
-- Check auth middleware, dependency injection, or context builders for implicit inputs.
+- Find request DTOs, Pydantic models, serializers, protobuf messages, form definitions, multipart fields, or file constraints.
+- Trace field aliases, validators, defaults, enum constraints, coercion, required/optional semantics, and server-side defaults.
+- Check auth middleware, interceptors, dependency injection, tenant resolvers, feature flags, and context builders for implicit inputs.
 
 ## 3. Execution Path
 
-- Trace handler to service/use case to repository or gateway.
-- Identify transaction boundaries, retries, circuit breakers, and fallback paths.
-- Record side effects such as DB writes, cache updates, events, tasks, or notifications.
+- Trace handler/controller to service/use case, domain logic, repository, gateway, external client, or async job.
+- Identify authorization checks, transaction boundaries, locks, retries, circuit breakers, fallbacks, timeouts, and cancellation handling.
+- Record side effects: DB writes, cache read/write/invalidation, events, tasks, notifications, object storage, and third-party calls.
+- Check state transitions, idempotency keys, deduplication, replay protection, and eventual-consistency assumptions.
 
 ## 4. Response Assembly
 
-- Find response DTOs, presenters, serializers, or manual JSON assembly.
-- Look for conditional fields, derived fields, and framework wrappers.
-- Check response headers, cookies, pagination metadata, and content negotiation.
+- Find response DTOs, presenters, serializers, protobuf messages, stream event schemas, file responses, or manual JSON assembly.
+- Look for conditional fields, derived fields, nullability, field masking, framework wrappers, and response envelopes.
+- Check status codes, headers, cookies, pagination metadata, redirects, content negotiation, and compression.
 
 ## 5. Error Enumeration
 
 - Search for raised exceptions, returned error objects, and framework exception handlers.
-- Check validation layers, auth failures, permission checks, not-found branches, conflicts, and rate limits.
-- Verify whether infrastructure failures are mapped to user-facing status codes or bubble up as 500s.
+- Check validation layers, auth failures, permission/tenant checks, not-found branches, conflicts, quotas, and rate limits.
+- Verify whether infrastructure failures are mapped to user-facing status/error codes or bubble up as 500s.
+- Include framework defaults such as 404, 405, schema validation, unsupported media type, and payload-too-large errors when reachable.
 
 ## 6. Supporting Evidence
 
 - Prefer tests that hit the endpoint directly.
-- Use OpenAPI, Swagger, protobuf, or API docs as contract references, not sole truth when code exists.
-- Check migration or schema files if the endpoint depends on specific persistence fields or state transitions.
+- Use OpenAPI, Swagger, protobuf, or API docs as declared contracts, not sole truth when code exists.
+- Check migrations, DB schema, ORM models, indexes, cache key builders, and message schemas when persistence or events affect behavior.
+- Check fixtures and mocks for undocumented response shapes or error branches.
 
 ## 7. Common Omissions
 
@@ -47,3 +50,5 @@ Use this checklist when the endpoint is hard to follow or the repository is larg
 - Default framework errors such as 404, 405, and schema-validation failures
 - Idempotency keys, deduplication, and replay protection
 - Cache invalidation or read-after-write consistency gaps
+- File cleanup after upload failure
+- External API timeout, retry, and partial-failure behavior
