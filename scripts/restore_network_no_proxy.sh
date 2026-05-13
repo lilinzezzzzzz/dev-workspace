@@ -3,6 +3,7 @@ set -euo pipefail
 
 CHECK_ONLY=0
 WITH_SUDO=0
+CLASH_PORT_PATTERN='7890|7891|7892|7893|7895|7897'
 
 usage() {
   cat <<'USAGE'
@@ -14,8 +15,9 @@ usage() {
   --with-sudo    同时以 root 身份执行只读检查，包括防火墙规则、路由和系统代理文件。
 
 本脚本用于清除 flclash/Clash 残留的常见用户级代理设置：
-GNOME 代理、Git 代理、npm/yarn/pnpm 代理，以及 systemd 用户环境
-代理变量。root 级别的防火墙检查为只读，不会修改系统配置。
+GNOME 代理、Git 代理、SSH ProxyCommand/ProxyJump、npm/yarn/pnpm
+代理，以及 systemd 用户环境代理变量。root 级别的防火墙检查为只读，
+不会修改系统配置。
 USAGE
 }
 
@@ -39,6 +41,12 @@ has_cmd() {
   command -v "$1" >/dev/null 2>&1
 }
 
+grep_ssh_proxy_lines() {
+  local file="$1"
+
+  grep -nEi "^[[:space:]]*(proxycommand|proxyjump)[[:space:]].*((127\\.0\\.0\\.1|localhost|::1).*(${CLASH_PORT_PATTERN})|(${CLASH_PORT_PATTERN}).*(127\\.0\\.0\\.1|localhost|::1)|clash|flclash|mihomo)" "$file" || true
+}
+
 clear_gnome_proxy() {
   if ! has_cmd gsettings; then
     echo "未找到 gsettings；跳过 GNOME 代理清理。"
@@ -53,6 +61,58 @@ clear_gnome_proxy() {
     run gsettings set "org.gnome.system.proxy.${schema}" host ''
     run gsettings set "org.gnome.system.proxy.${schema}" port 0
   done
+}
+
+clear_ssh_proxy_config() {
+  local ssh_config="${HOME}/.ssh/config"
+
+  if [[ ! -f "$ssh_config" ]]; then
+    echo "未发现 ~/.ssh/config；跳过 SSH 代理清理。"
+    return 0
+  fi
+
+  log "Clear SSH proxy config"
+  local matches=()
+  mapfile -t matches < <(grep_ssh_proxy_lines "$ssh_config")
+
+  if [[ "${#matches[@]}" -eq 0 ]]; then
+    echo "未发现 SSH Clash 代理配置项。"
+    return 0
+  fi
+
+  printf '将清理以下 SSH 代理配置行：\n'
+  printf '%s\n' "${matches[@]}"
+
+  if [[ "$CHECK_ONLY" -eq 1 ]]; then
+    echo "[check-only] 未修改 ~/.ssh/config。"
+    return 0
+  fi
+
+  local backup="${ssh_config}.bak.$(date +%Y%m%d%H%M%S)"
+  local tmp
+  tmp="$(mktemp "${ssh_config}.tmp.XXXXXX")"
+
+  cp -p "$ssh_config" "$backup"
+  awk -v ports="$CLASH_PORT_PATTERN" '
+    function suspicious(line, lower) {
+      lower = tolower(line)
+      if (lower !~ /^[[:space:]]*(proxycommand|proxyjump)[[:space:]]/) {
+        return 0
+      }
+      if (lower ~ /(clash|flclash|mihomo)/) {
+        return 1
+      }
+      if (lower ~ /(127\.0\.0\.1|localhost|::1)/ && lower ~ "(" ports ")") {
+        return 1
+      }
+      return 0
+    }
+    !suspicious($0)
+  ' "$ssh_config" > "$tmp"
+
+  chmod --reference="$ssh_config" "$tmp" 2>/dev/null || chmod 600 "$tmp"
+  mv "$tmp" "$ssh_config"
+  echo "已备份原 SSH 配置到：${backup}"
 }
 
 clear_git_proxy() {
@@ -139,6 +199,11 @@ check_user_state() {
     git config --global --get-regexp '.*proxy.*' || true
   fi
 
+  if [[ -f "${HOME}/.ssh/config" ]]; then
+    echo "-- SSH proxy --"
+    grep_ssh_proxy_lines "${HOME}/.ssh/config"
+  fi
+
   if has_cmd npm; then
     echo "-- npm proxy --"
     npm config get proxy || true
@@ -213,6 +278,7 @@ main() {
 
   clear_gnome_proxy
   clear_git_proxy
+  clear_ssh_proxy_config
   clear_node_proxy
   clear_systemd_user_env
   check_user_state
