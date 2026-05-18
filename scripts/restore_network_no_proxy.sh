@@ -16,8 +16,8 @@ usage() {
 
 本脚本用于清除 flclash/Clash 残留的常见用户级代理设置：
 GNOME 代理、Git 代理、SSH ProxyCommand/ProxyJump、npm/yarn/pnpm
-代理，以及 systemd 用户环境代理变量。root 级别的防火墙检查为只读，
-不会修改系统配置。
+代理、systemd 用户环境代理变量，并终止 clash/mihomo 代理进程。
+root 级别的防火墙检查为只读，不会修改系统配置。
 USAGE
 }
 
@@ -45,6 +45,49 @@ grep_ssh_proxy_lines() {
   local file="$1"
 
   grep -nEi "^[[:space:]]*(proxycommand|proxyjump)[[:space:]].*((127\\.0\\.0\\.1|localhost|::1).*(${CLASH_PORT_PATTERN})|(${CLASH_PORT_PATTERN}).*(127\\.0\\.0\\.1|localhost|::1)|clash|flclash|mihomo)" "$file" || true
+}
+
+clear_clash_process() {
+  log "Stop clash/mihomo processes"
+
+  local pids=()
+  mapfile -t pids < <(
+    ps -eo pid=,comm= | grep -Ei '(^|/)(flclash|clash|mihomo|verge-mihomo)$' | awk '{print $1}' || true
+  )
+
+  if [[ "${#pids[@]}" -eq 0 ]]; then
+    echo "未发现正在运行的 clash/mihomo 进程。"
+    return 0
+  fi
+
+  printf '将停止以下进程 (PID): %s\n' "${pids[*]}"
+
+  if [[ "$CHECK_ONLY" -eq 1 ]]; then
+    echo "[check-only] 未终止任何进程。"
+    return 0
+  fi
+
+  for pid in "${pids[@]}"; do
+    if kill -TERM "$pid" 2>/dev/null; then
+      echo "已发送 SIGTERM 到 PID $pid"
+    fi
+  done
+
+  sleep 1
+
+  # 检查是否还有残留，强制 kill
+  local remaining=()
+  mapfile -t remaining < <(
+    ps -eo pid=,comm= | grep -Ei '(^|/)(flclash|clash|mihomo|verge-mihomo)$' | awk '{print $1}' || true
+  )
+
+  for pid in "${remaining[@]}"; do
+    if kill -KILL "$pid" 2>/dev/null; then
+      echo "已发送 SIGKILL 到残留 PID $pid"
+    fi
+  done
+
+  echo "clash/mihomo 进程已停止。"
 }
 
 clear_gnome_proxy() {
@@ -281,6 +324,7 @@ main() {
   clear_ssh_proxy_config
   clear_node_proxy
   clear_systemd_user_env
+  clear_clash_process
   check_user_state
   check_runtime_state
   check_root_state
@@ -289,7 +333,7 @@ main() {
   if [[ "$CHECK_ONLY" -eq 1 ]]; then
     echo "只读检查模式完成，未修改任何设置。"
   else
-    echo "用户级代理清理完成。请重新打开终端和应用程序，以丢弃已继承的代理环境变量。"
+    echo "用户级代理清理完成，clash/mihomo 进程已终止。请重新打开终端和应用程序，以丢弃已继承的代理环境变量。"
   fi
   if [[ "$WITH_SUDO" -eq 0 ]]; then
     echo "如需检查 root 防火墙规则和系统代理文件，请使用 --with-sudo 参数运行。"
