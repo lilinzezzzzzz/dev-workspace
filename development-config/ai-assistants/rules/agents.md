@@ -41,38 +41,30 @@ alwaysApply: true
 
 ## Discovery
 
-- Before non-trivial changes, read files directly involved, immediate
-  callers/callees, relevant config, tests, and local instructions.
-- Identify constraints and blast radius: public APIs, persisted formats,
-  message schemas, migrations, concurrency, external services, auth,
-  permissions, and performance-sensitive paths.
-- Check workspace state when edits may overlap with user work.
+- For non-trivial code changes, reviews, bug investigations, unfamiliar
+  modules, or local instruction discovery, load `codebase-discovery.md`
+  before planning, reviewing, editing, or testing.
 - Ask only when missing information affects correctness, data safety, or
   API compatibility. For low-risk gaps, choose the conservative option
   and state the assumption.
-- When no project convention exists, use this file's defaults.
 
-## Execution Protocol
+## Project AGENTS.md Maintenance
 
-> Use this protocol internally. Show a visible plan only for non-trivial,
-> multi-file, risky, data-affecting, API-affecting, or ambiguous tasks.
+- Treat project-level `AGENTS.md` files as living, project-owned
+  contracts.
+- When creating, updating, deleting, reviewing, or syncing project-level
+  `AGENTS.md` files, load `project-agents-maintenance.md` before planning
+  or editing.
+- Maintain project-level instructions only for durable, project-specific
+  conventions, workflows, commands, invariants, or local constraints that
+  future agents need in order to work safely.
 
-1. **Understand** — Read relevant code and contracts before editing.
-2. **Plan** — List files to modify and one-line intent for each. Flag
-   compatibility or data-safety concerns.
-3. **Implement** — Make one logical change per edit. Keep call paths
-   shallow and avoid speculative abstractions.
-4. **Verify & Report** — Run relevant tests, linter, or type-checker.
-   Report what changed, what passed, what was not run, and why.
+## Execution Workflow
 
-Fallback cases:
-
-- If blocked by environment, credentials, network, services, or missing
-  dependencies, report the blocker and a practical alternative.
-- If rules conflict, apply: correctness > scope > code shape.
-- If a nearby issue is out of scope, mention it as a follow-up unless it
-  causes incorrect behavior in the current change or is a trivial fix in
-  the same function.
+- For non-trivial, multi-file, risky, data-affecting, API-affecting, or
+  ambiguous tasks, load `execution-workflow.md` before planning or editing.
+- Run the smallest meaningful verification that covers changed behavior,
+  and report what passed, what was not run, and why.
 
 ## Engineering Standards
 
@@ -99,10 +91,15 @@ Fallback cases:
 
 ## Task-Specific References
 
-Reference search paths, in priority order:
+Reference search paths are assistant-specific:
 
-1. `<project-root>/.qoder/rules/references/<file>.md`
-2. `~/.codex/references/<file>.md`
+- When the active assistant is Codex, resolve in this order:
+  1. `~/.codex/references/<file>.md`
+  2. `<project-root>/.qoder/rules/references/<file>.md`
+- When the active assistant is Qoder, resolve in this order:
+  1. `<project-root>/.qoder/rules/references/<file>.md`
+- If the active assistant cannot be identified, try both paths and report
+  the attempted order.
 
 ### Reference Loading Guardrails
 
@@ -115,8 +112,8 @@ Reference search paths, in priority order:
 - Before file edits, re-check the planned files and behavior against the
   matrix. If a new category is discovered, load the missing reference
   before editing.
-- Resolve each reference by trying the reference search paths above in
-  order. Treat a reference as loaded when any candidate path is readable.
+- Resolve each reference by trying the assistant-specific search paths above
+  in order. Treat a reference as loaded when any candidate path is readable.
   Do not claim a reference was loaded unless it was read with file-reading
   tools in the current task. Do not rely on memory, prior context, or
   Markdown link expansion for these rules.
@@ -150,8 +147,12 @@ behavior and files, not only by exact words.
 | --- | --- |
 | Python implementation | `python.md` |
 | Backend reliability | `backend-reliability.md` |
+| Codebase discovery | `codebase-discovery.md` |
+| Execution workflow | `execution-workflow.md` |
+| Git workflow | `git-workflow.md` |
 | Persistence | `database.md` |
 | Verification | `verification.md` |
+| Project instruction maintenance | `project-agents-maintenance.md` |
 
 Task area examples:
 
@@ -160,18 +161,28 @@ Task area examples:
 - Backend reliability: request handling, service logic, auth, validation,
   config, errors, retries, logging, external clients, or security-sensitive
   behavior.
+- Codebase discovery: non-trivial code changes, code reviews, bug
+  investigations, unfamiliar modules, local instruction discovery, blast
+  radius analysis, or tasks that may overlap with user work.
+- Execution workflow: non-trivial, multi-file, risky, data-affecting,
+  API-affecting, ambiguous, blocked, or verification-heavy tasks.
+- Git workflow: branch creation, commits, staged changes, reset, revert,
+  rebase, merge, cherry-pick, stash, tag, push, pull, PR/MR preparation, or
+  history-sensitive repository operations.
 - Persistence: database, ORM, migrations, repositories/DAOs, models,
   queries, transactions, pagination, vector store, or cache-backed
   persistence.
 - Verification: tests, bug fixes, behavior changes, CI/lint/type-check,
   regression coverage, or reporting verification results.
+- Project instruction maintenance: creating, updating, deleting, reviewing,
+  or syncing project-level or subdirectory `AGENTS.md` files; durable
+  repository-specific agent guidance; local instruction hierarchy changes.
 
 ## Git
 
-- Branch prefixes: `feature/*`, `bugfix/*`, `hotfix/*`, `release/*`,
-  `chore/*`, `docs/*`, `refactor/*`, `test/*`, `ci/*`.
-- When reverting changes, prefer `git revert` over `git reset` or force
-  push to preserve history.
+- For branch, commit, rebase, merge, revert, reset, stash, push, pull,
+  PR/MR, or other history-sensitive repository work, load
+  `git-workflow.md` before planning or running Git commands.
 
 ## Response Contract
 
