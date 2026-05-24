@@ -26,6 +26,9 @@ infras/milvus/etcd/*
 infras/milvus/minio/*
 infras/milvus/standalone/*
 
+# PostgreSQL
+infras/postgres/data/*
+
 # Docker specific
 *.sdi
 *.log
