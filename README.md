@@ -259,8 +259,7 @@ docker logs python-workspace
 ├── ssh-keys/
 │   └── README.md
 ├── development-config/
-│   ├── prompts/
-│   ├── ai-assistants/
+│   ├── terminal/
 │   └── vscode/
 ├── docs/
 └── infras/
@@ -275,7 +274,8 @@ docker logs python-workspace
 
 - `infras/milvus/` 目录会在首次启动相关容器后自动生成数据目录，但当前未纳入仓库
 - `infras/mq/docker-compose.yml` 提供 Kafka 相关独立编排
-- `development-config/vscode/README.md`、`development-config/ai-assistants/README.md`、`ssh-keys/README.md` 分别说明对应配置的使用方式
+- `development-config/vscode/README.md`、`development-config/terminal/README.md`、`ssh-keys/README.md` 分别说明对应配置的使用方式
+- AI assistant rules、skills 和 Codex/Qoder 同步入口已迁移到独立项目 `agent-workbench`
 
 ## 已知现状
 

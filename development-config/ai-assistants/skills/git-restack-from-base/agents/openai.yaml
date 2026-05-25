@@ -1,4 +1,0 @@
-interface:
-  display_name: "Git Restack From Base"
-  short_description: "必须先显示明确指定的基础分支，确认后再重切分支并迁移提交"
-  default_prompt: "Use $git-restack-from-base to require an explicitly provided base branch or base ref before doing anything else. If it is missing, ask only `基础分支是什么？` and stop. If it is provided, first visibly show the specified base, then follow the shared remote-base rule, resolve `scripts/restack_from_base.py` relative to the loaded skill directory, and show the resolved base ref, base freshness, and current branch for confirmation before recreating the current branch. After a successful restack and verification, ask whether to delete the source branch locally and remotely, show the exact refs that would be deleted, and run deletion only after explicit confirmation."

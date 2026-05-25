@@ -1,4 +1,0 @@
-interface:
-  display_name: "API Endpoint Analyzer"
-  short_description: "基于证据分析 API 端点契约、流程与错误"
-  default_prompt: "Use $api-endpoint-analyzer to analyze this API endpoint with evidence for request, response, flow, side effects, and errors."

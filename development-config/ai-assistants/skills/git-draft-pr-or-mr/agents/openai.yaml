@@ -1,4 +1,0 @@
-interface:
-  display_name: "Git Draft PR Or MR"
-  short_description: "基于明确基础分支和真实 diff 生成偏业务视角的 PR/MR 标题与描述，未限定分支名默认按对应远程分支处理"
-  default_prompt: "Use $git-draft-pr-or-mr to draft a PR or MR title and description against an explicit base branch, follow the shared remote-base rule, report the base freshness, and express the draft from a business-outcome perspective."

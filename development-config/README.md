@@ -1,14 +1,13 @@
 # Development Config
 
-> 个人开发环境配置集合，用于在不同机器和项目之间复用编辑器、终端和 AI assistant 配置。
+> 个人开发环境配置集合，用于在不同机器和项目之间复用编辑器和终端配置。
 
-本目录保存开发工具链相关配置，不承载具体业务代码。各子目录按工具或场景拆分，并在目录内维护更详细的使用说明。
+本目录保存开发工具链相关配置，不承载具体业务代码。各子目录按工具或场景拆分，并在目录内维护更详细的使用说明。AI assistant 配置已迁移到独立项目 `agent-workbench`。
 
 ## 目录结构
 
 ```text
 development-config/
-├── ai-assistants/   # Codex、Qoder 等 AI assistant 的 rules、skills 和配置
 ├── terminal/        # Ghostty、Zsh、Starship 等终端环境配置
 ├── vscode/          # VS Code 通用、Python、Go 工作区配置
 └── README.md
@@ -18,19 +17,10 @@ development-config/
 
 | 目录 | 用途 | 详细文档 |
 | ---- | ---- | -------- |
-| `ai-assistants/` | 同步 AI assistant 规则、skills 和 Codex 配置 | [`ai-assistants/README.md`](ai-assistants/README.md) |
 | `terminal/` | 安装和同步终端、Shell、提示符配置 | [`terminal/README.md`](terminal/README.md) |
 | `vscode/` | 维护 VS Code 通用配置和语言专用配置 | [`vscode/README.md`](vscode/README.md) |
 
 ## 常用入口
-
-### AI Assistant 配置
-
-```bash
-./development-config/ai-assistants/apply_agengts.sh
-```
-
-可交互选择同步 `rules`、`skills` 或 `codex-config`。选择 Qoder rules 时，需要输入已存在且以 `.qoder` 结尾的项目目录。
 
 ### Terminal 配置
 
@@ -55,3 +45,5 @@ cp development-config/vscode/python/* .vscode/
 - 新增工具配置时，优先新建独立子目录，并补充对应 README。
 - 修改配置同步脚本时，应同时更新相关文档和最小可行验证命令。
 - 不在本目录存放机器私有密钥、token、cookie 或其他敏感信息。
+- AI assistant rules、skills 和 Codex/Qoder 同步入口由独立项目
+  `agent-workbench` 维护，不在本仓库继续维护副本。
