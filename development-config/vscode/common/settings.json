@@ -70,6 +70,7 @@
     "**/.nuxt/**": true, // Nuxt 构建缓存
     "**/.turbo/**": true, // Turborepo 缓存
     "**/.cache/**": true, // 通用缓存目录
+    "**/logs/**": true, // 日志文件目录
     "**/dist/**": true, // 构建产物
     "**/build/**": true, // 构建产物
     "**/coverage/**": true, // 覆盖率产物
