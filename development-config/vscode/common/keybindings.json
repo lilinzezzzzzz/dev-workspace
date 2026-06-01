@@ -2,11 +2,18 @@
   // ==================== 重要说明 ====================
   // ⚠️ keybindings.json 只能放在用户级别目录才生效，不支持工作区级别！
   //
-  // macOS 用户目录: ~/Library/Application Support/Qoder/User/keybindings.json
-  // VS Code 用户目录: ~/Library/Application Support/Code/User/keybindings.json
+  // Qoder 用户目录:
+  //   macOS:   ~/Library/Application Support/Qoder/User/keybindings.json
+  //   Windows: %APPDATA%\Qoder\User\keybindings.json
+  //   Linux:   ~/.config/Qoder/User/keybindings.json
+  //
+  // VS Code 用户目录:
+  //   macOS:   ~/Library/Application Support/Code/User/keybindings.json
+  //   Windows: %APPDATA%\Code\User\keybindings.json
+  //   Linux:   ~/.config/Code/User/keybindings.json
   //
   // 应用配置:
-  // cp keybindings.json ~/Library/Application\ Support/Qoder/User/keybindings.json
+  // cp keybindings.json <目标用户目录>/keybindings.json
   // ==================================================
 
   // ==================== 导航快捷键 ====================
