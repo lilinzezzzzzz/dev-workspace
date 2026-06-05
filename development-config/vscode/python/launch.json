@@ -9,57 +9,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "🐍 Python: Current File",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${file}",
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "envFile": "${workspaceFolder}/.env",
-      "env": {
-        "PYTHONPATH": "${workspaceFolder}"
-      },
-      "justMyCode": true
-    },
-    {
-      "name": "🧪 Pytest: Current File",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "envFile": "${workspaceFolder}/.env",
-      "env": {
-        "PYTHONPATH": "${workspaceFolder}"
-      },
-      "args": [
-        "${file}",
-        "-s",
-        "-v",
-        "--tb=short"
-      ],
-      "justMyCode": true
-    },
-    {
-      "name": "🧪 Pytest: Workspace",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "envFile": "${workspaceFolder}/.env",
-      "env": {
-        "PYTHONPATH": "${workspaceFolder}"
-      },
-      "args": [
-        "tests",
-        "-s",
-        "-v",
-        "--tb=short"
-      ],
-      "justMyCode": true
-    },
-    {
       "name": "🚀 FastAPI: Uvicorn (main:app)",
       "type": "debugpy",
       "request": "launch",
@@ -68,7 +17,8 @@
       "console": "integratedTerminal",
       "envFile": "${workspaceFolder}/.env",
       "env": {
-        "PYTHONPATH": "${workspaceFolder}"
+        "PYTHONPATH": "${workspaceFolder}",
+        "PYTHONDONTWRITEBYTECODE": "1"
       },
       "args": [
         "main:app",
@@ -83,6 +33,40 @@
         "action": "openExternally",
         "pattern": "Uvicorn running on (http://\\S+)"
       }
+    },
+    {
+      "name": "🐍 Python: Current File",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "justMyCode": true
+    },
+    {
+      "name": "🧪 Pytest: Current File",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "args": [
+        "${file}",
+        "-s",
+        "-v",
+        "--tb=short"
+      ],
+      "justMyCode": true
     }
   ]
 }
