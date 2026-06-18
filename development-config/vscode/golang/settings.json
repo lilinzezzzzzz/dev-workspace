@@ -6,6 +6,9 @@
   "go.useLanguageServer": true, // 启用 Go 语言服务器 (gopls)
   "go.toolsManagement.autoUpdate": true, // 自动更新 Go 工具（如 goimports、dlv 等）
   "go.toolsGopath": "", // Go 工具安装路径（默认为 GOPATH/bin，留空使用默认）
+  "go.alternateTools": {
+    "go": "~/.local/share/mise/shims/go" // 使用 mise 管理项目 Go 版本
+  },
   // -------------------- Go 语言特定设置 --------------------
   "[go]": {
     "editor.formatOnSave": true, // 保存时自动格式化
@@ -53,7 +56,7 @@
     "usePlaceholders": true, // 使用占位符（补全时显示参数名）
     "completionBudget": "100ms", // 补全超时时间（控制响应速度）
     // 提示配置
-    "hints": {
+    "ui.inlayhint.hints": {
       "assignVariableTypes": false, // 不显示赋值变量类型
       "compositeLiteralFields": true, // 显示复合字面量字段
       "compositeLiteralTypes": false, // 不显示复合字面量类型
