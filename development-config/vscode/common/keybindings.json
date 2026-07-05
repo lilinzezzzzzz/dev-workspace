@@ -20,21 +20,36 @@
   // 后退: Windows/Linux 使用 Ctrl+Alt+Left, macOS 使用 Cmd+Opt+Left
   {
     "key": "ctrl+alt+left",
-    "mac": "cmd+alt+left",
-    "command": "workbench.action.navigateBack"
+    "command": "workbench.action.navigateBack",
+    "when": "!isMac"
+  },
+  {
+    "key": "cmd+alt+left",
+    "command": "workbench.action.navigateBack",
+    "when": "isMac"
   },
   // 前进: Windows/Linux 使用 Ctrl+Alt+Right, macOS 使用 Cmd+Opt+Right
   {
     "key": "ctrl+alt+right",
-    "mac": "cmd+alt+right",
-    "command": "workbench.action.navigateForward"
+    "command": "workbench.action.navigateForward",
+    "when": "!isMac"
+  },
+  {
+    "key": "cmd+alt+right",
+    "command": "workbench.action.navigateForward",
+    "when": "isMac"
   },
   // ==================== 格式化文档快捷键 ====================
   // 格式化文档：Windows/Linux 使用 Ctrl+Alt+L, macOS 使用 Cmd+Opt+L (PyCharm 风格)
   {
     "key": "ctrl+alt+l",
-    "mac": "cmd+alt+l",
-    "command": "editor.action.formatDocument"
+    "command": "editor.action.formatDocument",
+    "when": "!isMac"
+  },
+  {
+    "key": "cmd+alt+l",
+    "command": "editor.action.formatDocument",
+    "when": "isMac"
   },
   // 移除 VS Code 默认的 Shift+Alt+F 和 Cmd+Shift+F 快捷键（跨平台）
   {
