@@ -61,14 +61,8 @@ services:
       TZ: "UTC"
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "123456"
-      POSTGRES_DB: "ai_chat"
     volumes:
       - "./infras/postgres/data:/var/lib/postgresql/data"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d ai_chat"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
     networks:
       - common-network
 

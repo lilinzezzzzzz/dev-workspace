@@ -164,7 +164,7 @@ mysql -h localhost -P 3306 -u root -p123456
 ### PostgreSQL
 
 ```bash
-psql -h localhost -p 5432 -U postgres -d ai_chat
+psql -h localhost -p 5432 -U postgres -d postgres
 ```
 
 ### Oracle
