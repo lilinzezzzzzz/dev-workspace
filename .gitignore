@@ -36,6 +36,9 @@ infras/postgres/data/*
 # Screenshots
 screenshot*.png
 
+# Local applications
+/navicat17-premium-lite-cs-x86_64.AppImage
+
 ################################################################################
 # Python
 ################################################################################
