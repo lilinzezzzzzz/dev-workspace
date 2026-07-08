@@ -145,6 +145,7 @@ venv.bak/
 
 # Secrets
 configs/.secrets
+scripts/.workspace-root
 *.pem
 *.key
 .env.local

@@ -13,10 +13,24 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
+from typing import TextIO
 
 
-DEFAULT_ROOT = Path("/Users/lilinze/Documents")
+WORKSPACE_ROOT_FILE = Path(__file__).resolve().parent / ".workspace-root"
 DEFAULT_TIMEOUT_SECONDS = 10.0
+COLOR_AUTO = "auto"
+COLOR_ALWAYS = "always"
+COLOR_NEVER = "never"
+ANSI_RESET = "\033[0m"
+ANSI_CODES = {
+    "bold": "1",
+    "dim": "2",
+    "red": "31",
+    "green": "32",
+    "yellow": "33",
+    "blue": "34",
+    "cyan": "36",
+}
 
 
 class ResultKind(Enum):
@@ -25,6 +39,19 @@ class ResultKind(Enum):
     UPDATED = "成功更新"
     MANUAL = "跳过（需人工介入）"
     TIMED_OUT = "超时"
+
+
+RESULT_COLORS = {
+    ResultKind.UPDATED: "green",
+    ResultKind.MANUAL: "yellow",
+    ResultKind.TIMED_OUT: "red",
+}
+
+RESULT_LABELS = {
+    ResultKind.UPDATED: "UPDATED",
+    ResultKind.MANUAL: "SKIPPED",
+    ResultKind.TIMED_OUT: "TIMEOUT",
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -40,17 +67,14 @@ class CommandTimedOutError(RuntimeError):
     """表示子进程超过允许的执行时间。"""
 
 
+class WorkspaceRootConfigError(RuntimeError):
+    """表示 workspace root 配置不可用。"""
+
+
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     """解析命令行参数。"""
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "root",
-        nargs="?",
-        type=Path,
-        default=DEFAULT_ROOT,
-        help=f"扫描根目录（默认：{DEFAULT_ROOT}）",
-    )
     parser.add_argument(
         "--timeout",
         type=float,
@@ -58,10 +82,105 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         metavar="SECONDS",
         help=f"单个仓库 git pull 的超时秒数（默认：{DEFAULT_TIMEOUT_SECONDS:g}）",
     )
+    parser.add_argument(
+        "--color",
+        choices=(COLOR_AUTO, COLOR_ALWAYS, COLOR_NEVER),
+        default=COLOR_AUTO,
+        help="输出颜色模式（默认：auto）",
+    )
     args = parser.parse_args(argv)
     if args.timeout <= 0:
         parser.error("--timeout 必须大于 0")
     return args
+
+
+def should_use_color(mode: str, stream: TextIO) -> bool:
+    """判断当前输出流是否应启用 ANSI 颜色。"""
+
+    if mode == COLOR_ALWAYS:
+        return True
+    if mode == COLOR_NEVER:
+        return False
+    return (
+        stream.isatty()
+        and os.environ.get("NO_COLOR") is None
+        and os.environ.get("TERM") != "dumb"
+    )
+
+
+def color_text(text: str, *styles: str, use_color: bool) -> str:
+    """按需给文本添加 ANSI 样式。"""
+
+    if not use_color:
+        return text
+    codes = [ANSI_CODES[style] for style in styles]
+    return f"\033[{';'.join(codes)}m{text}{ANSI_RESET}"
+
+
+def badge(text: str, color: str, *, use_color: bool) -> str:
+    """生成统一的状态标签。"""
+
+    return color_text(f"[{text}]", "bold", color, use_color=use_color)
+
+
+def result_badge(kind: ResultKind, *, use_color: bool) -> str:
+    """生成仓库更新结果标签。"""
+
+    return badge(RESULT_LABELS[kind], RESULT_COLORS[kind], use_color=use_color)
+
+
+def print_error(message: str, *, use_color: bool, detail: str | None = None) -> None:
+    """输出统一格式的错误消息。"""
+
+    print(f"{badge('ERROR', 'red', use_color=use_color)} {message}", file=sys.stderr)
+    if detail:
+        print(f"  {detail}", file=sys.stderr)
+
+
+def load_workspace_root(config_file: Path = WORKSPACE_ROOT_FILE) -> Path:
+    """从配置文件读取 workspace root 绝对路径。"""
+
+    if not config_file.is_file():
+        raise WorkspaceRootConfigError(f"配置文件不存在：{config_file}")
+
+    try:
+        content = config_file.read_text(encoding="utf-8").strip()
+    except OSError as error:
+        message = f"读取配置文件失败：{config_file}：{error}"
+        raise WorkspaceRootConfigError(message) from error
+
+    lines = content.splitlines()
+    if not lines:
+        raise WorkspaceRootConfigError(f"配置文件为空：{config_file}")
+    if len(lines) != 1:
+        raise WorkspaceRootConfigError(
+            f"配置文件必须只包含一行 workspace root 绝对路径：{config_file}"
+        )
+
+    root = Path(lines[0])
+    if not root.is_absolute():
+        raise WorkspaceRootConfigError(f"workspace root 必须是绝对路径：{root}")
+    if not root.is_dir():
+        raise WorkspaceRootConfigError(f"workspace root 路径不存在或不是目录：{root}")
+    return root.resolve()
+
+
+def confirm_workspace_root(root: Path, *, use_color: bool) -> bool:
+    """要求用户确认即将更新的 workspace root。"""
+
+    print(badge("CONFIG", "cyan", use_color=use_color), "Workspace root")
+    print(f"  config: {color_text(str(WORKSPACE_ROOT_FILE), 'dim', use_color=use_color)}")
+    print(f"  root:   {color_text(str(root), 'bold', use_color=use_color)}")
+    try:
+        prompt = f"{badge('CONFIRM', 'yellow', use_color=use_color)} 执行快进更新？[y/N] "
+        answer = input(prompt)
+    except EOFError:
+        if not sys.stdin.isatty():
+            print(flush=True)
+        return False
+    if not sys.stdin.isatty():
+        print(flush=True)
+    return answer.strip().lower() in {"y", "yes"}
 
 
 def discover_repositories(root: Path) -> list[Path]:
@@ -169,22 +288,20 @@ def update_repository(repo: Path, timeout: float) -> RepoResult:
     return RepoResult(repo, ResultKind.UPDATED, detail)
 
 
-def print_summary(results: Sequence[RepoResult]) -> None:
-    """输出逐仓库结果和汇总统计。"""
-
-    print("\n执行结果：")
-    for result in results:
-        print(f"  [{result.kind.value}] {result.path}：{result.detail}")
+def print_summary(results: Sequence[RepoResult], *, use_color: bool) -> None:
+    """输出汇总统计。"""
 
     counts = {kind: 0 for kind in ResultKind}
     for result in results:
         counts[result.kind] += 1
+
+    total = len(results)
+    updated = color_text(str(counts[ResultKind.UPDATED]), "green", use_color=use_color)
+    skipped = color_text(str(counts[ResultKind.MANUAL]), "yellow", use_color=use_color)
+    timed_out = color_text(str(counts[ResultKind.TIMED_OUT]), "red", use_color=use_color)
     print(
-        "\n汇总："
-        f"发现 {len(results)} 个仓库，"
-        f"成功更新 {counts[ResultKind.UPDATED]} 个，"
-        f"跳过且需人工介入 {counts[ResultKind.MANUAL]} 个，"
-        f"超时 {counts[ResultKind.TIMED_OUT]} 个。"
+        f"\n{badge('SUMMARY', 'blue', use_color=use_color)} "
+        f"total={total} updated={updated} skipped={skipped} timeout={timed_out}"
     )
 
 
@@ -192,32 +309,55 @@ def main(argv: Sequence[str] | None = None) -> int:
     """执行批量仓库更新。"""
 
     args = parse_args(argv)
-    root = args.root.expanduser().resolve()
-
-    if shutil.which("git") is None:
-        print("错误：未找到 git 命令。", file=sys.stderr)
-        return 2
-    if not root.is_dir():
-        print(f"错误：目录不存在：{root}", file=sys.stderr)
-        return 2
+    stdout_color = should_use_color(args.color, sys.stdout)
+    stderr_color = should_use_color(args.color, sys.stderr)
 
     try:
+        root = load_workspace_root()
+    except WorkspaceRootConfigError as error:
+        print_error("Workspace root 配置不可用", detail=str(error), use_color=stderr_color)
+        return 2
+
+    if shutil.which("git") is None:
+        print_error(
+            "未找到 git 命令",
+            detail="请先安装 git 并确认 PATH 可用。",
+            use_color=stderr_color,
+        )
+        return 2
+
+    if not confirm_workspace_root(root, use_color=stdout_color):
+        print(
+            f"{badge('CANCELLED', 'yellow', use_color=stderr_color)} 未执行任何更新。",
+            file=sys.stderr,
+        )
+        return 1
+
+    try:
+        print(f"\n{badge('SCAN', 'cyan', use_color=stdout_color)} 正在扫描 Git 仓库...")
         repositories = discover_repositories(root)
     except OSError as error:
-        print(f"错误：扫描目录失败：{root}：{error}", file=sys.stderr)
+        print_error(
+            "扫描 workspace root 失败",
+            detail=f"{root}：{error}",
+            use_color=stderr_color,
+        )
         return 2
 
     results: list[RepoResult] = []
+    total = len(repositories)
+    print(f"{badge('FOUND', 'cyan', use_color=stdout_color)} {total} repositories\n")
     for index, repo in enumerate(repositories, start=1):
-        print(f"[{index}/{len(repositories)}] {repo}")
+        progress = color_text(f"[{index}/{total}]", "dim", use_color=stdout_color)
+        print(f"{progress} {repo}")
         try:
             result = update_repository(repo, args.timeout)
         except OSError as error:
             result = RepoResult(repo, ResultKind.MANUAL, f"执行 Git 失败：{error}")
         results.append(result)
-        print(f"  {result.kind.value}：{result.detail}")
+        print(f"  {result_badge(result.kind, use_color=stdout_color)} {result.detail}")
 
-    print_summary(results)
+    print_summary(results, use_color=stdout_color)
     has_unresolved = any(
         result.kind in {ResultKind.MANUAL, ResultKind.TIMED_OUT} for result in results
     )
