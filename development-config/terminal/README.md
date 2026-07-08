@@ -69,4 +69,9 @@ terminal/
 - **插件**: 修改 `configs/zshrc` 中的 `plugins=(...)`
 - **编辑器**: `configs/zshrc` 默认使用 Neovim/Vim 作为编辑器
 - **PATH**: `configs/zshrc` 自动添加 Homebrew/Go/Cargo 等常用路径
+- **Python 本地开发环境变量**: `configs/zshrc` 默认设置
+  `PYTHONDONTWRITEBYTECODE`、`PYTHONFAULTHANDLER`、
+  `PIP_REQUIRE_VIRTUALENV`、`PIP_DISABLE_PIP_VERSION_CHECK` 和
+  `UV_LINK_MODE`，用于减少缓存文件、提升崩溃诊断能力、避免误装系统
+  Python 包，并提升 uv 在跨文件系统场景下的兼容性
 - **GUI 输入法环境**: 修改 `configs/environment.d/input-method.conf`，并在 Linux 上重新登录使其生效
