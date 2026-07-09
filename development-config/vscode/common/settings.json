@@ -105,7 +105,8 @@
     "**/.next": true, // Next.js 缓存
     "**/.nuxt": true, // Nuxt 缓存
     "**/coverage": true, // 覆盖率输出
-    "**/.idea": true // IDE 配置目录
+    "**/.idea": true, // IDE 配置目录,
+    "**/venv": true // Python 虚拟环境
   },
   // -------------------- 搜索排除 --------------------
   // 搜索时跳过这些目录/文件
