@@ -43,6 +43,8 @@ services:
     environment:
       TZ: "UTC"
       MYSQL_ROOT_PASSWORD: "123456"
+      # 允许本机及 common-network 中的容器使用 root 连接本地开发 MySQL。
+      MYSQL_ROOT_HOST: "%"
     command: ["mysqld", "--default-authentication-plugin=mysql_native_password"]
     volumes:
       - "./infras/mysql/data:/var/lib/mysql"
