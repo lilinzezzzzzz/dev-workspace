@@ -43,7 +43,7 @@ services:
     environment:
       TZ: "UTC"
       MYSQL_ROOT_PASSWORD: "123456"
-    command: --default-authentication-plugin=mysql_native_password
+    command: ["mysqld", "--default-authentication-plugin=mysql_native_password"]
     volumes:
       - "./infras/mysql/data:/var/lib/mysql"
       - "./infras/mysql/conf/my.cnf:/etc/mysql/conf.d/my.cnf"
