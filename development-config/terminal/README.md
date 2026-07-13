@@ -65,7 +65,7 @@ terminal/
 
 - **主题**: 修改 `configs/ghostty.config` 中的 `theme`，可用主题列表: `ghostty +list-themes`
 - **字体**: 修改 `configs/ghostty.config` 中的 `font-family` 和 `font-size`
-- **提示符**: 修改 `configs/starship.toml`，支持 Python/Node.js/Go/Rust/Docker 等语言版本显示
+- **提示符**: 修改 `configs/starship.toml`，支持 Python/Node.js/Go/Rust/Docker 等语言版本显示；`git_status.stashed` 中的 `$` 必须写成 `"\\$"`，以避免被解析为变量
 - **插件**: 修改 `configs/zshrc` 中的 `plugins=(...)`
 - **编辑器**: `configs/zshrc` 默认使用 Neovim/Vim 作为编辑器
 - **PATH**: `configs/zshrc` 自动添加 Homebrew/Go/Cargo 等常用路径

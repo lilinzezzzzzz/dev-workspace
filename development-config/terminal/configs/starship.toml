@@ -44,6 +44,7 @@ staged = "[+$count](bold green)"
 renamed = "[R$count](bold cyan)"
 deleted = "[D$count](bold red)"
 untracked = "[?$count](bold blue)"
+stashed = "\\$"
 typechanged = "[T$count](bold magenta)"
 up_to_date = ""
 
