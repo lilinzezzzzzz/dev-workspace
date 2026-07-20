@@ -5,7 +5,7 @@
 当前仓库重点覆盖三类内容：
 
 - `python-workspace` 开发容器：Debian Bookworm + `uv` + 多版本 Python
-- 本地基础设施：Redis、MySQL、Milvus、Attu
+- 本地基础设施：Redis、MySQL、ClickHouse、Milvus、Attu
 - 开发工具配置：VS Code、AI assistants、提示词与 SSH 密钥说明
 
 ## 当前服务
@@ -19,6 +19,7 @@
 | `mysql` | `mysql` | `3306` | MySQL 8，root 密码 `123456` |
 | `postgres` | `postgres` | `5432` | PostgreSQL 17，按 `jsontype-postgres` profile 启动，用于 `JSONType` 方言测试 |
 | `oracle` | `oracle` | `1521` | Oracle Database Free，按 `jsontype-oracle` profile 启动，用于 `JSONType` 方言测试 |
+| `clickhouse` | `clickhouse` | `8123`、`9000` | ClickHouse 25.8，按 `clickhouse` profile 启动 |
 | `milvus-etcd` | `milvus-etcd` | - | Milvus 依赖组件 |
 | `milvus-minio` | `milvus-minio` | - | Milvus 对象存储 |
 | `milvus-standalone` | `milvus-standalone` | `19530`、`9091` | Milvus 单机版 |
@@ -111,6 +112,12 @@ docker compose --profile jsontype-oracle up -d oracle
 docker compose --profile jsontype-postgres --profile jsontype-oracle up -d postgres oracle
 ```
 
+ClickHouse 默认不会启动，需要时单独激活对应 profile：
+
+```bash
+docker compose --profile clickhouse up -d clickhouse
+```
+
 说明：
 
 - PostgreSQL 当前定位为 `JSONType` 方言专项测试容器；`ai-service` 的配置层还不能直接切到 PostgreSQL 运行整套应用
@@ -172,6 +179,23 @@ psql -h localhost -p 5432 -U postgres -d postgres
 ```bash
 sqlplus system/Welcome_12345@//localhost:1521/FREE
 ```
+
+### ClickHouse
+
+HTTP 接口：
+
+```bash
+curl 'http://localhost:8123/?user=clickhouse&password=123456&query=SELECT%201'
+```
+
+Native TCP 接口：
+
+```bash
+clickhouse-client --host localhost --port 9000 --user clickhouse --password 123456
+```
+
+数据和日志分别持久化到 `infras/clickhouse/data/` 与 `infras/clickhouse/logs/`。现有的
+`infras/clickhouse/config/` 不会挂载到容器，ClickHouse 使用镜像内置配置。
 
 ### Attu
 
