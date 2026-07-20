@@ -20,6 +20,7 @@
 | `postgres` | `postgres` | `5432` | PostgreSQL 17，按 `jsontype-postgres` profile 启动，用于 `JSONType` 方言测试 |
 | `oracle` | `oracle` | `1521` | Oracle Database Free，按 `jsontype-oracle` profile 启动，用于 `JSONType` 方言测试 |
 | `clickhouse` | `clickhouse` | `8123`、`9000` | ClickHouse 25.8，按 `clickhouse` profile 启动 |
+| `otel-collector` | `otel-collector` | `4318` | OpenTelemetry Collector，接收 OTLP/HTTP trace 并写入 ClickHouse，随 `clickhouse` profile 启动 |
 | `milvus-etcd` | `milvus-etcd` | - | Milvus 依赖组件 |
 | `milvus-minio` | `milvus-minio` | - | Milvus 对象存储 |
 | `milvus-standalone` | `milvus-standalone` | `19530`、`9091` | Milvus 单机版 |
@@ -112,10 +113,16 @@ docker compose --profile jsontype-oracle up -d oracle
 docker compose --profile jsontype-postgres --profile jsontype-oracle up -d postgres oracle
 ```
 
-ClickHouse 默认不会启动，需要时单独激活对应 profile：
+ClickHouse 和 OpenTelemetry Collector 默认不会启动。首次部署先创建环境文件并设置强密码：
 
 ```bash
-docker compose --profile clickhouse up -d clickhouse
+cp .env.example .env
+```
+
+然后激活 `clickhouse` profile，同时启动两项服务：
+
+```bash
+docker compose --profile clickhouse up -d clickhouse otel-collector
 ```
 
 说明：
@@ -182,20 +189,52 @@ sqlplus system/Welcome_12345@//localhost:1521/FREE
 
 ### ClickHouse
 
+以下命令从 `.env` 加载部署密码：
+
+```bash
+set -a
+. ./.env
+set +a
+```
+
 HTTP 接口：
 
 ```bash
-curl 'http://localhost:8123/?user=clickhouse&password=123456&query=SELECT%201'
+curl --user "clickhouse:${CLICKHOUSE_PASSWORD}" 'http://localhost:8123/?query=SELECT%201'
 ```
 
 Native TCP 接口：
 
 ```bash
-clickhouse-client --host localhost --port 9000 --user clickhouse --password 123456
+clickhouse-client --host localhost --port 9000 --user clickhouse --password "$CLICKHOUSE_PASSWORD"
 ```
 
-数据和日志分别持久化到 `infras/clickhouse/data/` 与 `infras/clickhouse/logs/`。现有的
+数据库名为 `ai-service`。数据和日志分别持久化到 `infras/clickhouse/data/` 与
+`infras/clickhouse/logs/`。现有的
 `infras/clickhouse/config/` 不会挂载到容器，ClickHouse 使用镜像内置配置。
+
+### OpenTelemetry Collector
+
+Collector 的 OTLP/HTTP trace 接收地址为：
+
+```text
+http://<collector-host>:4318/v1/traces
+```
+
+Collector 通过 Docker 内网连接 `clickhouse:9000`，自动创建数据库 `ai-service`
+并写入其中的 `otel_traces` 表。`13133` 健康检查端口只绑定服务器本机。
+
+部署时必须同时上传以下文件，并保持相对目录不变：
+
+```text
+docker-compose.yml
+.env.example
+infras/opentelemetry/otel-collector-config.yaml
+```
+
+在服务器上由 `.env.example` 创建不纳入版本控制的 `.env`。阿里云安全组应仅允许
+`ai-service` 所在机器访问 TCP `4318`，不要对全网开放；`8123` 和 `9000` 也不应
+向公网开放。
 
 ### Attu
 

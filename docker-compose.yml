@@ -92,9 +92,9 @@ services:
       - "9000:9000" # Native TCP 接口
     environment:
       TZ: "UTC"
-      CLICKHOUSE_DB: "default"
+      CLICKHOUSE_DB: "ai-service"
       CLICKHOUSE_USER: "clickhouse"
-      CLICKHOUSE_PASSWORD: "123456"
+      CLICKHOUSE_PASSWORD: "${CLICKHOUSE_PASSWORD:?CLICKHOUSE_PASSWORD must be set}"
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
     volumes:
       - "./infras/clickhouse/data:/var/lib/clickhouse"
@@ -103,6 +103,32 @@ services:
       nofile:
         soft: 262144
         hard: 262144
+    healthcheck:
+      test: ["CMD-SHELL", 'clickhouse-client --user "$$CLICKHOUSE_USER" --password "$$CLICKHOUSE_PASSWORD" --query "SELECT 1" >/dev/null']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - common-network
+
+  otel-collector:
+    profiles: ["clickhouse"]
+    image: "otel/opentelemetry-collector-contrib:0.156.0"
+    container_name: otel-collector
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    environment:
+      OTEL_CLICKHOUSE_PASSWORD: "${CLICKHOUSE_PASSWORD:?CLICKHOUSE_PASSWORD must be set}"
+    ports:
+      - "4318:4318" # OTLP/HTTP，由安全组限制来源 IP
+      - "127.0.0.1:13133:13133" # Collector 健康检查
+    volumes:
+      - "./infras/opentelemetry/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro"
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    restart: unless-stopped
     networks:
       - common-network
 
