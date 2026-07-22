@@ -209,7 +209,8 @@ Native TCP 接口：
 clickhouse-client --host localhost --port 9000 --user clickhouse --password "$CLICKHOUSE_PASSWORD"
 ```
 
-数据库名为 `ai-service`。数据和日志分别持久化到 `infras/clickhouse/data/` 与
+Compose 首次初始化的默认数据库名为 `ai-service`；Collector 还会自动创建
+`agent-backend` 数据库。数据和日志分别持久化到 `infras/clickhouse/data/` 与
 `infras/clickhouse/logs/`。现有的
 `infras/clickhouse/config/` 不会挂载到容器，ClickHouse 使用镜像内置配置。
 
@@ -221,8 +222,11 @@ Collector 的 OTLP/HTTP trace 接收地址为：
 http://<collector-host>:4318/v1/traces
 ```
 
-Collector 通过 Docker 内网连接 `clickhouse:9000`，自动创建数据库 `ai-service`
-并写入其中的 `otel_traces` 表。`13133` 健康检查端口只绑定服务器本机。
+Collector 通过 Docker 内网连接 `clickhouse:9000`，并按 Trace Resource 的
+`service.name` 分流：值为 `agent-backend` 的 Span 写入
+`agent-backend.otel_traces`，其余 Span 继续写入 `ai-service.otel_traces`。
+两个 exporter 都启用 `create_schema`，会自动创建目标数据库和表。
+`13133` 健康检查端口只绑定服务器本机。
 
 部署时必须同时上传以下文件，并保持相对目录不变：
 
@@ -233,7 +237,7 @@ infras/opentelemetry/otel-collector-config.yaml
 ```
 
 在服务器上由 `.env.example` 创建不纳入版本控制的 `.env`。阿里云安全组应仅允许
-`ai-service` 所在机器访问 TCP `4318`，不要对全网开放；`8123` 和 `9000` 也不应
+受信任的 OTLP 客户端访问 TCP `4318`，不要对全网开放；`8123` 和 `9000` 也不应
 向公网开放。
 
 ### Attu

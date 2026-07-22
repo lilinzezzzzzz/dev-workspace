@@ -13,11 +13,42 @@ processors:
     check_interval: 1s
     limit_mib: 512
     spike_limit_mib: 128
+  filter/agent_backend:
+    error_mode: ignore
+    trace_conditions:
+      - 'resource.attributes["service.name"] != "agent-backend"'
+  filter/ai_service:
+    error_mode: ignore
+    trace_conditions:
+      - 'resource.attributes["service.name"] == "agent-backend"'
 
 exporters:
-  clickhouse:
+  clickhouse/ai_service:
     endpoint: tcp://clickhouse:9000?dial_timeout=10s
     database: ai-service
+    username: clickhouse
+    password: ${env:OTEL_CLICKHOUSE_PASSWORD}
+    traces_table_name: otel_traces
+    create_schema: true
+    async_insert: true
+    compress: lz4
+    timeout: 5s
+    sending_queue:
+      enabled: true
+      num_consumers: 4
+      queue_size: 1000
+      batch:
+        min_size: 5000
+        max_size: 10000
+        flush_timeout: 5s
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_interval: 30s
+      max_elapsed_time: 300s
+  clickhouse/agent_backend:
+    endpoint: tcp://clickhouse:9000?dial_timeout=10s
+    database: agent-backend
     username: clickhouse
     password: ${env:OTEL_CLICKHOUSE_PASSWORD}
     traces_table_name: otel_traces
@@ -42,10 +73,14 @@ exporters:
 service:
   extensions: [health_check]
   pipelines:
-    traces:
+    traces/ai_service:
       receivers: [otlp]
-      processors: [memory_limiter]
-      exporters: [clickhouse]
+      processors: [memory_limiter, filter/ai_service]
+      exporters: [clickhouse/ai_service]
+    traces/agent_backend:
+      receivers: [otlp]
+      processors: [memory_limiter, filter/agent_backend]
+      exporters: [clickhouse/agent_backend]
   telemetry:
     logs:
       level: info
