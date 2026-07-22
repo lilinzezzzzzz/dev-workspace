@@ -34,6 +34,13 @@ Write-Host "========================================" -ForegroundColor Green
 Write-Host "  Python 开发环境一键部署" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 
+$envFile = Join-Path $ScriptDir ".env"
+if (-not (Test-Path $envFile)) {
+    Write-Error "未找到 .env"
+    Write-Host "  请先复制 .env.example 为 .env，并替换其中的全部密码占位值" -ForegroundColor Yellow
+    exit 1
+}
+
 # ============================================================
 # 步骤 1: 检查 Docker 环境
 # ============================================================
@@ -194,9 +201,9 @@ Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "连接方式:" -ForegroundColor Cyan
 Write-Host "  SSH 免密登录:  ssh -i ./ssh-keys/id_ed25519 root@localhost -p 10022" -ForegroundColor White
-Write-Host "  SSH 密码登录:  ssh root@localhost -p 10022  (密码: 123456)" -ForegroundColor White
+Write-Host "  SSH 密码登录:  ssh root@localhost -p 10022  (密码见 .env 的 PYTHON_WORKSPACE_ROOT_PASSWORD)" -ForegroundColor White
 Write-Host "  进入容器:      docker exec -it python-workspace bash" -ForegroundColor White
 Write-Host ""
 Write-Host "Redis 连接:" -ForegroundColor Cyan
-Write-Host "  redis-cli -h localhost -p 6379 -a 123456" -ForegroundColor White
+Write-Host "  密码由 .env 的 REDIS_PASSWORD 配置，连接命令见 README.md" -ForegroundColor White
 Write-Host ""

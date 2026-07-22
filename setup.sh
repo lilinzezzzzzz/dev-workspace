@@ -43,6 +43,12 @@ echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}  Python 开发环境一键部署${NC}"
 echo -e "${GREEN}========================================${NC}"
 
+if [ ! -f "$SCRIPT_DIR/.env" ]; then
+    print_error "未找到 .env"
+    echo "  请先执行 cp .env.example .env，并替换其中的全部密码占位值"
+    exit 1
+fi
+
 # ============================================================
 # 步骤 1: 检查 Docker 环境
 # ============================================================
@@ -180,9 +186,9 @@ echo -e "${GREEN}========================================${NC}"
 echo ""
 echo -e "${CYAN}连接方式:${NC}"
 echo "  SSH 免密登录:  ssh -i ./ssh-keys/id_ed25519 root@localhost -p 10022"
-echo "  SSH 密码登录:  ssh root@localhost -p 10022  (密码: 123456)"
+echo "  SSH 密码登录:  ssh root@localhost -p 10022  (密码见 .env 的 PYTHON_WORKSPACE_ROOT_PASSWORD)"
 echo "  进入容器:      docker exec -it python-workspace bash"
 echo ""
 echo -e "${CYAN}Redis 连接:${NC}"
-echo "  redis-cli -h localhost -p 6379 -a 123456"
+echo "  密码由 .env 的 REDIS_PASSWORD 配置，连接命令见 README.md"
 echo ""

@@ -138,7 +138,7 @@ docker-compose up -d python-venv
 # 使用 docker exec
 docker exec -it python-venv bash
 
-# 或使用 SSH（密码: 123456）
+# 或使用 SSH（密码见 .env 的 PYTHON_WORKSPACE_ROOT_PASSWORD）
 ssh root@localhost -p 10022
 ```
 

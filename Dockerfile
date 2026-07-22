@@ -62,9 +62,6 @@ RUN uv python list
 # 准备 sshd 与 host keys
 RUN mkdir -p /var/run/sshd && ssh-keygen -A
 
-# root 密码（dev only）
-RUN echo 'root:123456' | chpasswd
-
 # sshd 基本配置：允许 root+密码；关闭反向 DNS；降低爆破窗口
 RUN sed -ri 's/^#?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     sed -ri 's/^#?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \

@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+# 运行时设置 root 密码，避免凭据写入镜像层。
+: "${PYTHON_WORKSPACE_ROOT_PASSWORD:?PYTHON_WORKSPACE_ROOT_PASSWORD must be set}"
+printf 'root:%s\n' "$PYTHON_WORKSPACE_ROOT_PASSWORD" | chpasswd
+unset PYTHON_WORKSPACE_ROOT_PASSWORD
+
 # 处理 SSH 密钥
 SSH_DIR="/root/.ssh"
 HOST_SSH_DIR="/tmp/host-ssh"

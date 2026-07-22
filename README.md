@@ -15,8 +15,8 @@
 | 服务 | 容器名 | 默认端口 | 说明 |
 | --- | --- | --- | --- |
 | `python-workspace` | `python-workspace` | `10022`、`8000-8099` | Python 开发容器，按 `python-workspace` profile 启动 |
-| `redis` | `redis` | `6379` | Redis 6，密码 `123456` |
-| `mysql` | `mysql` | `3306` | MySQL 8，root 密码 `123456` |
+| `redis` | `redis` | `6379` | Redis 6，密码由 `.env` 配置 |
+| `mysql` | `mysql` | `3306` | MySQL 8，root 密码由 `.env` 配置 |
 | `postgres` | `postgres` | `5432` | PostgreSQL 17，按 `jsontype-postgres` profile 启动，用于 `JSONType` 方言测试 |
 | `oracle` | `oracle` | `1521` | Oracle Database Free，按 `jsontype-oracle` profile 启动，用于 `JSONType` 方言测试 |
 | `clickhouse` | `clickhouse` | `8123`、`9000` | ClickHouse 25.8，按 `clickhouse` profile 启动 |
@@ -59,6 +59,19 @@
 ```bash
 ssh-keygen -t rsa -b 4096
 ```
+
+首次部署先创建环境文件，并将其中所有占位值替换为强密码：
+
+```bash
+cp .env.example .env
+```
+
+`.env` 不纳入版本控制。Compose 会校验全部密码变量均已配置；即使只启动部分
+profile，也需要保留 `.env.example` 中列出的所有变量。
+
+数据库镜像通常只在首次初始化数据目录时读取初始化密码。已有 MySQL、PostgreSQL
+或 Oracle 数据时，仅修改 `.env` 不会自动轮换库内密码；需要在数据库内单独修改，
+或在确认不需要旧数据后重新初始化对应存储。
 
 ### 一键脚本
 
@@ -113,13 +126,8 @@ docker compose --profile jsontype-oracle up -d oracle
 docker compose --profile jsontype-postgres --profile jsontype-oracle up -d postgres oracle
 ```
 
-ClickHouse 和 OpenTelemetry Collector 默认不会启动。首次部署先创建环境文件并设置强密码：
-
-```bash
-cp .env.example .env
-```
-
-然后激活 `clickhouse` profile，同时启动两项服务：
+ClickHouse 和 OpenTelemetry Collector 默认不会启动。配置好 `.env` 后，激活
+`clickhouse` profile，同时启动两项服务：
 
 ```bash
 docker compose --profile clickhouse up -d clickhouse otel-collector
@@ -145,11 +153,8 @@ docker exec -it python-workspace bash
 ssh root@localhost -p 10022
 ```
 
-默认密码：
-
-```text
-123456
-```
+登录密码读取自 `.env` 中的 `PYTHON_WORKSPACE_ROOT_PASSWORD`。密码在容器启动时
+设置，不会写入 Docker 镜像层。
 
 说明：
 
@@ -166,30 +171,30 @@ ssh -i ./ssh-keys/id_rsa root@localhost -p 10022
 ### Redis
 
 ```bash
-redis-cli -h localhost -p 6379 -a 123456
+REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli -h localhost -p 6379
 ```
 
 ### MySQL
 
 ```bash
-mysql -h localhost -P 3306 -u root -p123456
+mysql -h localhost -P 3306 -u root -p"$MYSQL_ROOT_PASSWORD"
 ```
 
 ### PostgreSQL
 
 ```bash
-psql -h localhost -p 5432 -U postgres -d postgres
+PGPASSWORD="$POSTGRES_PASSWORD" psql -h localhost -p 5432 -U postgres -d postgres
 ```
 
 ### Oracle
 
 ```bash
-sqlplus system/Welcome_12345@//localhost:1521/FREE
+sqlplus "system/${ORACLE_PWD}@//localhost:1521/FREE"
 ```
 
 ### ClickHouse
 
-以下命令从 `.env` 加载部署密码：
+以上连接命令及以下 ClickHouse 命令都需要先从 `.env` 加载部署密码：
 
 ```bash
 set -a

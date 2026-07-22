@@ -80,7 +80,7 @@ ssh -i ./id_ed25519 root@localhost -p 10022
 # 或使用 RSA 密钥连接
 ssh -i ./id_rsa root@localhost -p 10022
 
-# 或使用密码连接（默认密码: 123456）
+# 或使用密码连接（密码见 .env 的 PYTHON_WORKSPACE_ROOT_PASSWORD）
 ssh root@localhost -p 10022
 ```
 
