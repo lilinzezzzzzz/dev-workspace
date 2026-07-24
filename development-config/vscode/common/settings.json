@@ -145,6 +145,7 @@
   "editor.detectIndentation": true, // 自动检测缩进设置
   "editor.autoIndent": "full", // 完全自动缩进
   "editor.wordWrap": "off", // 关闭自动换行
+  "diffEditor.wordWrap": "off", // 源代码管理的差异视图关闭自动换行
   "editor.wordWrapColumn": 120, // 换行列宽
   "editor.suggest.insertMode": "replace", // 补全默认使用替换模式
   "editor.formatOnSaveMode": "file", // 保存时格式化整个文件

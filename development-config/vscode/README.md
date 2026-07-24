@@ -246,6 +246,7 @@ cp development-config/vscode/golang/settings.json .vscode/
   "files.autoSave": "onFocusChange",        // 失焦自动保存
   "workbench.editor.limit.value": 5,       // 标签页限制
   "editor.smoothScrolling": true,          // 平滑滚动
+  "diffEditor.wordWrap": "off",           // 源代码管理差异视图关闭自动换行
   "workbench.colorTheme": "Material Dark Theme"   // 主题设置
 }
 ```
