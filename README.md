@@ -256,6 +256,26 @@ docker compose down
 docker logs python-workspace
 ```
 
+### Docker 日志与磁盘监控
+
+Milvus、etcd 和 MinIO 的 `json-file` 日志按单文件 `50 MB`、最多 `3` 个文件轮转，并使用 `unless-stopped` 重启策略。宿主机也应在 `/etc/docker/daemon.json` 中配置相同的默认日志上限，避免其他新建容器产生无限增长的日志文件。
+
+Linux 主机可以安装仓库提供的磁盘检查 timer：
+
+```bash
+sudo install -m 0755 scripts/check_disk_usage.sh /usr/local/sbin/dev-workspace-disk-usage-check
+sudo install -m 0644 systemd/dev-workspace-disk-usage.service /etc/systemd/system/
+sudo install -m 0644 systemd/dev-workspace-disk-usage.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now dev-workspace-disk-usage.timer
+```
+
+timer 每 5 分钟检查一次根文件系统。使用率达到 `80%` 时，检查单元失败并通过 `logger` 写入 `daemon.err`；可使用以下命令查看：
+
+```bash
+journalctl -u dev-workspace-disk-usage.service
+```
+
 ## 目录结构
 
 ```text
@@ -265,7 +285,11 @@ docker logs python-workspace
 ├── setup.sh
 ├── setup.ps1
 ├── scripts/
+│   ├── check_disk_usage.sh
 │   └── entrypoint.sh
+├── systemd/
+│   ├── dev-workspace-disk-usage.service
+│   └── dev-workspace-disk-usage.timer
 ├── ssh-keys/
 │   └── README.md
 ├── development-config/

@@ -73,6 +73,12 @@ services:
   milvus-etcd:
     image: "quay.io/coreos/etcd:v3.5.18"
     container_name: milvus-etcd
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
     environment:
       TZ: "UTC"
     command: >
@@ -88,6 +94,12 @@ services:
   milvus-minio:
     image: "minio/minio:RELEASE.2025-02-18T16-25-55Z"
     container_name: milvus-minio
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
     environment:
       TZ: "UTC"
       MINIO_ROOT_USER: "minioadmin"
@@ -101,6 +113,12 @@ services:
   milvus-standalone:
     image: "milvusdb/milvus:v2.6.7"
     container_name: milvus-standalone
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
     command: ["milvus", "run", "standalone"]
     security_opt:
       - seccomp:unconfined

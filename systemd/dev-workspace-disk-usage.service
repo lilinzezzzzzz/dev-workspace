@@ -1,0 +1,12 @@
+[Unit]
+Description=Check dev-workspace host disk usage
+
+[Service]
+Type=oneshot
+Environment=DISK_USAGE_MOUNT=/
+Environment=DISK_USAGE_THRESHOLD=80
+ExecStart=/usr/local/sbin/dev-workspace-disk-usage-check
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
