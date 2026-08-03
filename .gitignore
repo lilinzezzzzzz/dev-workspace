@@ -17,10 +17,6 @@ infras/redis/logs/*
 infras/mongodb/db/*
 infras/mongodb/logs/*
 
-# ClickHouse
-infras/clickhouse/data/*
-infras/clickhouse/logs/*
-
 # Milvus
 infras/milvus/etcd/*
 infras/milvus/minio/*

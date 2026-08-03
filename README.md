@@ -5,7 +5,7 @@
 当前仓库重点覆盖三类内容：
 
 - `python-workspace` 开发容器：Debian Bookworm + `uv` + 多版本 Python
-- 本地基础设施：Redis、MySQL、ClickHouse、Milvus、Attu
+- 本地基础设施：Redis、MySQL、Milvus、Attu
 - 开发工具配置：VS Code、AI assistants、提示词与 SSH 密钥说明
 
 ## 当前服务
@@ -19,8 +19,6 @@
 | `mysql` | `mysql` | `3306` | MySQL 8，root 密码由 `.env` 配置 |
 | `postgres` | `postgres` | `5432` | PostgreSQL 17，按 `jsontype-postgres` profile 启动，用于 `JSONType` 方言测试 |
 | `oracle` | `oracle` | `1521` | Oracle Database Free，按 `jsontype-oracle` profile 启动，用于 `JSONType` 方言测试 |
-| `clickhouse` | `clickhouse` | `8123`、`9000` | ClickHouse 25.8，按 `clickhouse` profile 启动 |
-| `otel-collector` | `otel-collector` | `4318` | OpenTelemetry Collector，接收 OTLP/HTTP trace 并写入 ClickHouse，随 `clickhouse` profile 启动 |
 | `milvus-etcd` | `milvus-etcd` | - | Milvus 依赖组件 |
 | `milvus-minio` | `milvus-minio` | - | Milvus 对象存储 |
 | `milvus-standalone` | `milvus-standalone` | `19530`、`9091` | Milvus 单机版 |
@@ -126,13 +124,6 @@ docker compose --profile jsontype-oracle up -d oracle
 docker compose --profile jsontype-postgres --profile jsontype-oracle up -d postgres oracle
 ```
 
-ClickHouse 和 OpenTelemetry Collector 默认不会启动。配置好 `.env` 后，激活
-`clickhouse` profile，同时启动两项服务：
-
-```bash
-docker compose --profile clickhouse up -d clickhouse otel-collector
-```
-
 说明：
 
 - PostgreSQL 当前定位为 `JSONType` 方言专项测试容器；`ai-service` 的配置层还不能直接切到 PostgreSQL 运行整套应用
@@ -191,59 +182,6 @@ PGPASSWORD="$POSTGRES_PASSWORD" psql -h localhost -p 5432 -U postgres -d postgre
 ```bash
 sqlplus "system/${ORACLE_PWD}@//localhost:1521/FREE"
 ```
-
-### ClickHouse
-
-以上连接命令及以下 ClickHouse 命令都需要先从 `.env` 加载部署密码：
-
-```bash
-set -a
-. ./.env
-set +a
-```
-
-HTTP 接口：
-
-```bash
-curl --user "clickhouse:${CLICKHOUSE_PASSWORD}" 'http://localhost:8123/?query=SELECT%201'
-```
-
-Native TCP 接口：
-
-```bash
-clickhouse-client --host localhost --port 9000 --user clickhouse --password "$CLICKHOUSE_PASSWORD"
-```
-
-Compose 首次初始化的默认数据库名为 `ai-service`；Collector 还会自动创建
-`agent-backend` 数据库。数据和日志分别持久化到 `infras/clickhouse/data/` 与
-`infras/clickhouse/logs/`。现有的
-`infras/clickhouse/config/` 不会挂载到容器，ClickHouse 使用镜像内置配置。
-
-### OpenTelemetry Collector
-
-Collector 的 OTLP/HTTP trace 接收地址为：
-
-```text
-http://<collector-host>:4318/v1/traces
-```
-
-Collector 通过 Docker 内网连接 `clickhouse:9000`，并按 Trace Resource 的
-`service.name` 分流：值为 `agent-backend` 的 Span 写入
-`agent-backend.otel_traces`，其余 Span 继续写入 `ai-service.otel_traces`。
-两个 exporter 都启用 `create_schema`，会自动创建目标数据库和表。
-`13133` 健康检查端口只绑定服务器本机。
-
-部署时必须同时上传以下文件，并保持相对目录不变：
-
-```text
-docker-compose.yml
-.env.example
-infras/opentelemetry/otel-collector-config.yaml
-```
-
-在服务器上由 `.env.example` 创建不纳入版本控制的 `.env`。阿里云安全组应仅允许
-受信任的 OTLP 客户端访问 TCP `4318`，不要对全网开放；`8123` 和 `9000` 也不应
-向公网开放。
 
 ### Attu
 
@@ -318,6 +256,26 @@ docker compose down
 docker logs python-workspace
 ```
 
+### Docker 日志与磁盘监控
+
+Milvus、etcd 和 MinIO 的 `json-file` 日志按单文件 `50 MB`、最多 `3` 个文件轮转，并使用 `unless-stopped` 重启策略。宿主机也应在 `/etc/docker/daemon.json` 中配置相同的默认日志上限，避免其他新建容器产生无限增长的日志文件。
+
+Linux 主机可以安装仓库提供的磁盘检查 timer：
+
+```bash
+sudo install -m 0755 scripts/check_disk_usage.sh /usr/local/sbin/dev-workspace-disk-usage-check
+sudo install -m 0644 systemd/dev-workspace-disk-usage.service /etc/systemd/system/
+sudo install -m 0644 systemd/dev-workspace-disk-usage.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now dev-workspace-disk-usage.timer
+```
+
+timer 每 5 分钟检查一次根文件系统。使用率达到 `80%` 时，检查单元失败并通过 `logger` 写入 `daemon.err`；可使用以下命令查看：
+
+```bash
+journalctl -u dev-workspace-disk-usage.service
+```
+
 ## 目录结构
 
 ```text
@@ -327,7 +285,11 @@ docker logs python-workspace
 ├── setup.sh
 ├── setup.ps1
 ├── scripts/
+│   ├── check_disk_usage.sh
 │   └── entrypoint.sh
+├── systemd/
+│   ├── dev-workspace-disk-usage.service
+│   └── dev-workspace-disk-usage.timer
 ├── ssh-keys/
 │   └── README.md
 ├── development-config/
@@ -335,7 +297,6 @@ docker logs python-workspace
 │   └── vscode/
 ├── docs/
 └── infras/
-    ├── clickhouse/
     ├── mongodb/
     ├── mq/
     ├── mysql/

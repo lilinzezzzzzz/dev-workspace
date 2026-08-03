@@ -70,58 +70,15 @@ services:
     networks:
       - common-network
 
-  clickhouse:
-    profiles: ["clickhouse"]
-    image: "clickhouse/clickhouse-server:25.8"
-    container_name: clickhouse
-    ports:
-      - "8123:8123" # HTTP 接口
-      - "9000:9000" # Native TCP 接口
-    environment:
-      TZ: "UTC"
-      CLICKHOUSE_DB: "ai-service"
-      CLICKHOUSE_USER: "clickhouse"
-      CLICKHOUSE_PASSWORD: "${CLICKHOUSE_PASSWORD:?CLICKHOUSE_PASSWORD must be set}"
-      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
-    volumes:
-      - "./infras/clickhouse/data:/var/lib/clickhouse"
-      - "./infras/clickhouse/logs:/var/log/clickhouse-server"
-    ulimits:
-      nofile:
-        soft: 262144
-        hard: 262144
-    healthcheck:
-      test: ["CMD-SHELL", 'clickhouse-client --user "$$CLICKHOUSE_USER" --password "$$CLICKHOUSE_PASSWORD" --query "SELECT 1" >/dev/null']
-      interval: 5s
-      timeout: 3s
-      retries: 20
-      start_period: 10s
-    restart: unless-stopped
-    networks:
-      - common-network
-
-  otel-collector:
-    profiles: ["clickhouse"]
-    image: "otel/opentelemetry-collector-contrib:0.156.0"
-    container_name: otel-collector
-    depends_on:
-      clickhouse:
-        condition: service_healthy
-    environment:
-      OTEL_CLICKHOUSE_PASSWORD: "${CLICKHOUSE_PASSWORD:?CLICKHOUSE_PASSWORD must be set}"
-    ports:
-      - "4318:4318" # OTLP/HTTP，由安全组限制来源 IP
-      - "127.0.0.1:13133:13133" # Collector 健康检查
-    volumes:
-      - "./infras/opentelemetry/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro"
-    command: ["--config=/etc/otelcol-contrib/config.yaml"]
-    restart: unless-stopped
-    networks:
-      - common-network
-
   milvus-etcd:
     image: "quay.io/coreos/etcd:v3.5.18"
     container_name: milvus-etcd
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
     environment:
       TZ: "UTC"
     command: >
@@ -137,6 +94,12 @@ services:
   milvus-minio:
     image: "minio/minio:RELEASE.2025-02-18T16-25-55Z"
     container_name: milvus-minio
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
     environment:
       TZ: "UTC"
       MINIO_ROOT_USER: "minioadmin"
@@ -150,6 +113,12 @@ services:
   milvus-standalone:
     image: "milvusdb/milvus:v2.6.7"
     container_name: milvus-standalone
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
     command: ["milvus", "run", "standalone"]
     security_opt:
       - seccomp:unconfined
