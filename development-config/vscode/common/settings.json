@@ -89,6 +89,8 @@
     "**/node_modules": true, // Node.js 依赖目录
     "**/.pnpm-store": true, // pnpm 缓存
     "**/.yarn": true, // Yarn 缓存
+    "**/.venv": true, // Python 虚拟环境
+    "**/.spec": true, // 设计规范目录
     "**/*.pyc": true, // Python 字节码文件
     "**/*.pyo": true, // Python 优化字节码文件
     "**/__pycache__": true, // Python 缓存目录
@@ -116,6 +118,7 @@
     "**/.yarn": true, // Yarn 缓存
     "**/bower_components": true, // Bower 依赖
     "**/.venv": true, // Python 虚拟环境
+    "**/.spec": true, // 设计规范目录
     "**/venv": true, // Python 虚拟环境
     "**/__pycache__": true, // Python 缓存
     "**/.pytest_cache": true, // Pytest 缓存
@@ -152,7 +155,7 @@
   // -------------------- 字体配置（跨平台）--------------------
   // 字体优先级: Source Code Pro > JetBrains Mono > Fira Code > 系统等宽字体
   "editor.fontFamily": "'Source Code Pro', 'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace",
-  "editor.fontSize": 12.0, // 字体大小
+  "editor.fontSize": 12.5, // 字体大小
   "editor.fontLigatures": false, // 禁用字体连字
   "editor.fontWeight": "400", // 字体粗细
   "editor.lineHeight": 22, // 行高
@@ -244,7 +247,7 @@
     "PYTHONIOENCODING": "utf-8",
     "PYTHONDONTWRITEBYTECODE": "1"
   },
-  "terminal.integrated.fontSize": 12.0, // 终端字体大小
+  "terminal.integrated.fontSize": 12.5, // 终端字体大小
   "terminal.integrated.fontFamily": "'Source Code Pro', 'JetBrains Mono', 'Fira Code', monospace", // 终端字体族
   "terminal.integrated.fontWeight": "normal", // 终端字体粗细
   "terminal.integrated.lineHeight": 1.2, // 终端行高

@@ -31,7 +31,7 @@
 ### 🎨 编辑器增强
 
 - **模块化设计**: 按语言分离配置，便于维护和扩展
-- **视觉优化**: One Dark Pro 主题 + Material Icon
+- **视觉优化**: Material Dark Theme 主题 + Material Icon，并提供高对比度覆盖
 - **智能辅助**: 路径补全、括号高亮、代码注释增强
 - **性能优化**: 标签页限制、自动保存、平滑滚动
 
@@ -241,12 +241,22 @@ cp development-config/vscode/golang/settings.json .vscode/
 
 ### 编辑器体验
 
-```json
+```jsonc
 {
-  "files.autoSave": "onFocusChange",        // 失焦自动保存
-  "workbench.editor.limit.value": 5,       // 标签页限制
-  "editor.smoothScrolling": true,          // 平滑滚动
-  "diffEditor.wordWrap": "off",           // 源代码管理差异视图关闭自动换行
+  "files.autoSave": "onFocusChange",              // 失焦自动保存
+  "workbench.editor.limit.value": 6,               // 标签页限制
+  "editor.smoothScrolling": true,                  // 平滑滚动
+  "diffEditor.wordWrap": "off",                   // 源代码管理差异视图关闭自动换行
+  "editor.fontSize": 12.5,                         // 编辑器字体大小
+  "terminal.integrated.fontSize": 12.5,            // 终端字体大小
+  "files.exclude": {
+    "**/.venv": true,
+    "**/venv": true,
+    "**/.spec": true
+  },
+  "search.exclude": {
+    "**/.spec": true
+  },
   "workbench.colorTheme": "Material Dark Theme"   // 主题设置
 }
 ```
@@ -327,9 +337,11 @@ cp development-config/vscode/golang/settings.json .vscode/
 
 ### 更换主题
 
-```json
+选区、标签页和资源管理器等 Workbench 颜色使用全局覆盖，以兼容 VS Code 的配置校验；注释颜色仍仅对 `Material Dark Theme` 生效。切换主题后，Workbench 覆盖会继续生效。
+
+```jsonc
 {
-  "workbench.colorTheme": "One Dark Pro",     // 替换主题
+  "workbench.colorTheme": "One Dark Pro",      // 替换主题
   "workbench.iconTheme": "material-icon-theme" // 文件图标主题
 }
 ```
