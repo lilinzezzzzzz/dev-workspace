@@ -234,9 +234,7 @@
     "list.activeSelectionIconForeground": "#ffcc00", // 激活选中项图标
     "list.inactiveSelectionIconForeground": "#ffcc00" // 非焦点选中项图标
   },
-  "editor.tokenColorCustomizations": {
-    "comments": "#9fd88d"
-  },
+  "editor.tokenColorCustomizations": {},
   // -------------------- 终端配置（跨平台）--------------------
   // 跨平台终端环境变量配置，确保各系统行为一致
   // Windows 终端环境变量
