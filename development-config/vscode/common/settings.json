@@ -198,6 +198,13 @@
   "workbench.productIconTheme": "material-product-icons", // 产品图标主题
   // -------------------- 标签页颜色自定义 --------------------
   "workbench.colorCustomizations": {
+    "[Material Dark Theme]": {
+      "editor.background": "#111111",
+      "sideBar.background": "#111111",
+      "activityBar.background": "#111111",
+      "panel.background": "#111111",
+      "statusBar.background": "#111111"
+    },
     "editor.selectionBackground": "#0e639c", // 编辑器选区背景
     "editor.selectionForeground": "#ffffff", // 编辑器选区文字
     "editor.inactiveSelectionBackground": "#264f7899", // 非焦点编辑器选区背景
