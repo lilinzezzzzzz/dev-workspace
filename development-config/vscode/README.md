@@ -337,7 +337,9 @@ cp development-config/vscode/golang/settings.json .vscode/
 
 ### 更换主题
 
-选区、标签页和资源管理器等 Workbench 颜色使用全局覆盖，以兼容 VS Code 的配置校验；注释颜色仍仅对 `Material Dark Theme` 生效。切换主题后，Workbench 覆盖会继续生效。
+`workbench.colorCustomizations` 在 `common/settings.json` 中统一维护，供 Python 和 Go 配置共享。`Material Dark Theme` 下仅将编辑器背景设为 `#111111`，不覆盖侧边栏、活动栏、面板和状态栏背景。选区、标签页和资源管理器等颜色使用全局覆盖，切换主题后仍会生效。
+
+修改通用配置后，运行 `python3 -B development-config/vscode/merge-settings.py`，同步生成 `settings-python.jsonc` 和 `settings-golang.jsonc`。
 
 ```jsonc
 {
