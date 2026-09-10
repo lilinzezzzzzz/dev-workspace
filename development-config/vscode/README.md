@@ -219,6 +219,8 @@ cp development-config/vscode/golang/settings.json .vscode/
 
 ### Go 核心设置
 
+编译错误诊断由 `gopls` 提供，不再配置已弃用且在启用语言服务器时不适用的 `go.buildOnSave`。
+
 ```json
 {
   "go.useLanguageServer": true,

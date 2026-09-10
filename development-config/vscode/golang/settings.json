@@ -102,7 +102,6 @@
     "uncoveredGutterStyle": "blockred"
   },
   // -------------------- 构建配置 --------------------
-  "go.buildOnSave": "off", // 保存时不自动构建
   "go.buildFlags": [],
   "go.buildTags": "",
   // -------------------- 调试配置 --------------------
