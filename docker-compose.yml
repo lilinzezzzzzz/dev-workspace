@@ -59,6 +59,7 @@ services:
     profiles: ["jsontype-postgres"]
     image: "postgres:17"
     container_name: postgres
+    restart: unless-stopped
     ports:
       - "5432:5432"
     environment:
