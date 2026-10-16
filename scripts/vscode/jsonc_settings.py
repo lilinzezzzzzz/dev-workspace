@@ -50,7 +50,7 @@ class JsoncParser:
         node = self.parse_value()
         self.skip_trivia()
         if self.position != len(self.text):
-            raise ValueError(f"JSONC 根值之后存在额外内容，位置 {self.position}")
+            raise ValueError(f"JSONC 根值之后存在额外内容, 位置 {self.position}")
         return node
 
     def parse_value(self) -> JsonNode:
@@ -96,7 +96,7 @@ class JsoncParser:
             if not isinstance(key, str):
                 raise TypeError("JSONC 对象的键必须为字符串")
             if key in members:
-                raise ValueError(f"JSONC 存在重复键：{key}")
+                raise ValueError(f"JSONC 存在重复键: {key}")
             self.expect(":")
             node = self.parse_value()
             node.key_start = key_start
@@ -123,7 +123,7 @@ def load_settings(text: str, *, allow_empty: bool = False) -> dict[str, Any]:
     if node is None:
         if allow_empty:
             return {}
-        raise ValueError("设置文件为空，请先生成配置")
+        raise ValueError("设置文件为空, 请先生成配置")
     if not isinstance(node.value, dict):
         raise TypeError("设置文件的根值必须为对象")
     return node.value
@@ -201,5 +201,5 @@ def edit_settings(text: str, desired: dict[str, Any]) -> str:
     for start, end, replacement in sorted(edits, reverse=True):
         text = text[:start] + replacement.replace("\n", newline) + text[end:]
     if not same_value(load_settings(text), desired):
-        raise ValueError("JSONC 编辑结果校验失败，未写入")
+        raise ValueError("JSONC 编辑结果校验失败, 未写入")
     return text

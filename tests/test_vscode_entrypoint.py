@@ -142,7 +142,7 @@ raise SystemExit(subprocess.run([os.environ["TEST_PYTHON"], *arguments[5:]]).ret
         result = self.run_entrypoint(input_text="invalid\n\n0\n")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("请输入 y 或 n", result.stdout)
-        self.assertIn("是否生成配置？[y/N]", result.stdout)
+        self.assertIn("是否生成配置? [y/N]", result.stdout)
         self.assertEqual(len(self.calls()), 1)
         self.assertFalse(list(self.config.glob("*.jsonc")))
 
@@ -214,7 +214,7 @@ raise SystemExit(subprocess.run([os.environ["TEST_PYTHON"], *arguments[5:]]).ret
         before = target.read_bytes(), target.stat().st_mtime_ns
         result = self.run_entrypoint(input_text=f"n\n2\n{project}\n2\n\n")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("保留：1 项", result.stdout)
+        self.assertIn("保留: 1 项", result.stdout)
         self.assertIn("未选择任何改动", result.stdout)
         self.assertNotIn("是否写入以上配置", result.stdout)
         self.assertEqual((target.read_bytes(), target.stat().st_mtime_ns), before)

@@ -192,10 +192,10 @@ def main() -> None:
         output_path.write_text(content, encoding="utf-8")
         print(f"已生成: {output_path}")
 
-    print(f"完成，共生成 {len(selected)} 个配置文件。")
-    print("settings-user.jsonc 用于对比并合并到用户设置，保留现有本机私有设置。")
-    print("settings-project-*.jsonc 是项目覆盖示例，按项目实际情况对比合并。")
-    print("本脚本仅写入 development-config/vscode，不修改用户设置或任何项目的 .vscode。")
+    print(f"完成, 共生成 {len(selected)} 个配置文件")
+    print("settings-user.jsonc 用于对比并合并到用户设置, 保留现有本机私有设置")
+    print("settings-project-*.jsonc 是项目覆盖示例, 按项目实际情况对比合并")
+    print("本脚本仅写入 development-config/vscode, 不修改用户设置或任何项目的 .vscode")
 
 
 if __name__ == "__main__":

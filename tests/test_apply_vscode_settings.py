@@ -224,13 +224,13 @@ class ApplySettingsTest(unittest.TestCase):
             os.write(master, b"1\n")
             wait_for("请输入项目根目录")
             os.write(master, "详细".encode() + b"\x7f\x7f" + str(project).encode() + b"\n")
-            wait_for("Python 根目录（")
+            wait_for("Python 根目录 (")
             os.write(master, b"\n")
-            wait_for("如何处理这些配置？")
+            wait_for("如何处理这些配置?")
             os.write(master, b"1\n")
-            wait_for("预览完成，是否写入")
+            wait_for("预览完成, 是否写入")
             os.write(master, b"n\n")
-            wait_for("仅预览，未写入")
+            wait_for("仅预览, 未写入")
             self.assertEqual(process.wait(timeout=10), 0)
             self.assertFalse((project / ".vscode").exists())
         finally:
@@ -288,7 +288,7 @@ class ApplySettingsTest(unittest.TestCase):
                 values = jsonc.load_settings(target.read_text())
                 self.assertEqual(values["python.analysis.extraPaths"], ["${workspaceFolder}"])
                 self.assertTrue(values["private.setting"])
-                self.assertTrue(result.stdout.strip().endswith("请创建虚拟环境或在 VS Code 中手动选择解释器。"))
+                self.assertTrue(result.stdout.strip().endswith("请创建虚拟环境或在 VS Code 中手动选择解释器"))
         result = self.run_script("project-python", str(project), "--conflicts", "existing")
         self.assertEqual(result.returncode, 2)
 
@@ -299,14 +299,14 @@ class ApplySettingsTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         target = project / ".vscode/settings.json"
         self.assertNotIn("python.defaultInterpreterPath", jsonc.load_settings(target.read_text()))
-        self.assertIn("提示：未找到", result.stdout.splitlines()[-1])
+        self.assertIn("提示: 未找到", result.stdout.splitlines()[-1])
         result = self.run_script("project-python", str(project))
         self.assertIn("配置已一致", result.stdout)
-        self.assertIn("提示：未找到", result.stdout.splitlines()[-1])
+        self.assertIn("提示: 未找到", result.stdout.splitlines()[-1])
         self.create(project / ".venv/bin/python")
         result = self.run_script("project-python", str(project), "--write")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertNotIn("提示：未找到", result.stdout)
+        self.assertNotIn("提示: 未找到", result.stdout)
         self.assertEqual(jsonc.load_settings(target.read_text())["python.defaultInterpreterPath"], "${workspaceFolder}/.venv/bin/python")
 
     def test_existing_venv_directory_is_proposed_as_executable_without_preview_write(self) -> None:
@@ -370,7 +370,7 @@ class ApplySettingsTest(unittest.TestCase):
         self.create(project / "backend/pyproject.toml")
         result = self.run_script("project-python", str(project))
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("Python 根目录：.", result.stdout)
+        self.assertIn("Python 根目录: .", result.stdout)
         outside = self.root / "outside"
         outside.mkdir()
         result = self.run_script("project-python", str(project), "--python-root", ".", "--test-dir", "../outside", "--write")
@@ -412,13 +412,13 @@ class ApplySettingsTest(unittest.TestCase):
                 result = self.run_script(input_text=f"3\n{target}\n\n{confirm}\n")
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertIn("1. 全部应用", result.stdout)
-                self.assertEqual(result.stdout.count("来源："), 1)
-                self.assertLess(result.stdout.index("同名值不同"), result.stdout.index("应用后："))
-                self.assertLess(result.stdout.index("应用后："), result.stdout.index("如何处理这些配置"))
-                self.assertEqual(result.stdout.count("当前值："), 3)
-                self.assertLess(result.stdout.index("应用后："), result.stdout.index("预览完成，是否写入"))
+                self.assertEqual(result.stdout.count("来源: "), 1)
+                self.assertLess(result.stdout.index("同名值不同"), result.stdout.index("应用后: "))
+                self.assertLess(result.stdout.index("应用后: "), result.stdout.index("如何处理这些配置"))
+                self.assertEqual(result.stdout.count("当前值: "), 3)
+                self.assertLess(result.stdout.index("应用后: "), result.stdout.index("预览完成, 是否写入"))
                 self.assertNotIn("@@", result.stdout)
-                self.assertIn("是否写入以上配置？[Y/n]", result.stdout)
+                self.assertIn("是否写入以上配置? [Y/n]", result.stdout)
                 self.assertEqual(target.exists(), confirm.lower() in {"", "y"})
 
     def test_individual_mode_and_cancel_leave_existing_file_unchanged(self) -> None:
@@ -431,12 +431,12 @@ class ApplySettingsTest(unittest.TestCase):
                 result = self.run_script(input_text=f"3\n{target}\n{answers}")
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertEqual((target.read_bytes(), target.stat().st_mtime_ns), before)
-                self.assertLess(result.stdout.index("应用后：2"), result.stdout.index("如何处理这些配置"))
+                self.assertLess(result.stdout.index("应用后: 2"), result.stdout.index("如何处理这些配置"))
                 if answers == "0\n":
                     self.assertIn("已取消", result.stdout)
                     self.assertNotIn("是否写入以上配置", result.stdout)
                 elif answers == "2\n\n":
-                    self.assertIn("保留：1 项", result.stdout)
+                    self.assertIn("保留: 1 项", result.stdout)
                     self.assertIn("未选择任何改动", result.stdout)
 
     def test_individual_choices_write_only_selected_nested_values_and_arrays(self) -> None:
@@ -456,8 +456,8 @@ class ApplySettingsTest(unittest.TestCase):
             **existing, "update": 2, "nested": {"old": 1, "extra": 7}, "array": [2],
         })
         self.assertIn("// 保留注释", target.read_text())
-        self.assertIn("新增设置：2 项；同名值不同：4 项", result.stdout)
-        self.assertIn("新增：0 项；修改：3 项；保留：1 项；跳过新增：2 项", result.stdout)
+        self.assertIn("新增设置: 2 项; 同名值不同: 4 项", result.stdout)
+        self.assertIn("新增: 0 项; 修改: 3 项; 保留: 1 项; 跳过新增: 2 项", result.stdout)
         self.assertLess(result.stdout.index("同名值不同"), result.stdout.index("如何处理这些配置"))
 
     def test_all_skipped_or_eof_does_not_create_target(self) -> None:
@@ -475,15 +475,15 @@ class ApplySettingsTest(unittest.TestCase):
         result = self.run_script(input_text=f"3\n{target}\ninvalid\n2\ninvalid\n2\n\ny\n")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(jsonc.load_settings(target.read_text()), {"new": {"a": 1}})
-        self.assertIn("请输入 1、2 或 0", result.stdout)
+        self.assertIn("请输入 1, 2 或 0", result.stdout)
         self.assertIn("请输入 1 或 2", result.stdout)
-        self.assertIn("新增：1 项；修改：0 项；保留：0 项；跳过新增：1 项", result.stdout)
+        self.assertIn("新增: 1 项; 修改: 0 项; 保留: 0 项; 跳过新增: 1 项", result.stdout)
 
     def test_default_menu_is_python_and_default_processing_applies_all_after_confirmation(self) -> None:
         project = self.project()
         result = self.run_script(input_text=f"\n{project}\n\n\nn\n")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("1. Python 项目配置（默认）", result.stdout)
+        self.assertIn("1. Python 项目配置 (默认)", result.stdout)
         self.assertIn("2. Go 项目配置", result.stdout)
         self.assertIn("3. 用户配置", result.stdout)
         self.assertIn("settings-project-python.jsonc", result.stdout)
@@ -507,8 +507,8 @@ class ApplySettingsTest(unittest.TestCase):
             )
         text = "\n".join(call.args[0] for call in output.call_args_list)
         self.assertIn("终端自动加载环境文件", text)
-        self.assertIn("当前值：true", text)
-        self.assertIn("应用后：false", text)
+        self.assertIn("当前值: true", text)
+        self.assertIn("应用后: false", text)
         self.assertIn("nested / x", text)
         self.assertNotIn("kept", text)
         self.assertIn("未在此文件设置", text)
