@@ -51,13 +51,14 @@ class UpdateRepositoryTest(unittest.TestCase):
             completed(),
             completed(stdout="main\n"),
             completed(stdout="origin/main\n"),
-            completed(stdout="Already up to date.\n"),
+            completed(stdout="Already up to date，保留原始标点。\n"),
         ]
 
         with patch.object(update_git_repos, "run_git", side_effect=responses) as run_git:
             result = update_git_repos.update_repository(Path("/repo"), 10)
 
         self.assertEqual(result.kind, update_git_repos.ResultKind.UPDATED)
+        self.assertEqual(result.detail, "main <- origin/main; Already up to date，保留原始标点。")
         self.assertEqual(run_git.call_args_list[-1].kwargs["timeout"], 10)
 
     def test_skips_dirty_repository_without_pull(self) -> None:
@@ -69,6 +70,7 @@ class UpdateRepositoryTest(unittest.TestCase):
             result = update_git_repos.update_repository(Path("/repo"), 10)
 
         self.assertEqual(result.kind, update_git_repos.ResultKind.MANUAL)
+        self.assertEqual(result.detail, "存在未提交或未跟踪的修改")
         run_git.assert_called_once()
 
     def test_marks_pull_failure_for_manual_intervention(self) -> None:
@@ -86,7 +88,7 @@ class UpdateRepositoryTest(unittest.TestCase):
             result = update_git_repos.update_repository(Path("/repo"), 10)
 
         self.assertEqual(result.kind, update_git_repos.ResultKind.MANUAL)
-        self.assertIn("Not possible to fast-forward", result.detail)
+        self.assertEqual(result.detail, "无法直接快进更新: fatal: Not possible to fast-forward")
 
     def test_marks_pull_timeout_and_continues(self) -> None:
         responses = [
@@ -100,9 +102,47 @@ class UpdateRepositoryTest(unittest.TestCase):
             result = update_git_repos.update_repository(Path("/repo"), 10)
 
         self.assertEqual(result.kind, update_git_repos.ResultKind.TIMED_OUT)
+        self.assertEqual(result.detail, "超过 10 秒, 已强制中止")
 
 
 class WorkspaceRootConfigTest(unittest.TestCase):
+    def test_help_uses_halfwidth_punctuation(self) -> None:
+        output = io.StringIO()
+        with redirect_stdout(output), self.assertRaises(SystemExit) as result:
+            update_git_repos.parse_args(["--help"])
+
+        self.assertEqual(result.exception.code, 0)
+        self.assertIn("单个仓库 git pull 的超时秒数 (默认: 10)", output.getvalue())
+        self.assertIn("输出颜色模式 (默认: auto)", output.getvalue())
+
+    def test_confirmation_defaults_to_no_and_preserves_root_text(self) -> None:
+        root = Path("/工作区（示例），保留标点")
+        cases = (
+            ("", False),
+            ("n", False),
+            ("invalid", False),
+            ("Y", True),
+            (" yes ", True),
+            (EOFError(), False),
+        )
+        for answer, expected in cases:
+            with self.subTest(answer=answer):
+                output = io.StringIO()
+                with (
+                    redirect_stdout(output),
+                    patch("builtins.input") as read_input,
+                    patch.object(update_git_repos.sys.stdin, "isatty", return_value=False),
+                ):
+                    if isinstance(answer, EOFError):
+                        read_input.side_effect = answer
+                    else:
+                        read_input.return_value = answer
+                    confirmed = update_git_repos.confirm_workspace_root(root, use_color=False)
+
+                self.assertEqual(confirmed, expected)
+                read_input.assert_called_once_with("[CONFIRM] 执行快进更新? [y/N] ")
+                self.assertIn(str(root), output.getvalue())
+
     def test_color_auto_disables_for_non_tty_stream(self) -> None:
         self.assertFalse(update_git_repos.should_use_color("auto", io.StringIO()))
 
@@ -144,7 +184,7 @@ class WorkspaceRootConfigTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary_directory:
             config_file = Path(temporary_directory) / ".workspace-root"
 
-            with self.assertRaises(update_git_repos.WorkspaceRootConfigError):
+            with self.assertRaisesRegex(update_git_repos.WorkspaceRootConfigError, "配置文件不存在: "):
                 update_git_repos.load_workspace_root(config_file)
 
     def test_rejects_relative_workspace_root(self) -> None:
@@ -152,7 +192,7 @@ class WorkspaceRootConfigTest(unittest.TestCase):
             config_file = Path(temporary_directory) / ".workspace-root"
             config_file.write_text("relative/path\n", encoding="utf-8")
 
-            with self.assertRaises(update_git_repos.WorkspaceRootConfigError):
+            with self.assertRaisesRegex(update_git_repos.WorkspaceRootConfigError, "workspace root 必须是绝对路径: "):
                 update_git_repos.load_workspace_root(config_file)
 
     def test_rejects_missing_workspace_root(self) -> None:
@@ -163,8 +203,34 @@ class WorkspaceRootConfigTest(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            with self.assertRaises(update_git_repos.WorkspaceRootConfigError):
+            with self.assertRaisesRegex(update_git_repos.WorkspaceRootConfigError, "workspace root 路径不存在或不是目录: "):
                 update_git_repos.load_workspace_root(config_file)
+
+    def test_rejects_empty_or_multiline_config_with_halfwidth_error(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="agent-task.") as temporary_directory:
+            root = Path(temporary_directory)
+            config_file = root / ".workspace-root"
+            cases = (
+                ("\n", "配置文件为空: "),
+                (f"{root}\n{root}\n", "配置文件必须只包含一行 workspace root 绝对路径: "),
+            )
+            for content, message in cases:
+                with self.subTest(content=content):
+                    config_file.write_text(content, encoding="utf-8")
+                    with self.assertRaisesRegex(update_git_repos.WorkspaceRootConfigError, message):
+                        update_git_repos.load_workspace_root(config_file)
+
+    def test_config_read_error_preserves_external_error_text(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="agent-task.") as temporary_directory:
+            config_file = Path(temporary_directory) / ".workspace-root"
+            config_file.touch()
+            with (
+                patch.object(Path, "read_text", side_effect=OSError("读取失败（原始消息），保留标点。")),
+                self.assertRaises(update_git_repos.WorkspaceRootConfigError) as result,
+            ):
+                update_git_repos.load_workspace_root(config_file)
+
+        self.assertEqual(str(result.exception), f"读取配置文件失败: {config_file}: 读取失败（原始消息），保留标点。")
 
     def test_main_requires_confirmation_before_update(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
@@ -190,13 +256,12 @@ class WorkspaceRootConfigTest(unittest.TestCase):
                     return_value="/usr/bin/git",
                 ),
             ):
-                with (
-                    redirect_stdout(io.StringIO()),
-                    redirect_stderr(io.StringIO()),
-                ):
-                    exit_code = update_git_repos.main([])
+                errors = io.StringIO()
+                with redirect_stdout(io.StringIO()), redirect_stderr(errors):
+                    exit_code = update_git_repos.main(["--color", "never"])
 
         self.assertEqual(exit_code, 1)
+        self.assertEqual(errors.getvalue(), "[CANCELLED] 未执行任何更新\n")
         discover_repositories.assert_not_called()
 
     def test_main_updates_after_confirmation(self) -> None:

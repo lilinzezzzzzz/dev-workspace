@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""安全地批量快进更新指定目录下的 Git 仓库。"""
+"""安全地批量快进更新指定目录下的 Git 仓库"""
 
 from __future__ import annotations
 
@@ -80,13 +80,13 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         type=float,
         default=DEFAULT_TIMEOUT_SECONDS,
         metavar="SECONDS",
-        help=f"单个仓库 git pull 的超时秒数（默认：{DEFAULT_TIMEOUT_SECONDS:g}）",
+        help=f"单个仓库 git pull 的超时秒数 (默认: {DEFAULT_TIMEOUT_SECONDS:g})",
     )
     parser.add_argument(
         "--color",
         choices=(COLOR_AUTO, COLOR_ALWAYS, COLOR_NEVER),
         default=COLOR_AUTO,
-        help="输出颜色模式（默认：auto）",
+        help="输出颜色模式 (默认: auto)",
     )
     args = parser.parse_args(argv)
     if args.timeout <= 0:
@@ -141,27 +141,27 @@ def load_workspace_root(config_file: Path = WORKSPACE_ROOT_FILE) -> Path:
     """从配置文件读取 workspace root 绝对路径。"""
 
     if not config_file.is_file():
-        raise WorkspaceRootConfigError(f"配置文件不存在：{config_file}")
+        raise WorkspaceRootConfigError(f"配置文件不存在: {config_file}")
 
     try:
         content = config_file.read_text(encoding="utf-8").strip()
     except OSError as error:
-        message = f"读取配置文件失败：{config_file}：{error}"
+        message = f"读取配置文件失败: {config_file}: {error}"
         raise WorkspaceRootConfigError(message) from error
 
     lines = content.splitlines()
     if not lines:
-        raise WorkspaceRootConfigError(f"配置文件为空：{config_file}")
+        raise WorkspaceRootConfigError(f"配置文件为空: {config_file}")
     if len(lines) != 1:
         raise WorkspaceRootConfigError(
-            f"配置文件必须只包含一行 workspace root 绝对路径：{config_file}"
+            f"配置文件必须只包含一行 workspace root 绝对路径: {config_file}"
         )
 
     root = Path(lines[0])
     if not root.is_absolute():
-        raise WorkspaceRootConfigError(f"workspace root 必须是绝对路径：{root}")
+        raise WorkspaceRootConfigError(f"workspace root 必须是绝对路径: {root}")
     if not root.is_dir():
-        raise WorkspaceRootConfigError(f"workspace root 路径不存在或不是目录：{root}")
+        raise WorkspaceRootConfigError(f"workspace root 路径不存在或不是目录: {root}")
     return root.resolve()
 
 
@@ -172,7 +172,7 @@ def confirm_workspace_root(root: Path, *, use_color: bool) -> bool:
     print(f"  config: {color_text(str(WORKSPACE_ROOT_FILE), 'dim', use_color=use_color)}")
     print(f"  root:   {color_text(str(root), 'bold', use_color=use_color)}")
     try:
-        prompt = f"{badge('CONFIRM', 'yellow', use_color=use_color)} 执行快进更新？[y/N] "
+        prompt = f"{badge('CONFIRM', 'yellow', use_color=use_color)} 执行快进更新? [y/N] "
         answer = input(prompt)
     except EOFError:
         if not sys.stdin.isatty():
@@ -248,7 +248,7 @@ def update_repository(repo: Path, timeout: float) -> RepoResult:
         return RepoResult(
             repo,
             ResultKind.MANUAL,
-            f"无法读取仓库状态：{command_detail(status)}",
+            f"无法读取仓库状态: {command_detail(status)}",
         )
     if status.stdout:
         return RepoResult(repo, ResultKind.MANUAL, "存在未提交或未跟踪的修改")
@@ -272,19 +272,19 @@ def update_repository(repo: Path, timeout: float) -> RepoResult:
     try:
         pull = run_git(repo, "pull", "--ff-only", timeout=timeout)
     except CommandTimedOutError:
-        return RepoResult(repo, ResultKind.TIMED_OUT, f"超过 {timeout:g} 秒，已强制中止")
+        return RepoResult(repo, ResultKind.TIMED_OUT, f"超过 {timeout:g} 秒, 已强制中止")
 
     if pull.returncode != 0:
         return RepoResult(
             repo,
             ResultKind.MANUAL,
-            f"无法直接快进更新：{command_detail(pull)}",
+            f"无法直接快进更新: {command_detail(pull)}",
         )
 
     pull_output = pull.stdout.strip()
     detail = f"{branch_name} <- {upstream_name}"
     if pull_output:
-        detail = f"{detail}；{pull_output.splitlines()[-1]}"
+        detail = f"{detail}; {pull_output.splitlines()[-1]}"
     return RepoResult(repo, ResultKind.UPDATED, detail)
 
 
@@ -321,14 +321,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     if shutil.which("git") is None:
         print_error(
             "未找到 git 命令",
-            detail="请先安装 git 并确认 PATH 可用。",
+            detail="请先安装 git 并确认 PATH 可用",
             use_color=stderr_color,
         )
         return 2
 
     if not confirm_workspace_root(root, use_color=stdout_color):
         print(
-            f"{badge('CANCELLED', 'yellow', use_color=stderr_color)} 未执行任何更新。",
+            f"{badge('CANCELLED', 'yellow', use_color=stderr_color)} 未执行任何更新",
             file=sys.stderr,
         )
         return 1
@@ -339,7 +339,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     except OSError as error:
         print_error(
             "扫描 workspace root 失败",
-            detail=f"{root}：{error}",
+            detail=f"{root}: {error}",
             use_color=stderr_color,
         )
         return 2
@@ -353,7 +353,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         try:
             result = update_repository(repo, args.timeout)
         except OSError as error:
-            result = RepoResult(repo, ResultKind.MANUAL, f"执行 Git 失败：{error}")
+            result = RepoResult(repo, ResultKind.MANUAL, f"执行 Git 失败: {error}")
         results.append(result)
         print(f"  {result_badge(result.kind, use_color=stdout_color)} {result.detail}")
 

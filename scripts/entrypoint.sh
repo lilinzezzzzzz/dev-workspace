@@ -23,7 +23,7 @@ if [ -f "$HOST_SSH_DIR/id_rsa.pub" ]; then
     cp "$HOST_SSH_DIR/id_rsa.pub" "$SSH_DIR/authorized_keys"
     chmod 644 "$SSH_DIR/id_rsa.pub"
     chmod 600 "$SSH_DIR/authorized_keys"
-    echo "[SSH] 公钥已配置，已启用免密登录"
+    echo "[SSH] 公钥已配置, 已启用免密登录"
 fi
 
 # 复制 SSH 配置文件（可选）
@@ -48,7 +48,7 @@ Host *
     UserKnownHostsFile /dev/null
 EOF
     chmod 600 "$SSH_DIR/config"
-    echo "[SSH] 已配置自动接受主机密钥（开发环境）"
+    echo "[SSH] 已配置自动接受主机密钥 (开发环境)"
 fi
 
 echo "[SSH] 配置完成"

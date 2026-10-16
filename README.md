@@ -323,6 +323,12 @@ uv run python -B -m unittest discover -s tests
 
 VS Code 统一入口无参数启动时先选择是否生成配置，再提供用户或项目配置菜单，项目模式必须输入项目根目录。Python 实现位于 `scripts/vscode/`。行为、预览和写入规则见 [VS Code 配置说明](tool-configs/vscode/README.md)。
 
+### 脚本输出约定
+
+`setup.sh`、`setup.ps1` 和 `scripts/` 下脚本的自有提示、帮助及错误信息保留原有语言，标点统一使用 ASCII 半角符号；冒号、逗号和分号后接文字时保留空格，短提示省略句末句号。部署脚本使用 `[步骤]`、`[完成]`、`[错误]` 和 `[!]` 标记，保留原有颜色；其他脚本继续使用各自的状态标签。路径、版本信息、配置内容以及 Git、Docker 等外部工具返回的文本按原文显示。
+
+仓库更新脚本仍只从 `scripts/.workspace-root` 读取扫描根目录，并在显示该目录后询问 `[CONFIRM] 执行快进更新? [y/N]`；回车、否定回答或输入结束均不执行更新。仅明确输入 `y` 或 `yes`（忽略大小写及首尾空格）后才继续，汇总仍使用 `[SUMMARY] total=... updated=... skipped=... timeout=...` 格式。该配置是本机私有文件，不纳入版本控制。
+
 ## 已知现状
 
 - Linux / macOS 的 `setup.sh` 当前不会自动启动 `python-workspace` profile

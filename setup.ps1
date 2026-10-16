@@ -10,15 +10,15 @@ $ErrorActionPreference = "Stop"
 
 # 颜色输出函数
 function Write-Step($message) {
-    Write-Host "`n[$([char]0x2192)] $message" -ForegroundColor Cyan
+    Write-Host "`n[步骤] $message" -ForegroundColor Cyan
 }
 
 function Write-Success($message) {
-    Write-Host "[✓] $message" -ForegroundColor Green
+    Write-Host "[完成] $message" -ForegroundColor Green
 }
 
 function Write-Error($message) {
-    Write-Host "[✗] $message" -ForegroundColor Red
+    Write-Host "[错误] $message" -ForegroundColor Red
 }
 
 function Write-Warning($message) {
@@ -37,7 +37,7 @@ Write-Host "========================================" -ForegroundColor Green
 $envFile = Join-Path $ScriptDir ".env"
 if (-not (Test-Path $envFile)) {
     Write-Error "未找到 .env"
-    Write-Host "  请先复制 .env.example 为 .env，并替换其中的全部密码占位值" -ForegroundColor Yellow
+    Write-Host "  请先复制 .env.example 为 .env, 并替换其中的全部密码占位值" -ForegroundColor Yellow
     exit 1
 }
 
@@ -184,9 +184,9 @@ $allHealthy = $true
 
 foreach ($service in $status) {
     if ($service.State -eq "running") {
-        Write-Host "  ✓ $($service.Name): 运行中" -ForegroundColor Green
+        Write-Host "  [完成] $($service.Name): 运行中" -ForegroundColor Green
     } else {
-        Write-Host "  ✗ $($service.Name): $($service.State)" -ForegroundColor Red
+        Write-Host "  [错误] $($service.Name): $($service.State)" -ForegroundColor Red
         $allHealthy = $false
     }
 }
@@ -205,5 +205,5 @@ Write-Host "  SSH 密码登录:  ssh root@localhost -p 10022  (密码见 .env �
 Write-Host "  进入容器:      docker exec -it python-workspace bash" -ForegroundColor White
 Write-Host ""
 Write-Host "Redis 连接:" -ForegroundColor Cyan
-Write-Host "  密码由 .env 的 REDIS_PASSWORD 配置，连接命令见 README.md" -ForegroundColor White
+Write-Host "  密码由 .env 的 REDIS_PASSWORD 配置, 连接命令见 README.md" -ForegroundColor White
 Write-Host ""

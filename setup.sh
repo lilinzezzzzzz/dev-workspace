@@ -19,15 +19,15 @@ NC='\033[0m'
 
 # 输出函数
 print_step() {
-    echo -e "\n${CYAN}[→] $1${NC}"
+    echo -e "\n${CYAN}[步骤] $1${NC}"
 }
 
 print_success() {
-    echo -e "${GREEN}[✓] $1${NC}"
+    echo -e "${GREEN}[完成] $1${NC}"
 }
 
 print_error() {
-    echo -e "${RED}[✗] $1${NC}"
+    echo -e "${RED}[错误] $1${NC}"
 }
 
 print_warning() {
@@ -45,7 +45,7 @@ echo -e "${GREEN}========================================${NC}"
 
 if [ ! -f "$SCRIPT_DIR/.env" ]; then
     print_error "未找到 .env"
-    echo "  请先执行 cp .env.example .env，并替换其中的全部密码占位值"
+    echo "  请先执行 cp .env.example .env, 并替换其中的全部密码占位值"
     exit 1
 fi
 
@@ -170,7 +170,7 @@ sleep 5
 
 docker compose ps --format "table {{.Name}}\t{{.Status}}" | while read line; do
     if echo "$line" | grep -q "running\|Up"; then
-        echo -e "  ${GREEN}✓ $line${NC}"
+        echo -e "  ${GREEN}[完成] $line${NC}"
     else
         echo -e "  ${GRAY}$line${NC}"
     fi
@@ -190,5 +190,5 @@ echo "  SSH 密码登录:  ssh root@localhost -p 10022  (密码见 .env 的 PYTH
 echo "  进入容器:      docker exec -it python-workspace bash"
 echo ""
 echo -e "${CYAN}Redis 连接:${NC}"
-echo "  密码由 .env 的 REDIS_PASSWORD 配置，连接命令见 README.md"
+echo "  密码由 .env 的 REDIS_PASSWORD 配置, 连接命令见 README.md"
 echo ""
