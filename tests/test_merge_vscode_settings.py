@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import glob
 import importlib.util
 import os
 import shutil
@@ -10,7 +11,7 @@ import unittest
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parents[1] / "development-config" / "vscode"
-SCRIPT_PATH = BASE_DIR / "merge-settings.py"
+SCRIPT_PATH = Path(__file__).parents[1] / "scripts/vscode/merge-settings.py"
 SPEC = importlib.util.spec_from_file_location("merge_vscode_settings", SCRIPT_PATH)
 assert SPEC is not None and SPEC.loader is not None
 settings_merger = importlib.util.module_from_spec(SPEC)
@@ -61,15 +62,77 @@ class ConfigurationSplitTest(unittest.TestCase):
         for platform in ("windows", "linux", "osx"):
             self.assertNotIn("GOFLAGS", user[f"terminal.integrated.env.{platform}"])
 
-    def test_user_plus_project_preserves_original_explicit_setting_values(self) -> None:
-        """只保证旧配置显式设置的值不变，允许统一用户默认增加生效项。"""
+    def test_user_plus_project_preserves_source_explicit_setting_values(self) -> None:
+        """保证源模板显式值在合并后不变，允许统一用户默认增加生效项。"""
         user = settings_merger.merge_settings(BASE_DIR, "user")
         for language in ("python", "golang"):
             with self.subTest(language=language):
                 project = settings_merger.merge_settings(BASE_DIR, f"project-{language}")
                 effective = settings_merger.deep_merge(user, project)
-                legacy = settings_merger.merge_settings(BASE_DIR, language)
-                self.assertEqual({key: effective[key] for key in legacy}, legacy)
+                explicit: dict[str, object] = {}
+                for source in (
+                    BASE_DIR / "common/settings.jsonc",
+                    BASE_DIR / language / "settings.jsonc",
+                    BASE_DIR / "common/project-settings.jsonc",
+                    BASE_DIR / language / "project-settings.jsonc",
+                ):
+                    explicit = settings_merger.deep_merge(
+                        explicit,
+                        settings_merger.parse_jsonc(source),
+                    )
+                self.assertEqual({key: effective[key] for key in explicit}, explicit)
+
+    def test_python_auto_discovery_patterns_cover_hidden_workspaces(self) -> None:
+        project = settings_merger.merge_settings(BASE_DIR, "project-python")
+        key = "python.testing.autoTestDiscoverOnSavePattern"
+        layouts = (
+            ("template", project, "tests", "backend/tests"),
+            (
+                "backend",
+                settings_merger.deep_merge(
+                    project,
+                    {key: "${workspaceFolder}/backend/tests/**/*.py"},
+                ),
+                "backend/tests",
+                "tests",
+            ),
+        )
+        workspace_paths = (
+            "project",
+            "My Project",
+            ".codex/worktrees/project",
+            ".hidden/worktrees/My Project",
+        )
+        with tempfile.TemporaryDirectory(prefix="agent-task.") as temporary:
+            directory = Path(temporary).resolve()
+            for layout, settings, test_directory, other_tests in layouts:
+                for workspace_path in workspace_paths:
+                    with self.subTest(layout=layout, workspace=workspace_path):
+                        workspace = directory / layout / workspace_path
+                        expected = {
+                            workspace / test_directory / relative
+                            for relative in (
+                                "test_root.py",
+                                "unit/test_nested.py",
+                                "unit/deep/test_deep.py",
+                            )
+                        }
+                        excluded = {
+                            workspace / test_directory / "test_data.txt",
+                            workspace / "src/main.py",
+                            workspace / other_tests / "test_other.py",
+                        }
+                        for path in expected | excluded:
+                            path.parent.mkdir(parents=True, exist_ok=True)
+                            path.write_text("", encoding="utf-8")
+                        pattern = settings[key].replace(
+                            "${workspaceFolder}", workspace.as_posix()
+                        )
+                        self.assertTrue(Path(pattern).is_absolute())
+                        matches = {
+                            Path(path) for path in glob.glob(pattern, recursive=True)
+                        }
+                        self.assertEqual(matches, expected)
 
     def test_user_defaults_extend_notebook_and_file_type_settings_across_projects(self) -> None:
         user = settings_merger.merge_settings(BASE_DIR, "user")
@@ -91,9 +154,10 @@ class ConfigurationSplitTest(unittest.TestCase):
         for language, key, expected in cases:
             with self.subTest(language=language, key=key):
                 project = settings_merger.merge_settings(BASE_DIR, f"project-{language}")
-                legacy = settings_merger.merge_settings(BASE_DIR, language)
+                language_defaults = settings_merger.parse_jsonc(BASE_DIR / language / "settings.jsonc")
                 effective = settings_merger.deep_merge(user, project)
-                self.assertNotIn(key, legacy)
+                self.assertNotIn(key, language_defaults)
+                self.assertNotIn(key, project)
                 self.assertIn(key, user)
                 self.assertEqual(effective[key], expected)
 
@@ -170,8 +234,9 @@ class ConfigurationSplitTest(unittest.TestCase):
         self.assertEqual(project["python.testing.pytestArgs"], ["integration", "-q"])
 
     def test_unknown_generation_target_is_rejected(self) -> None:
-        with self.assertRaises(ValueError):
-            settings_merger.merge_settings(BASE_DIR, "unknown")
+        for target in ("unknown", "python", "golang"):
+            with self.subTest(target=target), self.assertRaises(ValueError):
+                settings_merger.merge_settings(BASE_DIR, target)
 
 
 class GeneratorCommandTest(unittest.TestCase):
@@ -179,15 +244,16 @@ class GeneratorCommandTest(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory(prefix="agent-task.")
         self.addCleanup(self.temporary.cleanup)
         root = Path(self.temporary.name)
-        self.fixture = root / "vscode"
-        self.fixture.mkdir()
-        shutil.copyfile(SCRIPT_PATH, self.fixture / "merge-settings.py")
-        for source in BASE_DIR.glob("*/settings.json"):
+        repository = root / "repository with spaces"
+        self.fixture = repository / "development-config/vscode"
+        self.fixture.mkdir(parents=True)
+        self.script = repository / "scripts/vscode/merge-settings.py"
+        self.script.parent.mkdir(parents=True)
+        shutil.copyfile(SCRIPT_PATH, self.script)
+        for source in BASE_DIR.glob("*/*.jsonc"):
             destination = self.fixture / source.relative_to(BASE_DIR)
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, destination)
-        for source in BASE_DIR.glob("*/project-settings.json"):
-            shutil.copyfile(source, self.fixture / source.relative_to(BASE_DIR))
         self.project = root / "project"
         (self.project / ".vscode").mkdir(parents=True)
         self.project_settings = self.project / ".vscode" / "settings.json"
@@ -201,7 +267,7 @@ class GeneratorCommandTest(unittest.TestCase):
         environment = os.environ.copy()
         environment["HOME"] = str(self.home)
         result = subprocess.run(
-            [sys.executable, "-B", str(self.fixture / "merge-settings.py"), *arguments],
+            [sys.executable, "-B", str(self.script), *arguments],
             cwd=self.project,
             env=environment,
             capture_output=True,
@@ -218,10 +284,10 @@ class GeneratorCommandTest(unittest.TestCase):
         )
         return result
 
-    def test_default_command_generates_five_outputs_with_real_source_headers(self) -> None:
+    def test_default_command_generates_three_outputs_with_real_source_headers(self) -> None:
         result = self.run_generator()
         self.assertEqual(result.returncode, 0, result.stderr)
-        targets = {"user", "project-python", "project-golang", "python", "golang"}
+        targets = {"user", "project-python", "project-golang"}
         self.assertEqual(
             {path.name for path in self.fixture.glob("*.jsonc")},
             {f"settings-{target}.jsonc" for target in targets},
@@ -233,6 +299,7 @@ class GeneratorCommandTest(unittest.TestCase):
                 settings_merger.merge_settings(BASE_DIR, target),
             )
             header = output.read_text(encoding="utf-8").splitlines()[3]
+            self.assertIn("scripts/vscode/merge-settings.py", output.read_text(encoding="utf-8").splitlines()[2])
             self.assertNotIn("{lang}", header)
             for source in settings_merger.get_source_files(target):
                 self.assertIn(source, header)
@@ -240,8 +307,8 @@ class GeneratorCommandTest(unittest.TestCase):
     def test_flags_only_generate_requested_outputs(self) -> None:
         cases = (
             (("--user",), {"user"}),
-            (("--python",), {"python"}),
-            (("--golang",), {"golang"}),
+            (("--project-python",), {"project-python"}),
+            (("--project-golang",), {"project-golang"}),
             (("--project-python", "--project-golang"), {"project-python", "project-golang"}),
             (("--user", "--project-python"), {"user", "project-python"}),
         )
@@ -257,9 +324,11 @@ class GeneratorCommandTest(unittest.TestCase):
                 )
 
     def test_unknown_flag_fails_without_writing_outputs(self) -> None:
-        result = self.run_generator("--unknown")
-        self.assertNotEqual(result.returncode, 0)
-        self.assertEqual(list(self.fixture.glob("*.jsonc")), [])
+        for option in ("--unknown", "--python", "--golang"):
+            with self.subTest(option=option):
+                result = self.run_generator(option)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(list(self.fixture.glob("*.jsonc")), [])
 
 
 if __name__ == "__main__":

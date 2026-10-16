@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
 VS Code Settings Merger Script
-拆分生成统一用户设置、项目覆盖及兼容完整语言配置
+生成统一用户设置及 Python / Go 项目覆盖
 
 使用方法:
-    python merge-settings.py              # 生成所有配置
-    python merge-settings.py --user       # 仅生成统一用户设置
-    python merge-settings.py --project-python  # 仅生成 Python 项目覆盖
-    python merge-settings.py --python     # 仅生成兼容 Python 完整配置
-    python merge-settings.py --golang     # 仅生成兼容 Go 完整配置
+    python scripts/vscode/merge-settings.py              # 生成所有配置
+    python scripts/vscode/merge-settings.py --user       # 仅生成统一用户设置
+    python scripts/vscode/merge-settings.py --project-python  # 仅生成 Python 项目覆盖
+    python scripts/vscode/merge-settings.py --project-golang  # 仅生成 Go 项目覆盖
 """
 
 import argparse
@@ -18,6 +17,9 @@ from collections.abc import Mapping, Sequence
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+CONFIG_DIR = REPO_ROOT / "development-config/vscode"
 
 
 def strip_jsonc_comments(jsonc_content: str) -> str:
@@ -116,33 +118,26 @@ def deep_merge(
 
 
 def get_source_files(target: str) -> tuple[str, ...]:
-    """返回按覆盖优先级排列的源文件，兼容原有完整语言配置。"""
+    """返回指定目标按覆盖优先级排列的源文件。"""
     if target == "user":
         return (
-            "common/settings.json",
-            "python/settings.json",
-            "golang/settings.json",
+            "common/settings.jsonc",
+            "python/settings.jsonc",
+            "golang/settings.jsonc",
         )
     if target in {"project-python", "project-golang"}:
         language = target.removeprefix("project-")
         return (
-            "common/project-settings.json",
-            f"{language}/project-settings.json",
-        )
-    if target in {"python", "golang"}:
-        return (
-            "common/settings.json",
-            f"{target}/settings.json",
-            "common/project-settings.json",
-            f"{target}/project-settings.json",
+            "common/project-settings.jsonc",
+            f"{language}/project-settings.jsonc",
         )
     raise ValueError(f"不支持的配置目标: {target}")
 
 
-def merge_settings(base_dir: Path, lang: str) -> dict[str, Any]:
-    """合并指定目标；python / golang 仍返回原有完整配置。"""
+def merge_settings(base_dir: Path, target: str) -> dict[str, Any]:
+    """合并统一用户默认设置或指定语言的项目覆盖。"""
     merged: dict[str, Any] = {}
-    for source in get_source_files(lang):
+    for source in get_source_files(target):
         merged = deep_merge(merged, parse_jsonc(base_dir / source))
     return merged
 
@@ -156,7 +151,7 @@ def generate_jsonc_with_comments(
     lines = [
         "{",
         f"  // {header_comment}",
-        "  // 此文件由 merge-settings.py 自动生成，请勿手动编辑",
+        "  // 此文件由 scripts/vscode/merge-settings.py 自动生成，请勿手动编辑",
         "  // 源配置: " + " + ".join(source_files),
         "",
     ]
@@ -167,14 +162,12 @@ def generate_jsonc_with_comments(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="生成 VS Code 用户默认设置、项目覆盖及兼容完整配置",
+        description="生成 VS Code 统一用户默认设置及项目覆盖",
     )
     targets = {
         "user": "统一用户默认设置",
         "project-python": "Python 项目覆盖",
         "project-golang": "Go 项目覆盖",
-        "python": "Python 完整配置（兼容旧用法）",
-        "golang": "Go 完整配置（兼容旧用法）",
     }
     for target, title in targets.items():
         parser.add_argument(
@@ -187,7 +180,7 @@ def main() -> None:
     if not selected:
         selected = list(targets)
 
-    base_dir = Path(__file__).parent
+    base_dir = CONFIG_DIR
     for target in selected:
         merged = merge_settings(base_dir, target)
         content = generate_jsonc_with_comments(
@@ -201,8 +194,8 @@ def main() -> None:
 
     print(f"完成，共生成 {len(selected)} 个配置文件。")
     print("settings-user.jsonc 用于对比并合并到用户设置，保留现有本机私有设置。")
-    print("settings-project-*.jsonc 是项目覆盖示例；settings-python/golang.jsonc 保留旧完整用法。")
-    print("本脚本仅写入自身目录，不修改用户设置或任何项目的 .vscode。")
+    print("settings-project-*.jsonc 是项目覆盖示例，按项目实际情况对比合并。")
+    print("本脚本仅写入 development-config/vscode，不修改用户设置或任何项目的 .vscode。")
 
 
 if __name__ == "__main__":

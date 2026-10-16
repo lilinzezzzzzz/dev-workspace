@@ -1,0 +1,55 @@
+{
+  // Python 项目覆盖示例；应用前按实际环境、源码布局和测试体系检查下列注释
+
+  // 环境文件
+  "python.terminal.useEnvFile": true, // 按需启用：是否让 Python 终端读取环境文件
+  "python.envFile": "${workspaceFolder}/.env", // 按项目调整：如 ${workspaceFolder}/backend/.env
+
+  // 项目导入路径与分析范围
+  "python.analysis.autoSearchPaths": false, // 通常保留；需要自动识别源码路径时可启用
+  "python.analysis.extraPaths": [ // 按源码根目录调整：如 ${workspaceFolder}/src 或 ${workspaceFolder}/backend/src
+    "${workspaceFolder}"
+  ],
+  "python.analysis.exclude": [ // 按项目检查排除范围，避免误排除需要分析的源码或测试
+    "**/.*",
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.venv",
+    "**/venv",
+    "**/.pytest_cache",
+    "**/.ruff_cache",
+    "**/.mypy_cache",
+    "**/.tox",
+    "**/.nox",
+    "**/build",
+    "**/dist",
+    "**/site-packages",
+    "**/.git",
+    "**/.idea",
+    "**/logs",
+    "**/.hypothesis",
+    "**/htmlcov",
+    "**/*.egg-info"
+  ],
+
+  // 测试体系与发现范围
+  "python.testing.pytestEnabled": true, // 按项目选择；没有 Python 测试时设为 false
+  "python.testing.unittestEnabled": false, // 使用 unittest 时启用并配置 unittestArgs，同时关闭 pytest
+  "python.testing.cwd": "${workspaceFolder}", // 按测试运行目录调整：如 ${workspaceFolder}/backend
+  "python.testing.autoTestDiscoverOnSaveEnabled": true, // 按需启用保存后重新发现；没有测试时设为 false
+  "python.testing.autoTestDiscoverOnSavePattern": "${workspaceFolder}/tests/**/*.py", // 显式工作区前缀兼容隐藏目录；按布局调整，如 ${workspaceFolder}/backend/tests/**/*.py
+  "python.testing.pytestArgs": [ // 按项目调整测试目录和 pytest 参数；相对路径以 testing.cwd 为基准
+    "tests", // 如 cwd 已指向 backend，这里仍可使用 tests；无 pytest 测试时移除此参数组
+    "-s",
+    "-v",
+    "--tb=short"
+  ],
+
+  // 项目文件关联
+  "files.associations": { // 按项目文件类型增删，不使用的关联可删除
+    "*.j2": "jinja",
+    "*.jinja2": "jinja",
+    "*.pyi": "python",
+    "pyproject.toml": "toml"
+  }
+}

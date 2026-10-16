@@ -286,7 +286,8 @@ journalctl -u dev-workspace-disk-usage.service
 ├── setup.ps1
 ├── scripts/
 │   ├── check_disk_usage.sh
-│   └── entrypoint.sh
+│   ├── entrypoint.sh
+│   └── vscode/       # VS Code 配置生成、应用及 JSONC 编辑实现
 ├── systemd/
 │   ├── dev-workspace-disk-usage.service
 │   └── dev-workspace-disk-usage.timer
@@ -309,6 +310,18 @@ journalctl -u dev-workspace-disk-usage.service
 - `infras/mq/docker-compose.yml` 提供 Kafka 相关独立编排
 - `development-config/vscode/README.md`、`development-config/terminal/README.md`、`ssh-keys/README.md` 分别说明对应配置的使用方式
 - AI assistant rules、skills 和 Codex/Qoder 同步入口已迁移到独立项目 `agent-workbench`
+
+## 仓库维护脚本的开发环境
+
+本地使用 uv 管理 Python 3.14 环境；`.python-version` 固定本地版本，`pyproject.toml` 保留 Python 3.11+ 的脚本兼容范围。Ruff 和 pytest 是开发依赖，测试内容使用标准库 unittest；pytest 同时支持现有 VS Code 测试配置。
+
+```bash
+uv sync --locked
+uv run python -B -m unittest discover -s tests
+./development-config/vscode/apply-config.sh
+```
+
+VS Code 统一入口无参数启动时先选择是否生成配置，再提供用户或项目配置菜单，项目模式必须输入项目根目录。Python 实现位于 `scripts/vscode/`。行为、预览和写入规则见 [VS Code 配置说明](development-config/vscode/README.md)。
 
 ## 已知现状
 

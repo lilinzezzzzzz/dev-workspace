@@ -11,7 +11,7 @@
   "editor.matchBrackets": "always", // 始终高亮匹配括号
   "editor.unicodeHighlight.ambiguousCharacters": true, // 高亮易混淆 Unicode 字符
   "editor.unicodeHighlight.invisibleCharacters": true, // 高亮不可见字符
-  "editor.unicodeHighlight.includeComments": true, // 注释中也检查 Unicode 混淆字符
+  "editor.unicodeHighlight.includeComments": true, //注释中也检查 Unicode 混淆字符
   // -------------------- 自动补全与智能提示 --------------------
   "editor.autoClosingBrackets": "always", // 总是自动闭合括号
   "editor.autoClosingQuotes": "always", // 总是自动闭合引号

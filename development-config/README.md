@@ -32,12 +32,14 @@ development-config/
 
 ### VS Code 配置
 
+在仓库根目录生成统一用户默认设置和项目覆盖：
+
 ```bash
-cp -r development-config/vscode/common/* .vscode/
-cp development-config/vscode/python/* .vscode/
+uv sync --locked
+./development-config/vscode/apply-config.sh
 ```
 
-按项目语言选择复制 `python/` 或 `golang/` 下的配置。需要合并配置时，优先参考 `vscode/README.md` 中的说明。
+本地脚本开发环境使用 Python 3.14。统一入口无参数启动时先选择是否生成配置，再提供 Python（默认）、Go 或用户配置菜单；项目模式必须输入项目根目录，预览后确认写入。只生成时使用 `apply-config.sh --generate-only`。Python 实现集中在 `scripts/vscode/`，入口从任意工作目录调用都会使用本仓库的 uv 环境。三种配置都先统计并展示全部变更，再选择全部应用（默认）、逐项处理或取消，最后统一确认写入（回车默认写入，`n` 不写入）；本机额外设置保留。源模板统一使用 `.jsonc`；实际应用的用户和项目配置仍保留 `settings.json`、`launch.json`、`extensions.json`、`keybindings.json` 等约定文件名。具体合并方式和适用范围见 [`vscode/README.md`](vscode/README.md)。
 
 ## 维护原则
 

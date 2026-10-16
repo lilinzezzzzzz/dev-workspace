@@ -48,8 +48,6 @@
     // ==================================================
     // Markdown / 文档
     // ==================================================
-    // Markdown All in One：Markdown 编辑增强
-    "yzhang.markdown-all-in-one",
     // Markdownlint：Markdown 语法检查
     "davidanson.vscode-markdownlint",
     // vscode-pdf：在编辑器内预览 PDF

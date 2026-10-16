@@ -1,5 +1,5 @@
 {
-  // 用户级 Python 默认设置，与 common/settings.json 合并
+  // 用户级 Python 默认设置，与 common/settings.jsonc 合并
 
   // 环境激活
   "python.terminal.activateEnvironment": true, // 工作区终端自动激活环境

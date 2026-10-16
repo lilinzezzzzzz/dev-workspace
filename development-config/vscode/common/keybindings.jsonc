@@ -13,7 +13,7 @@
   //   Linux:   ~/.config/Code/User/keybindings.json
   //
   // 应用配置:
-  // cp keybindings.json <目标用户目录>/keybindings.json
+  // cp keybindings.jsonc <目标用户目录>/keybindings.json
   // ==================================================
 
   // ==================== 导航快捷键 ====================
