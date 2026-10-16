@@ -15,7 +15,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 print_status() {
-    echo -e "${GREEN}[✓]${NC} $1"
+    echo -e "${GREEN}[完成]${NC} $1"
 }
 
 print_warning() {
@@ -96,7 +96,7 @@ fi
 
 echo ""
 echo "======================================"
-echo -e "${GREEN}  配置已应用！${NC}"
+echo -e "${GREEN}  配置已应用!${NC}"
 echo "======================================"
 echo ""
 

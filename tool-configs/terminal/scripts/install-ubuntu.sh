@@ -19,7 +19,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 print_status() {
-    echo -e "${GREEN}[✓]${NC} $1"
+    echo -e "${GREEN}[完成]${NC} $1"
 }
 
 print_warning() {
@@ -27,12 +27,12 @@ print_warning() {
 }
 
 print_error() {
-    echo -e "${RED}[✗]${NC} $1"
+    echo -e "${RED}[错误]${NC} $1"
 }
 
 # 检查是否为 Ubuntu
 if ! grep -qi "ubuntu" /etc/os-release 2>/dev/null; then
-    print_warning "此脚本针对 Ubuntu 优化，其他发行版可能需要手动调整"
+    print_warning "此脚本针对 Ubuntu 优化, 其他发行版可能需要手动调整"
 fi
 
 # ==================== 1. 安装基础依赖 ====================
@@ -45,7 +45,7 @@ sudo apt install -y zsh git curl fzf
 echo ""
 echo ">>> 安装 Oh My Zsh..."
 if [ -d "$HOME/.oh-my-zsh" ]; then
-    print_status "Oh My Zsh 已安装，跳过"
+    print_status "Oh My Zsh 已安装, 跳过"
 else
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
     print_status "Oh My Zsh 安装完成"
@@ -169,23 +169,23 @@ fi
 # ==================== 完成 ====================
 echo ""
 echo "======================================"
-echo -e "${GREEN}  安装完成！${NC}"
+echo -e "${GREEN}  安装完成!${NC}"
 echo "======================================"
 echo ""
-echo "后续步骤："
-echo "  1. 注销并重新登录，使默认 Shell 生效"
+echo "后续步骤:"
+echo "  1. 注销并重新登录, 使默认 Shell 生效"
 echo "  2. 打开 Ghostty 终端"
-echo "  3. 在 Ghostty 中优先选择 'MesloLGS NF' 字体，必要时回退到 'JetBrains Mono'"
+echo "  3. 在 Ghostty 中优先选择 'MesloLGS NF' 字体, 必要时回退到 'JetBrains Mono'"
 echo "  4. GUI 应用的输入法环境也会在重新登录后生效"
 echo ""
-echo "已安装组件："
+echo "已安装组件:"
 echo "  - Ghostty 深色终端配置"
 echo "  - Zsh + Oh My Zsh + zsh-autosuggestions + zsh-syntax-highlighting"
 echo "  - Starship 低噪声双行提示符"
 echo "  - zoxide (按需启用)"
 echo "  - fzf (模糊搜索)"
 echo ""
-echo "配置同步命令："
+echo "配置同步命令:"
 echo "  从仓库复制到系统: $SCRIPT_DIR/../apply-config.sh"
 echo "  从系统同步到仓库: $SCRIPT_DIR/sync-config.sh"
 echo ""

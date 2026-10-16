@@ -17,7 +17,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 print_status() {
-    echo -e "${GREEN}[✓]${NC} $1"
+    echo -e "${GREEN}[完成]${NC} $1"
 }
 
 print_warning() {
@@ -25,13 +25,13 @@ print_warning() {
 }
 
 print_error() {
-    echo -e "${RED}[✗]${NC} $1"
+    echo -e "${RED}[错误]${NC} $1"
 }
 
 # 检查是否为 macOS
 if [[ "$(uname)" != "Darwin" ]]; then
     print_error "此脚本仅适用于 macOS"
-    echo "如果你使用的是 Ubuntu，请运行 install.sh"
+    echo "如果你使用的是 Ubuntu, 请运行 install.sh"
     exit 1
 fi
 
@@ -50,7 +50,7 @@ if ! command -v brew &> /dev/null; then
     fi
 
     if ! command -v brew &> /dev/null; then
-        print_error "Homebrew 安装后仍未找到 brew，请重新打开终端后再运行脚本"
+        print_error "Homebrew 安装后仍未找到 brew, 请重新打开终端后再运行脚本"
         exit 1
     fi
 
@@ -69,7 +69,7 @@ echo ""
 echo ">>> 安装 Oh My Zsh..."
 # macOS 自带 Zsh，无需额外安装
 if [ -d "$HOME/.oh-my-zsh" ]; then
-    print_status "Oh My Zsh 已安装，跳过"
+    print_status "Oh My Zsh 已安装, 跳过"
 else
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
     print_status "Oh My Zsh 安装完成"
@@ -176,26 +176,26 @@ fi
 # ==================== 完成 ====================
 echo ""
 echo "======================================"
-echo -e "${GREEN}  安装完成！${NC}"
+echo -e "${GREEN}  安装完成!${NC}"
 echo "======================================"
 echo ""
-echo "后续步骤："
+echo "后续步骤:"
 echo "  1. 重新打开终端或运行 'source ~/.zshrc'"
 echo "  2. 打开 Ghostty 应用 (在 Applications 中)"
-echo "  3. 在 Ghostty 设置中优先选择 'MesloLGS NF' 字体，必要时回退到 'JetBrains Mono'"
+echo "  3. 在 Ghostty 设置中优先选择 'MesloLGS NF' 字体, 必要时回退到 'JetBrains Mono'"
 echo ""
-echo "已安装组件："
+echo "已安装组件:"
 echo "  - Ghostty 深色终端配置"
 echo "  - Zsh + Oh My Zsh + zsh-autosuggestions + zsh-syntax-highlighting"
 echo "  - Starship 低噪声双行提示符"
 echo "  - zoxide (按需启用)"
 echo "  - fzf (模糊搜索)"
 echo ""
-echo "提示：如果 Homebrew 命令找不到，请运行："
+echo "提示: 如果 Homebrew 命令找不到, 请运行:"
 echo '  eval "$(/opt/homebrew/bin/brew shellenv)"  # Apple Silicon'
 echo '  eval "$(/usr/local/bin/brew shellenv)"     # Intel Mac'
 echo ""
-echo "配置同步命令："
+echo "配置同步命令:"
 echo "  从仓库复制到系统: $SCRIPT_DIR/../apply-config.sh"
 echo "  从系统同步到仓库: $SCRIPT_DIR/sync-config.sh"
 echo ""
