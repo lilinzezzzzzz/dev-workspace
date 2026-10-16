@@ -81,17 +81,17 @@ Python 实现位于仓库的 `scripts/vscode/`：`merge-settings.py` 负责生�
 
 ```bash
 # 生成统一用户设置及两份项目覆盖
-./development-config/vscode/apply-config.sh --generate-only
+./tool-configs/vscode/apply-config.sh --generate-only
 ```
 
 也可选择目标，多个选项可以组合：
 
 ```bash
 # 只更新共享用户配置
-./development-config/vscode/apply-config.sh --generate-only --user
+./tool-configs/vscode/apply-config.sh --generate-only --user
 
 # 只更新 Python 或 Go 项目覆盖
-./development-config/vscode/apply-config.sh --generate-only --project-python --project-golang
+./tool-configs/vscode/apply-config.sh --generate-only --project-python --project-golang
 
 ```
 
@@ -111,7 +111,7 @@ Python 实现位于仓库的 `scripts/vscode/`：`merge-settings.py` 负责生�
 
 ```bash
 uv sync --locked
-./development-config/vscode/apply-config.sh
+./tool-configs/vscode/apply-config.sh
 ```
 
 本仓库的本地开发环境由 `.python-version` 固定为 Python 3.14；脚本最低要求 Python 3.11，以兼容现有容器。开发依赖和锁定版本由仓库根目录的 `pyproject.toml`、`uv.lock` 管理。
@@ -147,20 +147,20 @@ Python 交互输入在提供 `readline` / libedit 的环境中启用终端行编
 
 ```bash
 # 用户设置：预览；确认后使用同一命令加 --write
-./development-config/vscode/apply-config.sh user
+./tool-configs/vscode/apply-config.sh user
 
 # 指定另一个 Profile 的实际用户设置文件
-./development-config/vscode/apply-config.sh user \
+./tool-configs/vscode/apply-config.sh user \
   --target "/path/to/profile/settings.json" --write
 
 # 项目根目录始终必填
-./development-config/vscode/apply-config.sh project-python "/path/to/project"
+./tool-configs/vscode/apply-config.sh project-python "/path/to/project"
 
 # Go 项目：预览；确认全部建议后加 --write
-./development-config/vscode/apply-config.sh project-golang "/path/to/go-project"
+./tool-configs/vscode/apply-config.sh project-golang "/path/to/go-project"
 
 # 手动指定后端布局；模板之外的项目设置继续保留
-./development-config/vscode/apply-config.sh project-python "/path/to/project" \
+./tool-configs/vscode/apply-config.sh project-python "/path/to/project" \
   --python-root backend --source-dir backend/src --test-dir backend/tests \
   --test-framework pytest --env-file backend/.env --write
 ```
@@ -292,7 +292,7 @@ Go 项目仍需单独安装 `golang.go`。Python 扩展配套的 Debugger 和 En
 
 ```bash
 python3 -B -m unittest tests/test_merge_vscode_settings.py
-./development-config/vscode/apply-config.sh --generate-only
+./tool-configs/vscode/apply-config.sh --generate-only
 ```
 
 应用脚本和 JSONC 编辑器使用独立临时目标验证，运行：
@@ -300,7 +300,7 @@ python3 -B -m unittest tests/test_merge_vscode_settings.py
 ```bash
 uv run python -B -m unittest tests/test_apply_vscode_settings.py tests/test_merge_vscode_settings.py tests/test_vscode_entrypoint.py
 uv run ruff check scripts/vscode tests/test_apply_vscode_settings.py tests/test_merge_vscode_settings.py tests/test_vscode_entrypoint.py
-bash -n development-config/vscode/apply-config.sh
+bash -n tool-configs/vscode/apply-config.sh
 ```
 
 测试覆盖用户配置批量应用、额外设置与注释保留、项目目录必填、菜单预览与取消、后端布局、无测试项目、显式参数、错误输入、符号链接、幂等和目标变更保护；不会应用到测试机的真实用户配置或现有项目。

@@ -197,6 +197,6 @@ cython_debug/
 ################################################################################
 # VS Code Merged Settings (Auto-generated)
 ################################################################################
-development-config/vscode/settings-user.jsonc
-development-config/vscode/settings-project-python.jsonc
-development-config/vscode/settings-project-golang.jsonc
+tool-configs/vscode/settings-user.jsonc
+tool-configs/vscode/settings-project-python.jsonc
+tool-configs/vscode/settings-project-golang.jsonc

@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-CONFIG_DIR = REPO_ROOT / "development-config/vscode"
+CONFIG_DIR = REPO_ROOT / "tool-configs/vscode"
 
 
 def strip_jsonc_comments(jsonc_content: str) -> str:
@@ -195,7 +195,7 @@ def main() -> None:
     print(f"完成, 共生成 {len(selected)} 个配置文件")
     print("settings-user.jsonc 用于对比并合并到用户设置, 保留现有本机私有设置")
     print("settings-project-*.jsonc 是项目覆盖示例, 按项目实际情况对比合并")
-    print("本脚本仅写入 development-config/vscode, 不修改用户设置或任何项目的 .vscode")
+    print("本脚本仅写入 tool-configs/vscode, 不修改用户设置或任何项目的 .vscode")
 
 
 if __name__ == "__main__":

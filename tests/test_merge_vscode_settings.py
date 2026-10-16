@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-BASE_DIR = Path(__file__).parents[1] / "development-config" / "vscode"
+BASE_DIR = Path(__file__).parents[1] / "tool-configs" / "vscode"
 SCRIPT_PATH = Path(__file__).parents[1] / "scripts/vscode/merge-settings.py"
 SPEC = importlib.util.spec_from_file_location("merge_vscode_settings", SCRIPT_PATH)
 assert SPEC is not None and SPEC.loader is not None
@@ -245,7 +245,7 @@ class GeneratorCommandTest(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         root = Path(self.temporary.name)
         repository = root / "repository with spaces"
-        self.fixture = repository / "development-config/vscode"
+        self.fixture = repository / "tool-configs/vscode"
         self.fixture.mkdir(parents=True)
         self.script = repository / "scripts/vscode/merge-settings.py"
         self.script.parent.mkdir(parents=True)

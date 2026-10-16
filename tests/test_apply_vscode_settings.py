@@ -16,7 +16,7 @@ from pathlib import Path
 from types import ModuleType
 from unittest.mock import patch
 
-BASE_DIR = Path(__file__).parents[1] / "development-config/vscode"
+BASE_DIR = Path(__file__).parents[1] / "tool-configs/vscode"
 SCRIPT_DIR = Path(__file__).parents[1] / "scripts/vscode"
 
 
@@ -87,7 +87,7 @@ class ApplySettingsTest(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name).resolve()
         repository = self.root / "repository with spaces"
-        self.fixture = repository / "development-config/vscode"
+        self.fixture = repository / "tool-configs/vscode"
         self.fixture.mkdir(parents=True)
         self.scripts = repository / "scripts/vscode"
         self.scripts.mkdir(parents=True)

@@ -10,7 +10,7 @@ import unittest
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parents[1]
-CONFIG_DIR = REPO_ROOT / "development-config/vscode"
+CONFIG_DIR = REPO_ROOT / "tool-configs/vscode"
 SCRIPT_DIR = REPO_ROOT / "scripts/vscode"
 
 
@@ -21,7 +21,7 @@ class VscodeEntrypointTest(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name).resolve()
         self.repository = self.root / "repository with spaces"
-        self.config = self.repository / "development-config/vscode"
+        self.config = self.repository / "tool-configs/vscode"
         self.scripts = self.repository / "scripts/vscode"
         self.config.mkdir(parents=True)
         self.scripts.mkdir(parents=True)

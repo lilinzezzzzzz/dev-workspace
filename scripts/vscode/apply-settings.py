@@ -25,10 +25,10 @@ except ModuleNotFoundError:
 try:
     import tomllib
 except ModuleNotFoundError:
-    raise SystemExit("需要 Python 3.11+; 请使用 development-config/vscode/apply-config.sh 运行") from None
+    raise SystemExit("需要 Python 3.11+; 请使用 tool-configs/vscode/apply-config.sh 运行") from None
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-CONFIG_DIR = REPO_ROOT / "development-config/vscode"
+CONFIG_DIR = REPO_ROOT / "tool-configs/vscode"
 PATTERN_KEY = "python.testing.autoTestDiscoverOnSavePattern"
 
 
@@ -328,7 +328,7 @@ def prepare_plan(args: argparse.Namespace) -> ApplicationPlan:
     source = CONFIG_DIR / f"settings-{args.command}.jsonc"
     source = source.expanduser()
     if not source.is_file():
-        raise ValueError("来源不存在, 请先运行 development-config/vscode/apply-config.sh --generate-only")
+        raise ValueError("来源不存在, 请先运行 tool-configs/vscode/apply-config.sh --generate-only")
     template = load_settings(source.read_text(encoding="utf-8"))
     target = (
         args.project.expanduser().resolve() / ".vscode/settings.json"

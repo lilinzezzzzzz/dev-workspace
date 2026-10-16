@@ -11,8 +11,8 @@
 - `ssh-keys/` 下的私钥、公钥和 `known_hosts` 按 `.gitignore` 处理；不要新增可提交的真实密钥。
 - `scripts/.workspace-root` 是本机私有配置，用于 `scripts/update_git_repos.py`，必须保持 ignored，不要提交。
 - `infras/**/data`、`infras/**/logs` 和 Milvus/PostgreSQL 等本地数据目录是运行时产物，不要手工纳入版本控制。
-- 修改 `development-config/terminal/configs/zshrc`、`ghostty.config`、`starship.toml` 或 `environment.d/*` 时，同步更新 `development-config/terminal/README.md` 中的使用说明。
-- 修改 VS Code 配置模板时，同步更新 `development-config/vscode/README.md`，并避免覆盖 `.vscode/` 中的用户本地配置。
+- 修改 `tool-configs/terminal/configs/zshrc`、`ghostty.config`、`starship.toml` 或 `environment.d/*` 时，同步更新 `tool-configs/terminal/README.md` 中的使用说明。
+- 修改 VS Code 配置模板时，同步更新 `tool-configs/vscode/README.md`，并避免覆盖 `.vscode/` 中的用户本地配置。
 
 ## Docker And Runtime
 
@@ -44,5 +44,5 @@
 
 ## Documentation
 
-- README 应以 `docker-compose.yml`、`Dockerfile`、`setup.sh`、`setup.ps1` 和 `development-config/` 的当前行为为准。
+- README 应以 `docker-compose.yml`、`Dockerfile`、`setup.sh`、`setup.ps1` 和 `tool-configs/` 的当前行为为准。
 - 如果脚本输出与实际 Compose profile 行为不一致，README 必须明确现状和限制，不要扩大承诺。
