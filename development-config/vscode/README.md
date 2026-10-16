@@ -1,226 +1,144 @@
-# VS Code 多语言开发环境配置
+# VS Code 用户设置与项目覆盖
 
-> 通用设置与 Python / Go 开发配置模板
+本目录采用“统一用户默认设置 + 项目少量覆盖”的方式维护 Python、Go 开发配置。共享的编辑偏好只维护一份；环境文件、导入路径、测试目录和构建条件由项目决定。
 
-一套开箱即用的 VS Code 配置方案，支持 Python 和 Go 语言开发，采用模块化配置结构，提供一致的团队开发体验和最佳实践。
+生成脚本只更新本目录的生成文件，不读取或覆盖本机用户设置，也不修改任何项目的 `.vscode/`。应用配置需要另行对比、合并。
 
----
-
-## 📋 目录
-
-- [特性](#特性)
-- [目录结构](#目录结构)
-- [配置文件说明](#配置文件说明)
-- [快速开始](#快速开始)
-- [Python 开发配置](#python-开发配置)
-- [Go 开发配置](#go-开发配置)
-- [通用配置](#通用配置)
-- [推荐扩展](#推荐扩展)
-- [常见问题](#常见问题)
-
----
-
-## 特性
-
-### 🐍 多语言支持
-
-- **Python 开发**: Ruff + Pylance 工具链，uv 依赖管理
-- **Go 开发**: Go 语言专用配置和调试支持
-- **通用配置**: 编辑器核心设置、主题、快捷键等跨语言共享
-
-### 🎨 编辑器增强
-
-- **模块化设计**: 按语言分离配置，便于维护和扩展
-- **视觉优化**: Material Dark Theme 主题 + Material Icon，使用紧凑布局和活动栏
-- **智能辅助**: 语言服务补全、括号高亮、TODO 聚合和内联诊断
-- **性能优化**: 标签页限制、自动保存、平滑滚动
-
-### 🔧 Git 工作流
-
-- **提交验证**: 启用输入验证
-- **状态监控**: 自动 Fetch 更新远程跟踪信息，不自动合并代码
-- **内置 Git**: 当前行 Blame、提交图、文件时间线、三方合并编辑器和 Worktree 自动检测
-
-### 🎯 其他亮点
-
-- **快捷键优化**: `Cmd+Option+L` 格式化文档（PyCharm macOS 风格）
-- **文件管理**: 自动排除缓存、智能搜索过滤
-- **多格式支持**: YAML、TOML、Jinja2、JSON、Markdown
-
-> ⚠️ **注意**: `keybindings.json` 只支持用户级别配置，不支持工作区级别。详见 [配置文件说明](#配置文件说明)。
-
----
-
-## 目录结构
+## 目录与职责
 
 ```text
 vscode/
-├── common/               # 通用配置（跨语言共享）
-│   ├── settings.json     # 编辑器核心设置、主题、Git等
-│   ├── extensions.json   # 推荐扩展列表
-│   └── keybindings.json  # 自定义快捷键映射（⚠️ 仅支持用户级别）
-├── python/               # Python 专用配置
-│   ├── settings.json     # Python 工具链配置（Ruff、Pylance等）
-│   └── launch.json       # Python 调试配置
-├── golang/               # Go 专用配置
-│   └── settings.json     # Go 语言配置
-├── merge-settings.py     # 深度合并通用配置与语言配置
-├── settings-python.jsonc # Python 合并产物（自动生成）
-├── settings-golang.jsonc # Go 合并产物（自动生成）
-└── README.md             # 本文档
+├── common/
+│   ├── settings.json          # 用户通用默认：界面、Git、终端等
+│   ├── project-settings.json  # 项目共享覆盖：原有 YAML 自定义标签
+│   ├── extensions.json        # 团队推荐扩展
+│   └── keybindings.json       # 用户快捷键
+├── python/
+│   ├── settings.json          # 用户 Python 默认：Ruff、Pylance、编辑体验
+│   ├── project-settings.json  # Python 项目：环境、分析路径、测试、文件关联
+│   └── launch.json            # Python / FastAPI 项目调试模板
+├── golang/
+│   ├── settings.json          # 用户 Go 默认：工具、编辑体验、gopls、Delve
+│   └── project-settings.json  # Go 项目：构建、测试、文件关联、终端环境
+├── merge-settings.py
+├── settings-user.jsonc           # 统一用户默认设置（自动生成）
+├── settings-project-python.jsonc # Python 项目覆盖（自动生成）
+├── settings-project-golang.jsonc # Go 项目覆盖（自动生成）
+├── settings-python.jsonc         # 原有 Python 完整配置（兼容产物）
+└── settings-golang.jsonc         # 原有 Go 完整配置（兼容产物）
 ```
 
-## 配置文件说明
+源模板保留分类标题和中文注释。生成文件只保留标题、来源说明和格式化后的正文，不复制逐项注释；五份产物均被 `.gitignore` 忽略，不应手工编辑或强制加入版本控制。
 
-### 使用方式
+## 拆分原则
 
-#### 方式一：工作区级配置（推荐）
-先运行合并脚本，再将对应语言的合并产物应用到项目根目录的 `.vscode/` 文件夹。已有配置先对比并合并，避免直接覆盖：
+| 位置 | 内容 | 更新方式 |
+| --- | --- | --- |
+| 用户通用默认 | 字体、主题、Git、SCM、终端显示、搜索习惯、通用目录排除、Docker 提示、Stats Bar、缩进颜色、数据文件编辑偏好 | 修改 `common/settings.json` |
+| 用户 Python 默认 | 环境自动激活、`[python]` 编辑行为、Ruff 统一规则、Pylance 补全与提示、Notebook 偏好 | 修改 `python/settings.json` |
+| 用户 Go 默认 | `[go]` 等语言块、工具选择、gopls 分析与补全、Inlay Hints、Delve 显示和覆盖率偏好 | 修改 `golang/settings.json` |
+| 共享项目覆盖 | `yaml.customTags` 中的 `!reference sequence` | 修改 `common/project-settings.json`；项目不用相应标签时可不保留 |
+| Python 项目覆盖 | `.env`、分析路径与排除、pytest / unittest 选择、测试目录与参数、文件关联 | 按项目调整 `python/project-settings.json` |
+| Go 项目覆盖 | 构建标记、gopls 环境、Lint / 测试参数、文件关联、目录排除、`GOFLAGS` | 按项目调整 `golang/project-settings.json` |
 
-Python 项目：
+### 保证范围与跨项目生效
 
-```bash
-project-root/
-└── .vscode/
-    ├── settings.json     # 来自 settings-python.jsonc
-    ├── extensions.json   # 来自 common/
-    └── launch.json       # 来自 python/
-```
+这次拆分保证“原有显式配置值不变”：两份兼容完整配置保持拆分前的设置值；统一用户默认与对应项目覆盖组合后，旧配置中明确设置过的每一项仍保持原值。不升级工具、不修改现有规则内容。原来通用模板中的文件排除与监听排除仍作为个人默认保留，项目可另行覆盖。
 
-> ⚠️ **注意**: `keybindings.json` 不支持工作区级别，必须放在用户目录。
+统一用户默认会扩大部分设置的适用范围。原先只存在于某种语言模板中的设置，应用到用户级后也会被其他项目继承；因此，这项保证不等于所有项目迁移后的完整有效配置或运行行为与以前完全相同。
 
-Go 项目：
+| 设置 | 统一用户默认中的值 | 应用后的范围 |
+| --- | --- | --- |
+| `notebook.formatOnSave.enabled` | `false` | 所有项目中的 Notebook，不限于 Python 项目 |
+| `notebook.codeActionsOnSave` | 保留原有显式保存时的修复、整理导入动作 | 所有项目中的 Notebook；实际动作取决于相应语言与扩展是否提供支持 |
+| `[makefile]` | Tab 缩进、宽度 4 | 所有项目中被识别为 Makefile 的文件 |
+| `[dockerfile]` | 空格缩进、宽度 4 | 所有项目中被识别为 Dockerfile 的文件 |
+| `[python]`、`[go]` 及对应语言工具设置 | 保留原有语言默认值 | 任意项目中相应语言的文件，不根据项目被称为 Python 或 Go 项目来隔离 |
 
-```bash
-project-root/
-└── .vscode/
-    ├── settings.json     # 来自 settings-golang.jsonc
-    └── extensions.json   # 来自 common/
-```
+例如，原先只使用 Go 完整配置的项目会新增继承 Notebook 和 Python 默认设置；原先只使用 Python 完整配置的项目会新增继承 Go、Makefile 和 Dockerfile 默认设置。项目需要例外时，应在对应层级覆盖相关选项，迁移时也要验证这些新增生效范围。
 
-#### 方式二：用户级配置
+### 用户级与项目级的优先级
 
-- `common/settings.json` → VS Code 用户设置，应用前与现有设置对比并合并
-- `common/keybindings.json` → 用户快捷键设置（⚠️ 必须使用用户级别）
+同一项、同一语言层级下，项目设置优先于用户设置。对象设置会合并，数组会整体替换。
 
-> **配置文件级别支持对照表**:
->
-> | 配置文件 | 用户级别 | 工作区级别 |
-> | -------- | :-----: | :-------: |
-> | `settings.json` | ✅ | ✅ |
-> | `keybindings.json` | ✅ | ❌ |
-> | `extensions.json` | ❌ | ✅ |
-> | `launch.json` | 通过用户 `settings.json` 的 `launch` 对象 | ✅ |
-> | `tasks.json` | ✅ | ✅ |
+语言专用设置优先于普通编辑器设置。例如用户默认中的 `[python].editor.formatOnSave`，应通过项目的 `[python]` 块覆盖，不能只在项目顶层写 `editor.formatOnSave`。
 
-扩展推荐应写入项目 `.vscode/extensions.json`，多根工作区也可写入 `.code-workspace` 的 `extensions.recommendations`。全局调试配置应合并进用户 `settings.json` 的 `launch` 对象，不是把 `launch.json` 复制到用户目录；本仓库的调试模板依赖项目文件与环境，优先作为项目级配置使用。
+因此，已有项目内的完整旧配置不会因为生成了用户配置就自动失效。迁移时要逐项移除重复设置，保留真实的项目差异，不能直接删除整个 `.vscode`。
 
----
+### 本机工具路径与远程环境
 
-## 快速开始
+- 不把个人绝对路径、凭证和机器私有配置写进模板。
+- `go.alternateTools.go` 保留原模板的 `~/.local/share/mise/shims/go` 默认值，以保持工具选择；这不是对目标机器的自动探测。机器未使用 mise 时应在实际用户设置中按需调整。
+- 模板不固定 `todo-tree.ripgrep.ripgrep`；本机已有的 Homebrew ripgrep 路径应在合并用户设置时保留。
+- SSH 主机或开发容器可以有独立的远程设置，工具路径应匹配实际运行环境，不应照搬本机绝对路径。
+- `http.proxySupport: "off"`、外部文件直接打开和关闭内置 AI 功能仍是原有个人默认值；本次拆分不重新选择这些策略。
 
-### 1️⃣ 安装推荐扩展
+## 生成配置
 
-打开配置了推荐列表的项目后，VS Code 会提示安装推荐扩展，也可在命令面板执行“Extensions: Show Recommended Extensions”查看推荐列表。以下命令可查看已安装扩展，并手动安装部分核心扩展：
+在仓库根目录执行：
 
 ```bash
-# 查看已安装扩展
-code --list-extensions
-
-# 批量安装核心扩展
-code --install-extension ms-python.python
-code --install-extension charliermarsh.ruff
-code --install-extension ms-python.vscode-pylance
-code --install-extension davidanson.vscode-markdownlint
-code --install-extension ms-vscode-remote.remote-containers
-code --install-extension ms-azuretools.vscode-containers
-code --install-extension docker.docker
-```
-
-### 2️⃣ 配置开发环境
-
-**Python 项目配置**：
-
-```bash
-# 安装 uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# 创建项目环境
-uv venv
-
-# 激活环境（Windows PowerShell）
-.venv\Scripts\Activate.ps1
-
-# 安装依赖
-uv pip install -r requirements.txt
-```
-
-**Go 项目配置**：
-
-```bash
-# 确保 Go 已安装
-go version
-
-# 初始化 Go 模块
-go mod init your-project-name
-
-# 安装依赖
-go mod tidy
-```
-
-### 3️⃣ 应用配置文件
-
-```bash
-# 在仓库根目录生成 Python、Go 两份完整配置
+# 生成统一用户设置、两份项目覆盖和两份兼容完整配置
 python3 -B development-config/vscode/merge-settings.py
-
-# 新项目先创建 .vscode 目录；以下以当前目录为目标项目
-mkdir -p .vscode
-
-# Python 项目选择这一份；-i 在文件已存在时询问是否覆盖
-cp -i development-config/vscode/settings-python.jsonc .vscode/settings.json
-cp -i development-config/vscode/python/launch.json .vscode/launch.json
-
-# Go 项目改用这一份，不要在 Python 复制步骤后继续执行
-cp -i development-config/vscode/settings-golang.jsonc .vscode/settings.json
-
-# 推荐扩展列表独立应用；快捷键只能手工合并到用户级设置
-cp -i development-config/vscode/common/extensions.json .vscode/extensions.json
 ```
 
-以上源路径相对于本仓库根目录；应用到其他项目时，替换目标 `.vscode/` 为该项目目录。已有 `settings.json` 应先对比再手工合并；拒绝覆盖提示可保留原文件。不要依次复制 `common/settings.json` 与语言目录的 `settings.json`，后一次复制会丢失通用配置。
+也可选择目标，多个选项可以组合：
 
-源模板保留分类标题和中文行尾注释；合并产物由脚本生成，仅保留文件头说明，不逐项复制源注释。不要手工修改合并产物。
+```bash
+# 只更新共享用户配置
+python3 -B development-config/vscode/merge-settings.py --user
 
-### 4️⃣ 验证配置
+# 只更新 Python 或 Go 项目覆盖
+python3 -B development-config/vscode/merge-settings.py --project-python --project-golang
 
-1. **重启 VS Code** 使配置生效
-2. **检查语言支持**：
-   - Python: 打开 `.py` 文件应有语法高亮和智能提示
-   - Go: 打开 `.go` 文件应有语法高亮和智能提示
-3. **测试调试功能**：按 `F5` 启动调试
+# 保留旧 CLI 用法：只生成对应语言的完整配置
+python3 -B development-config/vscode/merge-settings.py --python
+python3 -B development-config/vscode/merge-settings.py --golang
+```
 
----
+| 产物 | 合并顺序（后面的覆盖前面的） | 用途 |
+| --- | --- | --- |
+| `settings-user.jsonc` | common 用户默认 → Python 用户默认 → Go 用户默认 | 对比并合并到 VS Code 用户设置 |
+| `settings-project-python.jsonc` | common 项目覆盖 → Python 项目覆盖 | Python 项目 `.vscode/settings.json` 的起点 |
+| `settings-project-golang.jsonc` | common 项目覆盖 → Go 项目覆盖 | Go 项目 `.vscode/settings.json` 的起点 |
+| `settings-python.jsonc` | common 用户默认 → Python 用户默认 → common 项目覆盖 → Python 项目覆盖 | 兼容原来的完整 Python 配置 |
+| `settings-golang.jsonc` | common 用户默认 → Go 用户默认 → common 项目覆盖 → Go 项目覆盖 | 兼容原来的完整 Go 配置 |
 
-## Python 开发配置
+统一用户文件同时包含 Python、Go 默认设置，以及跨项目生效的 Notebook、Makefile、Dockerfile 等偏好，具体范围见“保证范围与跨项目生效”。它不是两份旧完整配置的直接合并，不包含项目环境、测试目录和构建条件。旧完整产物保留原语言配置的设置值，用于迁移过渡，不应继续作为新项目的首选方式。
 
-### Python 工具链配置
+## 应用与迁移
 
-| 工具 | 作用 | 配置位置 |
-| ------ | ------ | ---------- |
-| **Ruff** | Python Linter + Formatter | `python/settings.json` |
-| **Pylance** | 类型检查器 | `python/settings.json` |
-| **uv** | 虚拟环境与依赖管理 | README 的终端步骤；不在模板中指定 uv 命令或路径 |
-| **调试配置** | FastAPI/Uvicorn 调试 | `python/launch.json` |
+以下是后续迁移步骤；运行生成脚本本身不会执行这些操作。
 
-### Python 核心设置
+1. 用命令面板的 `Preferences: Open User Settings (JSON)` 打开实际用户设置，将 `settings-user.jsonc` 与其对比合并。保留本机工具路径、已有私有配置和有意选择的个人覆盖，不要整份直接替换。
+2. 检查项目现有 `.vscode/settings.json`。先保留项目专有设置，再清理已由用户默认提供的重复项。
+3. 对照相应 `settings-project-*.jsonc`，只保留项目实际需要的覆盖。`tests/`、`${workspaceFolder}` 和 `.env` 是现有模板的默认约定，不保证适合所有项目。
+4. 按需将 `python/launch.json` 合并到项目调试配置，将推荐扩展列表合并到 `.vscode/extensions.json`。项目已有的调试项和扩展推荐应保留。
+5. 先在一个项目验证补全、Ruff、测试发现和调试，再逐步迁移其他项目。
 
-以下为 `python/settings.json` 中的设置摘录：
+同一项目如同时使用 Python、Go，应合并两份项目覆盖并审查冲突，特别是文件关联、排除目录、构建条件和测试参数；脚本不自动决定项目采用哪套规则。没有特殊配置的项目可以不创建 `settings.json`。
+
+`settings-user.jsonc` 不是含个人配置的最终用户文件：每次更新都需要对比合并一次。完成迁移后，共享设置的后续调整不再需要复制到每个项目。更换 Profile 或远程环境时，也应检查对应设置层级是否有覆盖。
+
+### 配置文件的应用位置
+
+| 内容 | 位置 |
+| --- | --- |
+| 用户设置 | 用户 `settings.json` |
+| 项目设置 | `.vscode/settings.json`，或多根工作区对应的设置层级 |
+| 快捷键 | 用户级 `keybindings.json`，不支持项目级 |
+| 扩展推荐 | `.vscode/extensions.json`，或 `.code-workspace` 的 `extensions.recommendations` |
+| 项目调试 | `.vscode/launch.json` |
+| 通用调试项 | 可手工合并到用户 `settings.json` 的 `launch` 对象；不直接复制用户级 `launch.json` |
+
+本仓库的快捷键包括前进、后退及文档格式化；macOS 使用 `Cmd+Option+L` 格式化，Windows/Linux 使用 `Ctrl+Alt+L`。应用前与已有用户快捷键对比合并。
+
+## Python 行为与项目差异
+
+用户默认中的 Python 编辑行为摘录：
 
 ```json
 {
-  "ruff.enable": true,
-  "python.analysis.diagnosticMode": "openFilesOnly",
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": false,
@@ -228,337 +146,80 @@ cp -i development-config/vscode/common/extensions.json .vscode/extensions.json
       "source.fixAll.ruff": "never",
       "source.organizeImports.ruff": "never"
     }
-  }
-}
-```
-
-模板不固定 Python 解释器路径，调试器使用当前选中的工作区解释器；通过“Python: Select Interpreter”选择项目环境。模板也未显式设置 `python.analysis.typeCheckingMode`，该项沿用扩展默认值或其他适用设置，不保证启用 `basic`。Ruff 提供检查与手动格式化，保存时不自动格式化、修复或整理导入。
-
-## Go 开发配置
-
-### Go 工具链配置
-
-| 工具 | 作用 | 配置位置 |
-| ------ | ------ | ---------- |
-| **Go 扩展** | Go 语言支持 | `golang/settings.json` |
-| **调试配置** | Delve 调试器 | 集成在 `golang/settings.json` |
-| **格式化** | goimports | `golang/settings.json` |
-
-### Go 核心设置
-
-编译错误诊断由 `gopls` 提供，不再配置已弃用且在启用语言服务器时不适用的 `go.buildOnSave`。
-
-```json
-{
-  "go.useLanguageServer": true,
-  "go.formatTool": "goimports",
-  "go.lintTool": "golangci-lint"
-}
-```
-
-## 通用配置
-
-### 内置 Git 配置
-
-```jsonc
-{
-  "git.autofetch": true,                       // 更新远程信息，不自动合并
-  "git.blame.editorDecoration.enabled": true,   // 当前行作者和提交信息
-  "git.mergeEditor": true,                     // 三方合并编辑器
-  "git.detectWorktrees": true                  // 自动检测关联的 Worktree
-}
-```
-
-在源代码管理中查看提交图，在资源管理器的时间线中查看当前文件历史。内置 Blame 显示最后修改当前行的提交作者，不等同于整份文件的逐行批注。
-
-### 网络、安全与本机路径
-
-- `http.proxySupport: "off"` 关闭扩展的代理支持；使用代理的机器应按实际网络环境调整。
-- `security.workspace.trust.untrustedFiles: "open"` 直接在当前窗口打开受信任目录外的文件；需要逐次询问时改为 `"prompt"`。
-- `chat.disableAIFeatures: true` 关闭 VS Code 内置聊天与 AI 功能。
-- 通用模板不固定 `todo-tree.ripgrep.ripgrep` 的本机绝对路径；仅在目标机器需要时补充。
-- `go.alternateTools` 仍由 `golang/settings.json` 管理，按目标机器的 Go / mise 安装方式调整，不复制到 common 或 Python 配置。
-- 系统证书及高对比度主题沿用 VS Code 默认值，不额外添加覆盖。
-
-### 编辑器体验
-
-```jsonc
-{
-  "files.autoSave": "onFocusChange",              // 失焦自动保存
-  "workbench.editor.limit.value": 6,               // 标签页限制
-  "editor.smoothScrolling": true,                  // 平滑滚动
-  "diffEditor.wordWrap": "off",                   // 源代码管理差异视图关闭自动换行
-  "editor.fontSize": 12.5,                         // 编辑器字体大小
-  "terminal.integrated.fontSize": 12.5,            // 终端字体大小
-  "files.exclude": {
-    "**/.venv": true,
-    "**/venv": true,
-    "**/.spec": true
   },
-  "search.exclude": {
-    "**/.spec": true
-  },
-  "workbench.colorTheme": "Material Dark Theme"   // 主题设置
+  "ruff.configurationPreference": "editorOnly",
+  "python.analysis.diagnosticMode": "openFilesOnly"
 }
 ```
 
----
+- 保留现有 Ruff 规则：行长 88、现有 `select` / `ignore`、FastAPI immutable calls 和 `editorOnly`。该策略以编辑器规则为准，不会因拆分就改成读取项目 TOML；若项目要求以自己的 `pyproject.toml` 或 `ruff.toml` 为准，需要单独决定并在项目中覆盖规则来源。
+- Pylance 继续提供补全和类型分析，保留现有提示及诊断抑制设置，不额外指定 `typeCheckingMode`。
+- 普通 Python 文件保存时仍不自动格式化、修复或整理导入；Notebook 的保存行为仍由原有 `notebook.*` 设置单独控制。
+- Python 项目覆盖保留 pytest 开启、unittest 关闭、`tests/**/*.py` 发现范围及原有 pytest 参数；环境文件仍为 `${workspaceFolder}/.env`。
+- 模板不固定 Python 解释器。通过 `Python: Select Interpreter` 选择项目环境；uv 的建环境和依赖安装通过终端执行，不由模板自动完成。
+- 修改 `ruff.enable` 后，扩展可能提示重启 VS Code。拆分没有切换该值，统一默认中仍为 `true`。
 
-## 推荐扩展
+### FastAPI 调试
 
-### 核心工具（必装）
-
-| 扩展 | 功能 | 适用语言 |
-| ------ | ------ | ---------- |
-| [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) | Python 语言支持 | Python |
-| [Ruff](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) | 现代化 Linter + Formatter | Python |
-| [Pylance](https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance) | 静态类型检查 | Python |
-
-Python 扩展会配套推荐 Pylance、Python Debugger 和 Python Environments；它们分别负责语言分析、调试和环境管理，不属于重复功能。现有 Python 格式化、诊断和测试配置保持独立维护。
-
-### 界面语言
-
-- **简体中文语言包**: `ms-ceintl.vscode-language-pack-zh-hans`
-
-### 开发容器
-
-| 扩展 | 功能 |
-| ------ | ------ |
-| [Remote - SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) | 连接远程主机开发，不要求使用容器 |
-| [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) | 容器内开发 |
-| [Container Tools](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-containers) | 容器、镜像管理与应用调试 |
-| [Docker DX](https://marketplace.visualstudio.com/items?itemName=docker.docker) | Dockerfile / Compose / Bake 编辑增强 |
-
-Docker DX、Container Tools 与 Dev Containers 职责不同。当前关闭 Docker DX 的 Compose 语言服务，减少与其他 Compose 编辑支持重叠；不需要因此移除 Dockerfile 编辑或容器管理扩展。
-
-### 通用语言支持
-
-- **YAML**: `redhat.vscode-yaml`
-- **TOML**: `tamasfe.even-better-toml`
-- **Protobuf**: `bufbuild.vscode-buf`
-- **dotenv**: `mikestead.dotenv`
-
-### 代码质量与标记
-
-- **Error Lens**: `usernamehw.errorlens`（内联显示错误/警告）
-- **TODO Tree**: `gruntfuggly.todo-tree`（TODO/FIXME 聚合）
-
-### 辅助工具
-
-- **Indent Rainbow**: `oderwat.indent-rainbow`（缩进着色）
-- **EditorConfig**: `editorconfig.editorconfig`（统一代码风格）
-
-### Markdown / 文档
-
-- **Markdown All in One**: `yzhang.markdown-all-in-one`
-- **markdownlint**: `davidanson.vscode-markdownlint`（检查与默认格式化工具）
-- **vscode-pdf**: `tomoki1207.pdf`（PDF 预览）
-
-### 系统状态
-
-- **Stats Bar**: `njzy.stats-bar`（状态栏 CPU / 内存显示）
-
-推荐列表不再包含 GitLens、Comment Translate、Better Comments 和 Path Intellisense，也不添加 npm Intellisense。使用内置 Git、语言服务补全和 Todo Tree 覆盖日常需求。扩展推荐不会自动卸载已经安装的扩展。
-
-### 主题 / 图标
-
-- **Material Dark Theme**: `romanrei.material-dark`
-- **Material Icon Theme**: `pkief.material-icon-theme`
-- **Material Product Icons**: `pkief.material-product-icons`
-
----
-
-## ⚙️ 自定义配置
-
-### 修改 Python 解释器路径
-
-模板不固定解释器路径，优先通过“Python: Select Interpreter”选择环境。需要指定初始默认路径时，按系统选择以下示例之一，路径应替换为实际解释器位置。
-
-Linux/macOS 示例：
-
-```json
-{
-  "python.defaultInterpreterPath": "/usr/bin/python3"
-}
-```
-
-Windows 示例：
-
-```json
-{
-  "python.defaultInterpreterPath": "C:\\Python311\\python.exe"
-}
-```
-
-已为工作区选过解释器时，修改 `python.defaultInterpreterPath` 不会自动切换当前解释器，应重新执行“Python: Select Interpreter”。
-
-### 启用/禁用 Git 输入验证
-
-```jsonc
-{
-  "git.inputValidation": true,   // 启用输入验证
-  "git.confirmSync": false       // 同步时不弹确认对话框
-}
-```
-
-### 更换主题
-
-`workbench.colorCustomizations` 在 `common/settings.json` 中统一维护，供 Python 和 Go 配置共享。`Material Dark Theme` 下仅将编辑器背景设为 `#111111`，不覆盖侧边栏、活动栏、面板和状态栏背景。选区、标签页和资源管理器等颜色使用全局覆盖，切换主题后仍会生效。
-
-修改通用配置后，运行 `python3 -B development-config/vscode/merge-settings.py`，同步生成 `settings-python.jsonc` 和 `settings-golang.jsonc`。
-
-```jsonc
-{
-  "workbench.colorTheme": "Dark 2026",         // 替换为内置主题
-  "workbench.iconTheme": "material-icon-theme" // 文件图标主题
-}
-```
-
-### 调整 FastAPI 调试端口
-
-编辑 `.vscode/launch.json` 中 FastAPI 调试项的 `args`。以下与 `python/launch.json` 的默认值一致，只调整 `--port` 后面的值即可：
+`python/launch.json` 保留 FastAPI、当前 Python 文件及当前测试文件三项调试配置。FastAPI 参数为：
 
 ```jsonc
 {
   "args": [
     "main:app",
-    "--host", "0.0.0.0",  // 监听所有 IPv4 网络接口
-    "--port", "8000"      // 默认端口 8000
+    "--host", "0.0.0.0", // 监听所有 IPv4 网络接口
+    "--port", "8000"     // 默认端口
   ]
 }
 ```
 
-模板默认监听 `0.0.0.0`，便于通过容器端口映射或从其他设备访问；实际可访问范围还取决于端口发布和防火墙配置。直接在本机调试且只需本机访问时，可按需改为 `127.0.0.1`。
+调试器使用工作区当前解释器，默认读取项目 `.env`，不启用 Uvicorn 热重载。应用入口、端口和环境按项目调整。`0.0.0.0` 便于容器端口映射和其他设备访问，实际访问范围取决于端口发布与防火墙；只需本机访问时可改为 `127.0.0.1`。
 
----
+## Go 行为与项目差异
 
-## 常见问题
+- 用户默认保留 Go 工具选择、`goimports` 格式化、gopls 分析与补全、参数提示、覆盖率显示及 Delve 偏好。
+- `[go]` 保存时格式化、显式保存时整理导入，保留原有 Tab 缩进和行宽标记；`[go.mod]`、`[go.sum]`、Makefile 和 Dockerfile 编辑偏好也保留。
+- `go.lintFlags`、`go.testFlags`（`-v`、`-race`）、30 秒超时、测试环境及构建标记移入 Go 项目覆盖，值不变。
+- `gopls.buildFlags` 和 `gopls.env` 移入项目覆盖，其他 gopls 偏好保留在用户默认中。
+- `terminal.integrated.env.*` 中的 `GOFLAGS: "-mod=mod"` 仅在 Go 项目覆盖中；合并时继续保留 common 中的 Python IO 和字节码环境设置。
+- Go 工程文件关联、vendor / bin / dist 等排除及搜索排除按原值保留在项目覆盖中。
 
-### Q1: 如何选择正确的配置文件？
+## 推荐扩展
 
-**A**: 根据项目类型选择：
+`common/extensions.json` 只表达团队推荐，不会自动安装、卸载扩展，也不影响设置继承。当前推荐列表保持不变：
 
-- **Python 项目**: 使用 `settings-python.jsonc`，按需应用推荐扩展和 Python 调试配置
-- **Go 项目**: 使用 `settings-golang.jsonc`（需单独安装 Go 扩展）
-- **混合项目**: 手工深度合并两个语言模板；当前脚本只生成 Python、Go 两份独立配置
+| 类别 | 扩展 ID |
+| --- | --- |
+| 界面语言 | `ms-ceintl.vscode-language-pack-zh-hans` |
+| 远程与容器 | `ms-vscode-remote.remote-containers`、`ms-vscode-remote.remote-ssh`、`ms-azuretools.vscode-containers`、`docker.docker` |
+| Python | `ms-python.python`、`charliermarsh.ruff`、`ms-python.vscode-pylance` |
+| 配置文件与接口 | `redhat.vscode-yaml`、`tamasfe.even-better-toml`、`bufbuild.vscode-buf`、`mikestead.dotenv` |
+| 诊断与标记 | `usernamehw.errorlens`、`gruntfuggly.todo-tree` |
+| 编辑辅助 | `oderwat.indent-rainbow`、`editorconfig.editorconfig` |
+| 文档 | `yzhang.markdown-all-in-one`、`davidanson.vscode-markdownlint`、`tomoki1207.pdf` |
+| 系统状态 | `njzy.stats-bar` |
+| 主题与图标 | `romanrei.material-dark`、`pkief.material-icon-theme`、`pkief.material-product-icons` |
 
-> **注意**: Go 扩展 `golang.go` 需要单独安装，不在默认推荐扩展列表中。
+Go 项目仍需单独安装 `golang.go`。Python 扩展配套的 Debugger 和 Environments 分别负责调试与环境管理；它们不是 Ruff、Pylance 的替代品。内置 Git 继续提供当前行 Blame、提交图、文件时间线、三方合并编辑器和 Worktree 检测，不重新引入已清理的 GitLens 等扩展。
 
-### Q2: Ruff 和 Pylance 冲突？
+可用 `code --list-extensions` 查看已安装扩展，在命令面板运行 `Extensions: Show Recommended Extensions` 查看推荐。Docker DX、Container Tools 和 Dev Containers 的职责不同，保留原有组合及 Docker DX Compose 服务关闭的设置。
 
-**A**: 两者职责不同：
+## 验证
 
-- **Ruff**: 负责代码风格（格式化、导入排序、简单错误）
-- **Pylance**: 负责类型检查（类型注解、函数签名）
-
-模板通过 `[python].editor.defaultFormatter` 选择 Ruff 格式化，没有“禁用 Pylance 格式化”的设置。Pylance 的 `reportUnusedImport`、`reportUnusedVariable` 和 `reportMissingTypeStubs` 在模板中设为 `none`；其中前两项交由 Ruff 检查，缺少类型存根的提示不再显示。
-
-### Q3: Git 提交验证如何配置？
-
-**A**: 配置中已启用输入验证：
-
-```jsonc
-{
-  "git.inputValidation": true  // 启用输入验证
-}
-```
-
-如需跳过验证（不推荐）：
+在仓库根目录运行：
 
 ```bash
-git commit -m "wip" --no-verify
+python3 -B -m unittest tests/test_merge_vscode_settings.py
+python3 -B development-config/vscode/merge-settings.py
 ```
 
-### Q4: 虚拟环境未自动激活？
+测试分别验证“原有显式配置值不变”和新增用户默认的跨项目继承，不把旧键的值相同当作完整有效配置相同。测试覆盖 Notebook、Makefile、Dockerfile 及另一种语言默认设置的新增继承，也验证项目可以覆盖这些偏好而保留同一对象中的其他默认项。
 
-**A**: 检查以下配置：
+此外，测试覆盖生成目标、用户与项目边界、嵌套对象和数组覆盖、选择性生成及保护用户/项目文件。这些是配置组合与生成流程的验证；已有项目的实际迁移仍应在目标 VS Code 窗口验证，生成成功不代表项目已应用。
 
-```json
-{
-  "python.terminal.activateEnvironment": true,
-  "python.terminal.activateEnvInCurrentTerminal": true
-}
-```
+## 参考资料
 
-手动激活：
-
-```bash
-# Windows PowerShell
-.venv\Scripts\Activate.ps1
-
-# Linux/macOS
-source .venv/bin/activate
-```
-
-### Q5: uv 命令未找到？
-
-**A**: 安装 uv：
-
-```bash
-# Linux/macOS
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Windows (PowerShell)
-irm https://astral.sh/uv/install.ps1 | iex
-
-# 或使用 pip
-pip install uv
-```
-
-### Q6: VS Code Git 日志显示大量重复命令？
-
-**A**: 先查看“输出 → Git”中的命令来源。当前模板启用自动 Fetch，周期性更新远程信息属于预期行为，不会自动合并代码。如不需要后台更新，可按需关闭 `git.autofetch`。当前行 Blame 按所查看的行读取作者信息；若仓库很大且影响操作，可临时关闭行尾 Blame 排查。模板已移除 GitLens 配置，不应再调整 `gitlens.*` 设置。
-
-### Q7: 快捷键配置不生效？
-
-**A**: `keybindings.json` 只支持用户级别配置，不支持工作区级别。请将配置复制到用户目录：
-
-```bash
-# Qoder (macOS)
-cp keybindings.json ~/Library/Application\ Support/Qoder/User/keybindings.json
-
-# VS Code (macOS)
-cp keybindings.json ~/Library/Application\ Support/Code/User/keybindings.json
-
-# VS Code (Windows)
-copy keybindings.json %APPDATA%\Code\User\keybindings.json
-
-# VS Code (Linux)
-cp keybindings.json ~/.config/Code/User/keybindings.json
-```
-
----
-
-## 📚 参考资源
-
-### Python 相关
-
-- [Ruff 官方文档](https://docs.astral.sh/ruff/)
-- [Pylance GitHub](https://github.com/microsoft/pylance-release)
-- [uv 官方文档](https://docs.astral.sh/uv/)
-- [VS Code Python 教程](https://code.visualstudio.com/docs/python/python-tutorial)
-- [FastAPI 调试指南](https://fastapi.tiangolo.com/tutorial/debugging/)
-
-### Go 相关
-
-- [Go 扩展文档](https://github.com/golang/vscode-go/blob/master/docs/settings.md)
-- [Delve 调试器](https://github.com/go-delve/delve)
-- [golangci-lint](https://golangci-lint.run/)
-
-### 通用资源
-
-- [VS Code 官方文档](https://code.visualstudio.com/docs)
-- [VS Code Git 历史与 Blame](https://code.visualstudio.com/docs/sourcecontrol/history)
-
----
-
-## 📄 许可证
-
-本配置文件集为开源项目，采用 MIT 许可证，欢迎自由使用和修改。
-
-## 🤝 贡献
-
-如有改进建议，欢迎提交 Issue 或 Pull Request！
-
-**维护者**: 多语言开发环境配置团队
-**关注领域**: Python/Go 开发工具链优化、VS Code 配置最佳实践
+- [VS Code 设置优先级](https://code.visualstudio.com/docs/configure/settings#_settings-precedence)
+- [全局调试配置](https://code.visualstudio.com/docs/debugtest/debugging-configuration#_global-launch-configuration)
+- [Ruff 编辑器设置](https://docs.astral.sh/ruff/editors/settings/)
+- [Go 扩展设置](https://github.com/golang/vscode-go/blob/master/docs/settings.md)

@@ -199,3 +199,6 @@ cython_debug/
 ################################################################################
 development-config/vscode/settings-python.jsonc
 development-config/vscode/settings-golang.jsonc
+development-config/vscode/settings-user.jsonc
+development-config/vscode/settings-project-python.jsonc
+development-config/vscode/settings-project-golang.jsonc

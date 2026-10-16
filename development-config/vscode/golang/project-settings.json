@@ -1,0 +1,57 @@
+{
+  // Go 项目覆盖示例，按项目构建与测试要求选择
+
+  // 项目构建与语言服务器环境
+  "go.buildFlags": [],
+  "go.buildTags": "",
+  "gopls": {
+    "buildFlags": [], // 项目构建参数
+    "env": {} // 项目语言服务器环境
+  },
+
+  // 项目 Lint 与测试参数
+  "go.lintFlags": [
+    "--fast" // 快速模式
+  ],
+  "go.testFlags": [
+    "-v", // 详细输出
+    "-race" // 启用竞态检测
+  ],
+  "go.testTimeout": "30s", // 测试超时时间
+  "go.testEnvVars": {}, // 测试环境变量（根据项目添加）
+
+  // 项目文件关联与排除
+  "files.associations": {
+    "*.go": "go",
+    "go.mod": "go.mod",
+    "go.sum": "go.sum",
+    "*.tmpl": "html", // Go 模板文件（HTML 模板）
+    "*.gohtml": "html", // Go HTML 模板
+    "*.gotmpl": "go", // Go 模板文件（语法高亮）
+    "*.yaml": "yaml",
+    "*.yml": "yaml"
+  },
+  "files.exclude": {
+    "**/vendor": true, // 排除 vendor 目录（依赖管理）
+    "**/.git": true,
+    "**/bin": true, // 编译输出目录
+    "**/dist": true
+  },
+  "search.exclude": {
+    "**/vendor": true,
+    "**/node_modules": true,
+    "**/*.lock": true,
+    "**/go.sum": true // go.sum 文件（大文件）
+  },
+
+  // 项目终端环境
+  "terminal.integrated.env.windows": {
+    "GOFLAGS": "-mod=mod" // Go 模块模式（确保模块感知）
+  },
+  "terminal.integrated.env.linux": {
+    "GOFLAGS": "-mod=mod"
+  },
+  "terminal.integrated.env.osx": {
+    "GOFLAGS": "-mod=mod"
+  }
+}

@@ -372,8 +372,5 @@
   },
   "yaml.schemas": {
     "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "docker-compose.y*ml"
-  },
-  "yaml.customTags": [
-    "!reference sequence"
-  ]
+  }
 }

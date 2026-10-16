@@ -1,21 +1,23 @@
 #!/usr/bin/env python3
 """
 VS Code Settings Merger Script
-合并 common/settings.json 与语言特定配置(python/golang)
-生成完整的 VS Code settings.json 配置文件
+拆分生成统一用户设置、项目覆盖及兼容完整语言配置
 
 使用方法:
     python merge-settings.py              # 生成所有配置
-    python merge-settings.py --python     # 仅生成 Python 配置
-    python merge-settings.py --golang     # 仅生成 Go 配置
+    python merge-settings.py --user       # 仅生成统一用户设置
+    python merge-settings.py --project-python  # 仅生成 Python 项目覆盖
+    python merge-settings.py --python     # 仅生成兼容 Python 完整配置
+    python merge-settings.py --golang     # 仅生成兼容 Go 完整配置
 """
 
+import argparse
 import json
 import re
-import argparse
-from pathlib import Path
+from collections.abc import Mapping, Sequence
 from copy import deepcopy
-from typing import Any, Dict
+from pathlib import Path
+from typing import Any
 
 
 def strip_jsonc_comments(jsonc_content: str) -> str:
@@ -85,21 +87,24 @@ def strip_jsonc_comments(jsonc_content: str) -> str:
     return result_str
 
 
-def parse_jsonc(file_path: Path) -> Dict[str, Any]:
+def parse_jsonc(file_path: Path) -> dict[str, Any]:
     """解析 JSONC 文件，返回字典"""
     content = file_path.read_text(encoding="utf-8")
     json_content = strip_jsonc_comments(content)
     return json.loads(json_content)
 
 
-def deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
+def deep_merge(
+    base: Mapping[str, Any],
+    override: Mapping[str, Any],
+) -> dict[str, Any]:
     """
     深度合并两个字典
     - override 中的值会覆盖 base 中的值
     - 对于嵌套字典，递归合并
     - 对于列表，override 完全替换 base
     """
-    result = deepcopy(base)
+    result = deepcopy(dict(base))
 
     for key, value in override.items():
         if key in result and isinstance(result[key], dict) and isinstance(value, dict):
@@ -110,117 +115,94 @@ def deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]
     return result
 
 
-def generate_jsonc_with_comments(
-    config: Dict[str, Any], header_comment: str, language: str
-) -> str:
-    """
-    生成带有头部注释的 JSONC 内容
-    由于无法保留原始注释，这里添加文件头部说明
-    """
-    lines = ["{"]
-    lines.append(f"  // {header_comment}")
-    lines.append("  // 此文件由 merge-settings.py 自动生成，请勿手动编辑")
-    lines.append(f"  // 源配置: common/settings.json + {language}/settings.json")
-    lines.append("")
+def get_source_files(target: str) -> tuple[str, ...]:
+    """返回按覆盖优先级排列的源文件，兼容原有完整语言配置。"""
+    if target == "user":
+        return (
+            "common/settings.json",
+            "python/settings.json",
+            "golang/settings.json",
+        )
+    if target in {"project-python", "project-golang"}:
+        language = target.removeprefix("project-")
+        return (
+            "common/project-settings.json",
+            f"{language}/project-settings.json",
+        )
+    if target in {"python", "golang"}:
+        return (
+            "common/settings.json",
+            f"{target}/settings.json",
+            "common/project-settings.json",
+            f"{target}/project-settings.json",
+        )
+    raise ValueError(f"不支持的配置目标: {target}")
 
-    # 格式化 JSON 内容
-    json_str = json.dumps(config, indent=2, ensure_ascii=False)
 
-    # 跳过第一行的 "{" 和最后一行的 "}"
-    json_lines = json_str.split("\n")[1:-1]
-    lines.extend(json_lines)
-    lines.append("}")
-
-    return "\n".join(lines)
-
-
-def merge_settings(base_dir: Path, lang: str) -> Dict[str, Any]:
-    """
-    合并通用配置和语言特定配置
-
-    Args:
-        base_dir: vscode 目录路径
-        lang: 语言名称 (python 或 golang)
-
-    Returns:
-        合并后的配置字典
-    """
-    common_path = base_dir / "common" / "settings.json"
-    lang_path = base_dir / lang / "settings.json"
-
-    # 解析配置文件
-    common_config = parse_jsonc(common_path)
-    lang_config = parse_jsonc(lang_path)
-
-    # 深度合并
-    merged = deep_merge(common_config, lang_config)
-
+def merge_settings(base_dir: Path, lang: str) -> dict[str, Any]:
+    """合并指定目标；python / golang 仍返回原有完整配置。"""
+    merged: dict[str, Any] = {}
+    for source in get_source_files(lang):
+        merged = deep_merge(merged, parse_jsonc(base_dir / source))
     return merged
 
 
-def main():
+def generate_jsonc_with_comments(
+    config: Mapping[str, Any],
+    header_comment: str,
+    source_files: Sequence[str],
+) -> str:
+    """生成配置正文及真实源文件列表，不复制源配置的逐项注释。"""
+    lines = [
+        "{",
+        f"  // {header_comment}",
+        "  // 此文件由 merge-settings.py 自动生成，请勿手动编辑",
+        "  // 源配置: " + " + ".join(source_files),
+        "",
+    ]
+    lines.extend(json.dumps(dict(config), indent=2, ensure_ascii=False).splitlines()[1:-1])
+    lines.append("}")
+    return "\n".join(lines)
+
+
+def main() -> None:
     parser = argparse.ArgumentParser(
-        description="合并 VS Code 配置文件",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-示例:
-    python merge-settings.py              # 生成所有配置
-    python merge-settings.py --python     # 仅生成 Python 配置
-    python merge-settings.py --golang     # 仅生成 Go 配置
-        """,
+        description="生成 VS Code 用户默认设置、项目覆盖及兼容完整配置",
     )
-    parser.add_argument("--python", action="store_true", help="仅生成 Python 配置")
-    parser.add_argument("--golang", action="store_true", help="仅生成 Go 配置")
-
+    targets = {
+        "user": "统一用户默认设置",
+        "project-python": "Python 项目覆盖",
+        "project-golang": "Go 项目覆盖",
+        "python": "Python 完整配置（兼容旧用法）",
+        "golang": "Go 完整配置（兼容旧用法）",
+    }
+    for target, title in targets.items():
+        parser.add_argument(
+            f"--{target}",
+            action="store_true",
+            help=f"生成{title}",
+        )
     args = parser.parse_args()
+    selected = [target for target in targets if getattr(args, target.replace("-", "_"))]
+    if not selected:
+        selected = list(targets)
 
-    # 确定脚本所在目录
-    script_dir = Path(__file__).parent
-
-    # 确定要生成哪些配置
-    generate_python = args.python or (not args.python and not args.golang)
-    generate_golang = args.golang or (not args.python and not args.golang)
-
-    generated_files = []
-
-    if generate_python:
-        print("📄 正在合并 Python 配置...")
-        merged = merge_settings(script_dir, "python")
-        output_path = script_dir / "settings-python.jsonc"
-
-        # 生成 JSONC 内容
+    base_dir = Path(__file__).parent
+    for target in selected:
+        merged = merge_settings(base_dir, target)
         content = generate_jsonc_with_comments(
             merged,
-            "Python 开发环境配置",
-            language="python",
+            targets[target],
+            get_source_files(target),
         )
+        output_path = base_dir / f"settings-{target}.jsonc"
         output_path.write_text(content, encoding="utf-8")
+        print(f"已生成: {output_path}")
 
-        print(f"   ✅ 已生成: {output_path}")
-        generated_files.append(output_path)
-
-    if generate_golang:
-        print("📄 正在合并 Golang 配置...")
-        merged = merge_settings(script_dir, "golang")
-        output_path = script_dir / "settings-golang.jsonc"
-
-        # 生成 JSONC 内容
-        content = generate_jsonc_with_comments(
-            merged,
-            "Golang 开发环境配置",
-            language="golang",
-        )
-        output_path.write_text(content, encoding="utf-8")
-
-        print(f"   ✅ 已生成: {output_path}")
-        generated_files.append(output_path)
-
-    print(f"\n🎉 完成! 共生成 {len(generated_files)} 个配置文件")
-    print("\n使用方法:")
-    print("  将生成的配置文件复制到项目的 .vscode/settings.json 即可使用")
-    print(
-        "  或创建符号链接: ln -s /path/to/settings-python.jsonc .vscode/settings.json"
-    )
+    print(f"完成，共生成 {len(selected)} 个配置文件。")
+    print("settings-user.jsonc 用于对比并合并到用户设置，保留现有本机私有设置。")
+    print("settings-project-*.jsonc 是项目覆盖示例；settings-python/golang.jsonc 保留旧完整用法。")
+    print("本脚本仅写入自身目录，不修改用户设置或任何项目的 .vscode。")
 
 
 if __name__ == "__main__":

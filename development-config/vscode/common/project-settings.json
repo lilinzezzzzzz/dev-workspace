@@ -1,0 +1,4 @@
+{
+  // 项目共享覆盖：仅在项目使用相应 YAML 标签时保留
+  "yaml.customTags": ["!reference sequence"] // 保留原模板的 GitLab CI 标签支持
+}
