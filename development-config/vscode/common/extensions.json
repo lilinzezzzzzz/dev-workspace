@@ -23,11 +23,6 @@
     // Pylance：静态类型检查（微软官方，包含 Pyright 功能 + IntelliSense 增强）
     "ms-python.vscode-pylance",
     // ==================================================
-    // Git
-    // ==================================================
-    // GitLens：历史追溯与提交分析
-    "eamodio.gitlens",
-    // ==================================================
     // 配置文件 / 接口定义
     // ==================================================
     // YAML：schema 校验与补全
@@ -48,12 +43,6 @@
     // ==================================================
     // 编辑体验增强（低噪音）
     // ==================================================
-    // Better Comments：注释关键字高亮
-    "aaron-bond.better-comments",
-    // Comment Translate：代码注释翻译
-    "intellsmi.comment-translate",
-    // Path Intellisense：路径补全
-    "christian-kohler.path-intellisense",
     // Indent Rainbow：缩进着色
     "oderwat.indent-rainbow",
     // ==================================================
@@ -63,6 +52,8 @@
     "yzhang.markdown-all-in-one",
     // Markdownlint：Markdown 语法检查
     "davidanson.vscode-markdownlint",
+    // vscode-pdf：在编辑器内预览 PDF
+    "tomoki1207.pdf",
     // ==================================================
     // 工程化基础
     // ==================================================

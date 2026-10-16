@@ -111,7 +111,7 @@ def deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]
 
 
 def generate_jsonc_with_comments(
-    config: Dict[str, Any], header_comment: str = ""
+    config: Dict[str, Any], header_comment: str, language: str
 ) -> str:
     """
     生成带有头部注释的 JSONC 内容
@@ -120,7 +120,7 @@ def generate_jsonc_with_comments(
     lines = ["{"]
     lines.append(f"  // {header_comment}")
     lines.append("  // 此文件由 merge-settings.py 自动生成，请勿手动编辑")
-    lines.append("  // 源配置: common/settings.json + {lang}/settings.json")
+    lines.append(f"  // 源配置: common/settings.json + {language}/settings.json")
     lines.append("")
 
     # 格式化 JSON 内容
@@ -189,7 +189,11 @@ def main():
         output_path = script_dir / "settings-python.jsonc"
 
         # 生成 JSONC 内容
-        content = generate_jsonc_with_comments(merged, "Python 开发环境配置")
+        content = generate_jsonc_with_comments(
+            merged,
+            "Python 开发环境配置",
+            language="python",
+        )
         output_path.write_text(content, encoding="utf-8")
 
         print(f"   ✅ 已生成: {output_path}")
@@ -201,7 +205,11 @@ def main():
         output_path = script_dir / "settings-golang.jsonc"
 
         # 生成 JSONC 内容
-        content = generate_jsonc_with_comments(merged, "Golang 开发环境配置")
+        content = generate_jsonc_with_comments(
+            merged,
+            "Golang 开发环境配置",
+            language="golang",
+        )
         output_path.write_text(content, encoding="utf-8")
 
         print(f"   ✅ 已生成: {output_path}")

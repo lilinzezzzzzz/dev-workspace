@@ -175,6 +175,9 @@
   "workbench.commandPalette.preserveInput": true, // 命令面板保留上次输入
   // 活动栏配置
   "workbench.activityBar.location": "default", // 显示活动栏
+  "workbench.activityBar.compact": true, // 使用紧凑的侧边活动栏
+  "window.density.layout": "compact", // 新版界面使用紧凑布局
+  "workbench.experimental.modernUIUppercaseViewHeaders": true, // 新版界面的标题使用大写文字
   "workbench.sideBar.location": "left", // 侧边栏位置
   // -------------------- 资源管理器配置 --------------------
   "explorer.confirmDelete": true, // 删除文件需要确认
@@ -281,7 +284,11 @@
   // -------------------- Git 核心配置 --------------------
   "git.enableSmartCommit": true, // 启用智能提交
   "git.confirmSync": false, // 同步时不弹确认对话框
-  "git.autofetch": false, // 禁用自动 fetch
+  "git.autofetch": true, // 自动获取远程提交信息，不自动合并
+  "git.blame.editorDecoration.enabled": true, // 在当前行末显示最后修改的作者和提交信息
+  "git.mergeEditor": true, // 启用三方合并编辑器
+  "git.detectWorktrees": true, // 自动检测仓库关联的 Worktree
+  "diffEditor.codeLens": true, // 允许在 Diff 编辑器中显示 CodeLens
   "git.autorefresh": true, // 启用自动刷新
   "git.decorations.enabled": true, // 启用 Git 装饰器
   "git.allowNoVerifyCommit": true, // 允许跳过验证提交
@@ -300,43 +307,19 @@
   "scm.providerCountBadge": "hidden", // 隐藏提供商计数
   "scm.alwaysShowRepositories": true, // 总是显示仓库列表
   "scm.repositories.visible": 10, // 最多显示 10 个仓库
+  // -------------------- 网络与安全 --------------------
+  "http.proxySupport": "off", // 关闭扩展的代理支持；需要代理时按本机环境调整
+  "security.workspace.trust.untrustedFiles": "open", // 直接在当前窗口打开受信任目录外的文件
+  // -------------------- AI 功能 --------------------
+  "chat.disableAIFeatures": true, // 关闭 VS Code 内置聊天与 AI 功能
   // -------------------- 遥测配置 --------------------
   "redhat.telemetry.enabled": false, // 禁用 RedHat 扩展遥测
   // =============================================================================
   // 🔌 插件扩展配置
   // =============================================================================
-  // -------------------- GitLens 配置 --------------------
-  // 设计原则：最小干扰 + 按需获取 + 性能优化
-  "gitlens.currentLine.enabled": true, // 启用当前行责任注释
-  "gitlens.blame.highlight.enabled": true, // 启用 blame 高亮
-  "gitlens.codeLens.enabled": false, // 禁用 CodeLens 显示
-  "gitlens.statusBar.enabled": false, // 禁用状态栏显示
-  "gitlens.hovers.enabled": true, // 启用悬停提示
-  "gitlens.hovers.currentLine.over": "line", // 悬停触发范围
-  "gitlens.hovers.annotations.enabled": true, // 启用注释悬停
-  "gitlens.advanced.messages": {
-    "suppressCommitHasNoPreviousCommitWarning": false,
-    "suppressCreatePullRequestPrompt": true // 抑制 PR 创建提示
-  },
-  "gitlens.defaultDateFormat": "YYYY-MM-DD HH:mm", // 默认日期格式
-  "gitlens.defaultDateShortFormat": "YY-MM-DD", // 短日期格式
-  "gitlens.defaultTimeFormat": "HH:mm:ss", // 默认时间格式
-  "gitlens.telemetry.enabled": false, // 禁用遥测数据收集
-  "gitlens.views.commitDetails.files.layout": "auto", // 提交详情布局
-  "gitlens.views.repositories.showBranchComparison": false,
-  "gitlens.views.repositories.showContributors": false,
-  "gitlens.views.repositories.showIncomingActivity": false,
-  "gitlens.views.repositories.showRemotes": false,
-  "gitlens.views.repositories.showStashes": false,
-  "gitlens.views.repositories.showTags": false,
-  "gitlens.views.repositories.showWorktrees": false,
-  "gitlens.graph.scrollRowPadding": 6,
-  "gitlens.graph.showDetailsView": "selection", // 只在选中提交时更新详情
-  "gitlens.graph.minimap.enabled": false, // 关闭小地图
-  // -------------------- 翻译插件配置 --------------------
-  "commentTranslate.multiLineMerge": false, // 不合并多行翻译
-  "commentTranslate.targetLanguage": "zh-CN", // 目标翻译语言
-  "commentTranslate.hover.enabled": false, // 禁用悬停翻译
+  // -------------------- Docker --------------------
+  "docker.extension.enableComposeLanguageServer": false, // 关闭 Docker DX 的 Compose 编辑支持
+  "docker.extension.dockerEngineAvailabilityPrompt": false, // Docker Engine 不可用时不弹出提醒
   // -------------------- Indent Rainbow 配置 --------------------
   "indentRainbow.includedLanguages": [], // 为空表示所有语言
   "indentRainbow.excludedLanguages": [
@@ -362,6 +345,9 @@
   "statsBar.memoUsage.format": "$$(database) ${used}/${total} ${unit}, ${percent}%",
   "statsBar.cpuLoad.format": "$(chip) ${percent}%",
   // -------------------- 通用数据文件配置 --------------------
+  "[markdown]": {
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint" // 使用 markdownlint 格式化 Markdown
+  },
   "[json]": {
     "editor.tabSize": 2,
     "editor.formatOnSave": true,
@@ -389,8 +375,5 @@
   },
   "yaml.customTags": [
     "!reference sequence"
-  ],
-  // -------------------- 其他扩展 --------------------
-  "chatgpt.commentCodeLensEnabled": false, // 禁用注释区域 CodeLens
-  "chatgpt.openOnStartup": true // 启动时自动打开 ChatGPT 扩展
+  ]
 }
