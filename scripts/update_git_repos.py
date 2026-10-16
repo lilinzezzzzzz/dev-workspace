@@ -15,7 +15,6 @@ from enum import Enum
 from pathlib import Path
 from typing import TextIO
 
-
 WORKSPACE_ROOT_FILE = Path(__file__).resolve().parent / ".workspace-root"
 DEFAULT_TIMEOUT_SECONDS = 10.0
 COLOR_AUTO = "auto"

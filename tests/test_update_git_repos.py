@@ -6,11 +6,9 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from contextlib import redirect_stderr
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import Mock, patch
-
 
 SCRIPT_PATH = Path(__file__).parents[1] / "scripts" / "update_git_repos.py"
 SPEC = importlib.util.spec_from_file_location("update_git_repos", SCRIPT_PATH)
@@ -39,9 +37,9 @@ class UpdateRepositoryTest(unittest.TestCase):
         with (
             patch.object(update_git_repos.subprocess, "Popen", return_value=process),
             patch.object(update_git_repos.os, "killpg") as killpg,
+            self.assertRaises(update_git_repos.CommandTimedOutError),
         ):
-            with self.assertRaises(update_git_repos.CommandTimedOutError):
-                update_git_repos.run_git(Path("/repo"), "pull", timeout=0.01)
+            update_git_repos.run_git(Path("/repo"), "pull", timeout=0.01)
 
         killpg.assert_called_once_with(1234, update_git_repos.signal.SIGKILL)
         self.assertEqual(process.communicate.call_count, 2)
@@ -300,12 +298,10 @@ class WorkspaceRootConfigTest(unittest.TestCase):
                     "which",
                     return_value="/usr/bin/git",
                 ),
+                redirect_stdout(io.StringIO()),
+                redirect_stderr(io.StringIO()),
             ):
-                with (
-                    redirect_stdout(io.StringIO()),
-                    redirect_stderr(io.StringIO()),
-                ):
-                    exit_code = update_git_repos.main([])
+                exit_code = update_git_repos.main([])
 
         self.assertEqual(exit_code, 0)
 
