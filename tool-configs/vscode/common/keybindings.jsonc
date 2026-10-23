@@ -2,62 +2,92 @@
   // ==================== 重要说明 ====================
   // ⚠️ keybindings.json 只能放在用户级别目录才生效，不支持工作区级别！
   //
-  // Qoder 用户目录:
-  //   macOS:   ~/Library/Application Support/Qoder/User/keybindings.json
-  //   Windows: %APPDATA%\Qoder\User\keybindings.json
-  //   Linux:   ~/.config/Qoder/User/keybindings.json
-  //
-  // VS Code 用户目录:
+  // VS Code 默认 Profile 用户目录:
   //   macOS:   ~/Library/Application Support/Code/User/keybindings.json
   //   Windows: %APPDATA%\Code\User\keybindings.json
   //   Linux:   ~/.config/Code/User/keybindings.json
   //
   // 应用配置:
-  // cp keybindings.jsonc <目标用户目录>/keybindings.json
+  // 在 VS Code 中运行 Preferences: Open Keyboard Shortcuts (JSON)，
+  // 将本文件规则对比合并到当前 Profile 的 keybindings.json，保留其他自定义快捷键。
+  // macOS 修饰键按 Control → Option → Command 排列，JSONC 中对应 ctrl → alt → cmd。
+  // 注意：macOS 的 alt 就是键盘上的 Option（⌥）键；VS Code 配置使用 alt，不使用 opt。
+  // 例如 alt+cmd+l 表示同时按 Option（⌥）+ Command（⌘）+ L。
   // ==================================================
-
   // ==================== 导航快捷键 ====================
-  // 后退: Windows/Linux 使用 Ctrl+Alt+Left, macOS 使用 Cmd+Opt+Left
+  // 后退: Windows/Linux 使用 Ctrl+Alt+Left, macOS 使用 Option+Cmd+Left
   {
     "key": "ctrl+alt+left",
     "command": "workbench.action.navigateBack",
     "when": "!isMac"
   },
   {
-    "key": "cmd+alt+left",
+    // macOS: opt+cmd+left
+    "key": "alt+cmd+left",
     "command": "workbench.action.navigateBack",
     "when": "isMac"
   },
-  // 前进: Windows/Linux 使用 Ctrl+Alt+Right, macOS 使用 Cmd+Opt+Right
+  // 前进: Windows/Linux 使用 Ctrl+Alt+Right, macOS 使用 Option+Cmd+Right
   {
     "key": "ctrl+alt+right",
     "command": "workbench.action.navigateForward",
     "when": "!isMac"
   },
   {
-    "key": "cmd+alt+right",
+    // macOS: opt+cmd+right
+    "key": "alt+cmd+right",
     "command": "workbench.action.navigateForward",
     "when": "isMac"
   },
-  // ==================== 格式化文档快捷键 ====================
-  // 格式化文档：Windows/Linux 使用 Ctrl+Alt+L, macOS 使用 Cmd+Opt+L (PyCharm 风格)
+  // ==================== 全部折叠 / 展开快捷键 ====================
+  // 显式保留 VS Code 默认按键，方便查阅；空格表示先后按下两组快捷键。
+  // 全部折叠：Windows/Linux 先 Ctrl+K 再 Ctrl+0；macOS 先 Cmd+K 再 Cmd+0（数字零）。
+  // 全部展开：Windows/Linux 先 Ctrl+K 再 Ctrl+J；macOS 先 Cmd+K 再 Cmd+J。
+  // 仅在编辑器文本获得焦点且启用折叠时生效，只读文档也可使用。
+  {
+    "key": "ctrl+k ctrl+0",
+    "command": "editor.foldAll",
+    "when": "!isMac && editorTextFocus && foldingEnabled"
+  },
+  {
+    "key": "cmd+k cmd+0",
+    "command": "editor.foldAll",
+    "when": "isMac && editorTextFocus && foldingEnabled"
+  },
+  {
+    "key": "ctrl+k ctrl+j",
+    "command": "editor.unfoldAll",
+    "when": "!isMac && editorTextFocus && foldingEnabled"
+  },
+  {
+    "key": "cmd+k cmd+j",
+    "command": "editor.unfoldAll",
+    "when": "isMac && editorTextFocus && foldingEnabled"
+  },
+  // ==================== 格式化快捷键 ====================
+  // PyCharm 风格：Windows/Linux 使用 Ctrl+Alt+L, macOS 使用 Option+Cmd+L。
+  // 仅在可编辑文本获得焦点且有对应 formatter 时生效；无选区格式化全文，有选区格式化选区。
+  // formatter 不支持选区格式化时，不回退为格式化全文。保留 VS Code 默认快捷键。
   {
     "key": "ctrl+alt+l",
     "command": "editor.action.formatDocument",
-    "when": "!isMac"
+    "when": "!isMac && editorTextFocus && !editorReadonly && !editorHasSelection && editorHasDocumentFormattingProvider"
   },
   {
-    "key": "cmd+alt+l",
+    // macOS: opt+cmd+l
+    "key": "alt+cmd+l",
     "command": "editor.action.formatDocument",
-    "when": "isMac"
-  },
-  // 移除 VS Code 默认的 Shift+Alt+F 和 Cmd+Shift+F 快捷键（跨平台）
-  {
-    "key": "shift+alt+f",
-    "command": "-editor.action.formatDocument"
+    "when": "isMac && editorTextFocus && !editorReadonly && !editorHasSelection && editorHasDocumentFormattingProvider"
   },
   {
-    "key": "shift+cmd+f",
-    "command": "-editor.action.formatDocument"
+    "key": "ctrl+alt+l",
+    "command": "editor.action.formatSelection",
+    "when": "!isMac && editorTextFocus && !editorReadonly && editorHasSelection && editorHasDocumentSelectionFormattingProvider"
+  },
+  {
+    // macOS: opt+cmd+l
+    "key": "alt+cmd+l",
+    "command": "editor.action.formatSelection",
+    "when": "isMac && editorTextFocus && !editorReadonly && editorHasSelection && editorHasDocumentSelectionFormattingProvider"
   }
 ]

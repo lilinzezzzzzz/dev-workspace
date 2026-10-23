@@ -213,7 +213,28 @@ Python 项目的自动识别只检查目录和 TOML 元数据，不导入项目�
 | 项目调试：`python/launch.jsonc` | `.vscode/launch.json` |
 | 通用调试项 | 可手工合并到用户 `settings.json` 的 `launch` 对象；不直接复制用户级 `launch.json` |
 
-本仓库的快捷键包括前进、后退及文档格式化；macOS 使用 `Cmd+Option+L` 格式化，Windows/Linux 使用 `Ctrl+Alt+L`。应用前与已有用户快捷键对比合并。
+本仓库的快捷键面向 VS Code：导航和格式化使用 PyCharm 风格的按键，全部折叠 / 展开使用 VS Code 默认按键，并显式保留在 `common/keybindings.jsonc` 中方便查阅。
+
+macOS 修饰键按键盘布局顺序 `Control → Option → Command` 书写，JSONC 中对应 `ctrl → alt → cmd`。这只是书写顺序，不改变实际组合键；例如 `alt+cmd+l` 与 `cmd+alt+l` 等效。
+
+macOS 配置中的 `alt` 对应键盘上的 **Option（⌥）** 键。VS Code 使用 `alt` 作为配置名称，不使用 `opt`；例如 `alt+cmd+l` 就是同时按 `Option（⌥）+ Command（⌘）+ L`。
+每条 `alt+cmd+…` 绑定的 `key` 上方均附有 `opt+cmd+…` 注释，方便对照 Mac 键盘；`opt` 仅用于注释。
+
+| 操作 | macOS | Windows / Linux |
+| --- | --- | --- |
+| 后退 | `Option+Cmd+Left` | `Ctrl+Alt+Left` |
+| 前进 | `Option+Cmd+Right` | `Ctrl+Alt+Right` |
+| 格式化 | `Option+Cmd+L` | `Ctrl+Alt+L` |
+| 收起所有代码 | `Cmd+K` 后按 `Cmd+0` | `Ctrl+K` 后按 `Ctrl+0` |
+| 展开所有代码 | `Cmd+K` 后按 `Cmd+J` | `Ctrl+K` 后按 `Ctrl+J` |
+
+全部折叠 / 展开是连续两组按键，先按第一组，再按第二组；`0` 是数字零。JSONC 的 `key` 字符串用空格分隔两组按键。规则仅在代码编辑器文本获得焦点且启用折叠（`editorTextFocus && foldingEnabled`）时生效，只读文档也可使用，不占用加减号组合的默认缩放或导航快捷键。
+
+格式化仅在可编辑文本获得焦点且存在对应 formatter 时生效：无选区时格式化全文，有选区时格式化选区。若 formatter 不支持选区格式化，则该选区快捷键不生效，不回退为格式化全文。按键对齐不代表不同 formatter 的格式化结果完全一致。
+
+保留 VS Code 默认格式化快捷键；macOS 的 `Option+Cmd+Left/Right` 会改为导航历史的后退/前进，覆盖这两个按键原有的编辑器标签切换行为。
+
+应用时，在 VS Code 中运行 `Preferences: Open Keyboard Shortcuts (JSON)`，将 `common/keybindings.jsonc` 对比合并到当前 Profile 的用户快捷键文件，保留其他自定义快捷键。已有旧版规则时，替换原来的两条格式化绑定，并删除旧的 `shift+alt+f`、`shift+cmd+f` 对 `-editor.action.formatDocument` 的解绑规则。应用脚本不会自动同步快捷键。
 
 ## Python 行为与项目差异
 
