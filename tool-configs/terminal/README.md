@@ -75,6 +75,12 @@ terminal/
 - **插件**: 修改 `configs/zshrc` 中的 `plugins=(...)`
 - **编辑器**: `configs/zshrc` 默认使用 Neovim/Vim 作为编辑器
 - **PATH**: `configs/zshrc` 自动添加 Homebrew/Go/Cargo 等常用路径
+- **Rex 并行试用**: 可与 Ghostty 共用现有 Zsh、Oh My Zsh 插件和 Starship
+  配置。Rex 使用账户默认登录 Shell；在 Rex 终端中，`configs/zshrc` 会将
+  `REX_BIN_DIR` 放回 PATH 首位，并在每次提示符显示前恢复该顺序，使 `rex`
+  命令与启动该终端的服务器版本对应。
+  若本机 `.zshrc` 还有 mise 等 PATH 初始化，将此条件块放在这些初始化之后。
+  字体、配色和快捷键需在 Rex 中单独设置。本仓库安装脚本不安装 Rex。
 - **Python 本地开发环境变量**: `configs/zshrc` 默认设置
   `PYTHONDONTWRITEBYTECODE`、`PYTHONFAULTHANDLER`、
   `PIP_REQUIRE_VIRTUALENV`、`PIP_DISABLE_PIP_VERSION_CHECK` 和

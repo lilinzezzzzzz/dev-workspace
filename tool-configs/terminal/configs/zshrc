@@ -90,3 +90,15 @@ fi
 if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
 fi
+
+# Keep Rex's CLI matched to the server that opened this terminal.
+if [[ -n "$REX_BIN_DIR" && -d "$REX_BIN_DIR" ]]; then
+  _rex_restore_cli_path() {
+    if [[ -n "$REX_BIN_DIR" && -d "$REX_BIN_DIR" ]]; then
+      path=("$REX_BIN_DIR" $path)
+    fi
+  }
+  _rex_restore_cli_path
+  autoload -Uz add-zsh-hook
+  add-zsh-hook precmd _rex_restore_cli_path
+fi
