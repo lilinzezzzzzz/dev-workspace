@@ -294,6 +294,7 @@ journalctl -u dev-workspace-disk-usage.service
 ├── ssh-keys/
 │   └── README.md
 ├── tool-configs/
+│   ├── finder-menu/
 │   ├── terminal/
 │   └── vscode/
 ├── docs/
@@ -309,6 +310,7 @@ journalctl -u dev-workspace-disk-usage.service
 - `infras/milvus/` 目录会在首次启动相关容器后自动生成数据目录，但当前未纳入仓库
 - `infras/mq/docker-compose.yml` 提供 Kafka 相关独立编排
 - `tool-configs/vscode/README.md`、`tool-configs/terminal/README.md`、`ssh-keys/README.md` 分别说明对应配置的使用方式
+- macOS Finder 右键菜单工具的安装与使用见 [Finder Menu 说明](tool-configs/finder-menu/README.md)
 - AI assistant rules、skills 和 Codex/Qoder 同步入口已迁移到独立项目 `agent-workbench`
 
 ## 仓库维护脚本的开发环境

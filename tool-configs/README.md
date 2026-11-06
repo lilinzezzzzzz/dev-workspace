@@ -1,6 +1,6 @@
 # Tool Configs
 
-> 个人开发环境配置集合，用于在不同机器和项目之间复用编辑器和终端配置。
+> 个人开发环境配置集合，用于在不同机器和项目之间复用编辑器、终端配置和本机工具使用说明。
 
 本目录保存开发工具链相关配置，不承载具体业务代码。各子目录按工具或场景拆分，并在目录内维护更详细的使用说明。AI assistant 配置已迁移到独立项目 `agent-workbench`。
 
@@ -8,6 +8,7 @@
 
 ```text
 tool-configs/
+├── finder-menu/     # macOS Finder 右键菜单工具安装与使用
 ├── terminal/        # Ghostty、Zsh、Starship 等终端环境配置
 ├── vscode/          # VS Code 通用、Python、Go 工作区配置
 └── README.md
@@ -17,6 +18,7 @@ tool-configs/
 
 | 目录 | 用途 | 详细文档 |
 | ---- | ---- | -------- |
+| `finder-menu/` | 安装和使用 macOS Finder 右键菜单扩展 | [`finder-menu/README.md`](finder-menu/README.md) |
 | `terminal/` | 安装和同步终端、Shell、提示符配置 | [`terminal/README.md`](terminal/README.md) |
 | `vscode/` | 维护 VS Code 通用配置和语言专用配置 | [`vscode/README.md`](vscode/README.md) |
 
