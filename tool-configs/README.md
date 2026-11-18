@@ -9,6 +9,7 @@
 ```text
 tool-configs/
 ├── finder-menu/     # macOS Finder 右键菜单工具安装与使用
+├── gitignore/       # Python 项目 .gitignore 模板
 ├── terminal/        # Ghostty、Zsh、Starship 等终端环境配置
 ├── vscode/          # VS Code 通用、Python、Go 工作区配置
 └── README.md
@@ -19,6 +20,7 @@ tool-configs/
 | 目录 | 用途 | 详细文档 |
 | ---- | ---- | -------- |
 | `finder-menu/` | 安装和使用 macOS Finder 右键菜单扩展 | [`finder-menu/README.md`](finder-menu/README.md) |
+| `gitignore/` | 复用 Python 项目的 Git 忽略规则 | [`gitignore/README.md`](gitignore/README.md) |
 | `terminal/` | 安装和同步终端、Shell、提示符配置 | [`terminal/README.md`](terminal/README.md) |
 | `vscode/` | 维护 VS Code 通用配置和语言专用配置 | [`vscode/README.md`](vscode/README.md) |
 

@@ -295,6 +295,7 @@ journalctl -u dev-workspace-disk-usage.service
 │   └── README.md
 ├── tool-configs/
 │   ├── finder-menu/
+│   ├── gitignore/
 │   ├── terminal/
 │   └── vscode/
 ├── docs/
